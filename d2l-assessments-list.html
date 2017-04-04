@@ -1,0 +1,78 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="d2l-assessments-list-item.html">
+<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+
+
+<!--
+`d2l-assessments-list`
+-->
+
+<dom-module id="d2l-assessments-list">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+
+			.date-header {
+				background-color: var(--d2l-color-gypsum);
+			}
+		</style>
+		<template is="dom-repeat" items="[[_toArray(assessmentItemsGrouped)]]">
+			<template is="dom-repeat" items="[[item.value]]">
+				<d2l-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
+			</template>
+		</template>
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+
+			is: 'd2l-assessments-list',
+
+			properties: {
+				assessmentItems: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				},
+				assessmentItemsGrouped: Object
+			},
+
+			observers: [
+				'_onAssessmentItemsChanged(assessmentItems.*)'
+			],
+
+			_onAssessmentItemsChanged: function(newItems) {
+				var groupedItems = {};
+
+				if (!newItems.base.length) {
+					return;
+				}
+
+				for (var i = 0; i < newItems.base.length; i++) {
+					if (!groupedItems[newItems.base[i].dueDate]) {
+						groupedItems[newItems.base[i].dueDate] = [];
+					}
+
+					groupedItems[newItems.base[i].dueDate].push(newItems.base[i]);
+				}
+
+				this.set('assessmentItemsGrouped', groupedItems);
+			},
+
+			_toArray: function(obj) {
+				return Object.keys(obj).map(function(key) {
+					return {
+						name: key,
+						value: obj[key]
+					};
+				});
+			}
+
+		});
+	</script>
+</dom-module>

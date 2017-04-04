@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="localize-behavior.html">
+<link rel="import" href="d2l-assessments-list.html">
 
 <!--
 `d2l-upcoming-assessments`
@@ -14,8 +16,27 @@ Widget to display upcoming assessments
 			:host {
 				display: block;
 			}
+
+			h2 {
+				font-weight: normal;
+				margin-left: 15px;
+			}
+
+			[dir="rtl"] :host h2 {
+				margin-left: 0px;
+				margin-right: 15px;
+			}
 		</style>
-		<h2>Upcoming Assessments</h2>
+
+		<iron-ajax
+			auto
+			url="{{endpoint}}"
+			handle-as="json"
+			on-response="_onResponse">
+		</iron-ajax>
+
+		<h2>{{localize('upcomingAssessments')}}</h2>
+		<d2l-assessments-list assessment-items={{assessments}}></d2l-assessments-list>
 	</template>
 
 	<script>
@@ -23,9 +44,59 @@ Widget to display upcoming assessments
 
 		Polymer({
 			is: 'd2l-upcoming-assessments',
+
+			properties: {
+				endpoint: String,
+
+				assessments: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				}
+			},
+
 			behaviors: [
 				window.D2L.UpcomingAssessments.LocalizeBehavior
-			]
+			],
+
+			ready: function() {
+				this.$$('d2l-assessments-list').assessmentItems = [{
+					'title': 'Math Assignment',
+					'courseName': 'Math',
+					'itemType': 'Assignment',
+					'dueDate': '2017-04-05',
+					'isCompleted': true
+				}, {
+					'title': 'Math Quiz',
+					'courseName': 'Math',
+					'itemType': 'Quiz',
+					'dueDate': '2017-04-06'
+				}, {
+					'title': 'Science Quiz',
+					'courseName': 'Science',
+					'itemType': 'Quiz',
+					'dueDate': '2017-04-08',
+					'isCompleted': true
+				}, {
+					'title': 'History Assignment',
+					'courseName': 'History',
+					'itemType': 'Assignment',
+					'dueDate': '2017-04-08',
+					'isCompleted': true
+				}];
+			},
+
+			_onResponse: function(response) {
+
+				if (response.detail.status === 200) {
+
+					this.set('assessments', response.detail.xhr.response);
+					this.notifyPath('assessments.*');
+
+				}
+			}
 		});
+
 	</script>
 </dom-module>

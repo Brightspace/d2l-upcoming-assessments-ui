@@ -2,6 +2,8 @@
   "name": "d2l-upcoming-assessments",
   "description": "Widget to display upcoming assessments",
   "main": "d2l-upcoming-assessments.html",
+  "version": "0.0.1",
+  "private": true,
   "dependencies": {
     "polymer": "Polymer/polymer#^1.6.0",
     "app-localize-behavior": "PolymerElements/app-localize-behavior#~0.10.0"

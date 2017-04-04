@@ -57,6 +57,7 @@
 				}
 			},
 			_determineLanguage: function(locale, resources) {
+				this.useKeyIfMissing = true;
 				locale = locale.toLowerCase();
 
 				if (resources[locale]) {

@@ -1,0 +1,97 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../d2l-typography/d2l-typography-shared-styles.html">
+<link rel="import" href="../d2l-colors/d2l-colors.html">
+<link rel="import" href="../d2l-icons/tier1-icons.html">
+<link rel="import" href="localize-behavior.html">
+
+
+<!--
+`d2l-assessments-list-item`
+-->
+
+<dom-module id="d2l-assessments-list-item">
+	<template>
+		<style include="d2l-colors">
+			:host {
+				display: flex;
+				flex-direction: row;
+				width: calc(100% - 29px);
+				height: 70px;
+				margin-left: 15px;
+				margin-right: 14px;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				background-color: var(--d2l-color-white);
+			}
+
+			.assessment-title {
+				@apply --d2l-heading-3;
+				margin: 0;
+				font-size: 16px;
+				line-height: 0.75;
+				font-weight: normal;
+			}
+
+			.assessment-info {
+				@apply --d2l-body-standard-text;
+				font-size: 12px;
+			}
+
+			.info-container {
+				display: block;
+			}
+
+			iron-icon {
+				fill: var(--d2l-color-olivine);
+				width: 18px;
+				height: 18px;
+			}
+
+			.completion-icon-hidden {
+				display: none;
+			}
+
+			.due-date {
+				line-height: 1;
+			}
+
+		</style>
+			<div class="info-container">
+				<h3 class="assessment-title">{{assessmentItem.title}}</h3>
+				<div class="assessment-info">
+					<span class="course-name">{{assessmentItem.courseName}}</span> &bull; <span class="item-type">{{assessmentItem.itemType}}</span>
+				</div>
+				<div class="assessment-info due-date">{{localize('dueDate', 'dueDate', assessmentItem.dueDate)}}</div>
+			</div>
+			<iron-icon class="completion-icon-hidden" icon="d2l-tier1:check"></iron-icon>
+	</template>
+
+	<script>
+	'use strict';
+
+	Polymer({
+
+		is: 'd2l-assessments-list-item',
+
+		properties: {
+			assessmentItem: {
+				type: Object,
+				observer: '_assessmentItemChanged'
+			}
+		},
+
+		behaviors: [
+			window.D2L.UpcomingAssessments.LocalizeBehavior
+		],
+
+		_assessmentItemChanged: function(newAssessmentItem) {
+			if (newAssessmentItem.isCompleted) {
+				this.toggleClass('completion-icon-hidden', false, this.$$('iron-icon'));
+			}
+		}
+
+	});
+	</script>
+</dom-module>
