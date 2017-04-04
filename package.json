@@ -3,10 +3,12 @@
   "version": "0.0.1",
   "description": "A widget to display upcoming assessments for a given user",
   "main": "index.js",
+  "private": true,
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "postinstall": "bower install",
     "test": "npm run test:lint:js && wct",
     "test:lint:js": "./node_modules/.bin/eslint --ext .js,.html .",
     "test:no-lint": "wct -p"
