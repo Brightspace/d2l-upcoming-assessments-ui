@@ -12,6 +12,5 @@ addons:
 before_script:
   - npm run test:lint:js
   - npm run test:lint:wc
-  - polylint
 script:
   - xvfb-run wct
