@@ -1,6 +1,6 @@
 rules:
-    no-console:
-      - error
-      - allow:
-        - perf
-        - perfEnd
+  no-console:
+    - error
+    - allow:
+      - perf
+      - perfEnd
