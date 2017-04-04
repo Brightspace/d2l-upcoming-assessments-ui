@@ -10,3 +10,6 @@ rules:
   no-var: off
 globals:
   Polymer: true
+  WCT: true
+  a11ySuite: true
+  expect: true

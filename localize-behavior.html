@@ -1,0 +1,94 @@
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="lang/ar.html">
+<link rel="import" href="lang/en.html">
+<link rel="import" href="lang/es.html">
+<link rel="import" href="lang/fr.html">
+<link rel="import" href="lang/ja.html">
+<link rel="import" href="lang/ko.html">
+<link rel="import" href="lang/nl.html">
+<link rel="import" href="lang/pt.html">
+<link rel="import" href="lang/sv.html">
+<link rel="import" href="lang/tr.html">
+<link rel="import" href="lang/zh-tw.html">
+<link rel="import" href="lang/zh.html">
+
+<script>
+	'use strict';
+
+	(function() {
+		window.D2L = window.D2L || {};
+		window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
+
+		/*
+		* Behavior for elements that require localization, based on `app-localize-behavior`
+		* @polymerBehavior window.D2L.UpcomingAssessments.LocalizeBehavior
+		*/
+		window.D2L.UpcomingAssessments.LocalizeBehaviorImpl = {
+			properties: {
+				language: {
+					type: String,
+					computed: '_determineLanguage(locale, resources)'
+				},
+				locale: {
+					type: String,
+					value: function() {
+						return document.documentElement.lang
+							|| document.documentElement.getAttribute('data-lang-default')
+							|| 'en-us';
+					}
+				},
+				resources: {
+					value: function() {
+						return {
+							'en': this.en,
+							'ar': this.ar,
+							'es': this.es,
+							'fr': this.fr,
+							'ja': this.ja,
+							'ko': this.ko,
+							'nl': this.nl,
+							'pt': this.pt,
+							'sv': this.sv,
+							'tr': this.tr,
+							'zh': this.zh,
+							'zh-tw': this.zhTw
+						};
+					}
+				}
+			},
+			_determineLanguage: function(locale, resources) {
+				locale = locale.toLowerCase();
+
+				if (resources[locale]) {
+					return locale;
+				}
+
+				var langAndRegion = locale.split('-');
+
+				if (resources[langAndRegion[0]]) {
+					return langAndRegion[0];
+				}
+
+				return 'en';
+			}
+		};
+
+		/* @polymerBehavior */
+		window.D2L.UpcomingAssessments.LocalizeBehavior = [
+			Polymer.AppLocalizeBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehaviorImpl,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangArBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangEnBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangEsBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangFrBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangJaBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangKoBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangNlBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangPtBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangSvBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangTrBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangZhTwBehavior,
+			window.D2L.UpcomingAssessments.LocalizeBehavior.LangZhBehavior
+		];
+	})();
+</script>

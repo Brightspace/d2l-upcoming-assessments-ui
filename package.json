@@ -9,8 +9,9 @@
   },
   "scripts": {
     "postinstall": "bower install",
-    "test": "npm run test:lint:js && wct",
+    "test": "npm run test:lint:js && npm run test:lint:wc && wct",
     "test:lint:js": "./node_modules/.bin/eslint --ext .js,.html .",
+    "test:lint:wc": "polylint --no-recursion",
     "test:no-lint": "wct -p"
   },
   "repository": {
@@ -32,6 +33,7 @@
     "eslint-config-brightspace": "^0.2.1",
     "eslint-config-google": "^0.7.0",
     "eslint-plugin-html": "^1.7.0",
+    "polylint": "^2.10.4",
     "web-component-tester": "^4.2.2"
   }
 }
