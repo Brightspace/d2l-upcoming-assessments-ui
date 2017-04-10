@@ -1,0 +1,91 @@
+<link rel="import" href="../polymer/polymer.html">
+
+
+<!--
+`d2l-assessments-calendar`
+-->
+
+<dom-module id="d2l-assessments-calendar">
+	<template>
+	<style>
+		:host {
+			display: block;
+		}
+
+		.calendar-row {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			flex-grow: 1;
+			flex-shrink: 1;
+		}
+
+		.calendar-day {
+			width: 30px;
+			height: 30px;
+			margin: auto;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-weight: 700;
+		}
+
+		.calendar-day-header {
+			font-weight: 300;
+		}
+
+		.current-day {
+			background-color:rgba(0, 0, 255, 0.1);
+			border-radius: 100%;
+		}
+
+	</style>
+	<div class="calendar-row">
+		<template is="dom-repeat" items="[[calendarHeaders]]">
+			<span class="calendar-day calendar-day-header">{{item.value}}</span>
+		</template>
+	</div>
+	<div class="calendar-row">
+		<template is="dom-repeat" items="[[days]]">
+			<span class$="{{isCurrentDay(item.value)}}">{{item.value}}</span>
+		</template>
+	</div>
+	</template>
+
+	<script>
+	'use strict';
+
+	Polymer({
+
+		is: 'd2l-assessments-calendar',
+
+		properties: {
+
+			calendarHeaders: {
+				type: Array,
+				value: [
+					{value: 'S'}, {value: 'M'}, {value: 'T'}, {value: 'W'}, {value: 'T'}, {value: 'F'}, {value: 'S'}
+				]
+			},
+
+			days: {
+				type: Array,
+				value: [
+					{value: 1}, {value: 2}, {value: 3}, {value: 4}, {value: 5}, {value: 6}, {value: 7}
+				]
+			}
+		},
+
+		isCurrentDay: function(day) {
+			var classString = 'calendar-day';
+
+			if (new Date().getDate() === day) {
+				classString += ' current-day';
+			}
+
+			return classString;
+		}
+
+	});
+	</script>
+</dom-module>
