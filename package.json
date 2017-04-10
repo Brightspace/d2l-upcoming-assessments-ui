@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "A widget to display upcoming assessments for a given user",
   "main": "index.js",
-  "private": true,
   "directories": {
     "test": "test"
   },
