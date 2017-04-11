@@ -57,10 +57,6 @@
 				height: 18px;
 			}
 
-			.d2l-assessments-hidden {
-				display: none;
-			}
-
 			.due-date {
 				line-height: 1;
 			}
@@ -75,7 +71,9 @@
 				</div>
 				<div class="assessment-info due-date">{{localize('dueDate', 'dueDate', assessmentItem.dueDate)}}</div>
 			</div>
-			<iron-icon class="completion-icon d2l-assessments-hidden" icon="d2l-tier1:check"></iron-icon>
+			<template is="dom-if" if="{{_isCompleted(assessmentItem)}}">
+				<iron-icon class="completion-icon" icon="d2l-tier1:check"></iron-icon>
+			</template>
 	</template>
 
 	<script>
@@ -86,20 +84,15 @@
 		is: 'd2l-assessments-list-item',
 
 		properties: {
-			assessmentItem: {
-				type: Object,
-				observer: '_assessmentItemChanged'
-			}
+			assessmentItem: Object
 		},
 
 		behaviors: [
 			window.D2L.UpcomingAssessments.LocalizeBehavior
 		],
 
-		_assessmentItemChanged: function(newAssessmentItem) {
-			if (newAssessmentItem.isCompleted) {
-				this.toggleClass('d2l-assessments-hidden', false, this.$$('iron-icon'));
-			}
+		_isCompleted: function(item) {
+			return item.isCompleted;
 		}
 
 	});

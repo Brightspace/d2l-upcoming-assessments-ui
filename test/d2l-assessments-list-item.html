@@ -28,8 +28,17 @@
 					'title': 'Math Quiz',
 					'courseName': 'Math',
 					'itemType': 'Quiz',
-					'dueDate': '2017-04-06'
+					'dueDate': '2017-04-06',
 				};
+
+				var completedAssessmentItem = {
+					'title': 'Math Quiz',
+					'courseName': 'Math',
+					'itemType': 'Quiz',
+					'dueDate': '2017-04-06',
+					'isCompleted': true
+				};
+
 
 				describe('smoke test', function() {
 
@@ -51,6 +60,24 @@
 						expect(element.$$('.course-name').textContent).to.equal(assessmentItem.courseName);
 						expect(element.$$('.item-type').textContent).to.equal(assessmentItem.itemType);
 						expect(element.$$('.due-date').textContent).to.contain(assessmentItem.dueDate);
+					});
+
+					it('has a completion checkmark when completed', function() {
+						var element = fixture('basic');
+
+						element.set('assessmentItem', completedAssessmentItem);
+						element.$$('template').render();
+
+						expect(element.$$('.completion-icon')).to.exist;
+					});
+
+					it('doesn\'t have a completion checkmark when not completed', function() {
+						var element = fixture('basic');
+
+						element.set('assessmentItem', assessmentItem);
+						element.$$('template').render();
+
+						expect(element.$$('.completion-icon')).to.not.exist;
 					});
 
 				});
