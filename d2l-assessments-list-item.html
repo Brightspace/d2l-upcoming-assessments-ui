@@ -20,7 +20,6 @@
 				height: 70px;
 				margin-left: 15px;
 				margin-right: 14px;
-				flex-direction: row;
 				justify-content: space-between;
 				align-items: center;
 				background-color: var(--d2l-color-white);
@@ -37,19 +36,28 @@
 			.assessment-info {
 				@apply --d2l-body-standard-text;
 				font-size: 12px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
 			}
 
 			.info-container {
 				display: block;
 			}
 
-			iron-icon {
+			iron-icon.completion-icon {
 				fill: var(--d2l-color-olivine);
 				width: 18px;
 				height: 18px;
 			}
 
-			.completion-icon-hidden {
+			iron-icon.separator-icon {
+				opacity: 0.5;
+				width: 18px;
+				height: 18px;
+			}
+
+			.d2l-assessments-hidden {
 				display: none;
 			}
 
@@ -61,11 +69,13 @@
 			<div class="info-container">
 				<h3 class="assessment-title">{{assessmentItem.title}}</h3>
 				<div class="assessment-info">
-					<span class="course-name">{{assessmentItem.courseName}}</span> &bull; <span class="item-type">{{assessmentItem.itemType}}</span>
+					<div class="course-name">{{assessmentItem.courseName}}</div>
+					<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+					<div class="item-type">{{assessmentItem.itemType}}</div>
 				</div>
 				<div class="assessment-info due-date">{{localize('dueDate', 'dueDate', assessmentItem.dueDate)}}</div>
 			</div>
-			<iron-icon class="completion-icon-hidden" icon="d2l-tier1:check"></iron-icon>
+			<iron-icon class="completion-icon d2l-assessments-hidden" icon="d2l-tier1:check"></iron-icon>
 	</template>
 
 	<script>
@@ -88,7 +98,7 @@
 
 		_assessmentItemChanged: function(newAssessmentItem) {
 			if (newAssessmentItem.isCompleted) {
-				this.toggleClass('completion-icon-hidden', false, this.$$('iron-icon'));
+				this.toggleClass('d2l-assessments-hidden', false, this.$$('iron-icon'));
 			}
 		}
 
