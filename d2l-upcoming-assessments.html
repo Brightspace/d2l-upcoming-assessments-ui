@@ -3,13 +3,6 @@
 <link rel="import" href="localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
 
-<!--
-`d2l-upcoming-assessments`
-Widget to display upcoming assessments
-
-@demo demo/index.html
--->
-
 <dom-module id="d2l-upcoming-assessments">
 	<template>
 		<style>
@@ -37,6 +30,10 @@ Widget to display upcoming assessments
 
 		<h2>{{localize('upcomingAssessments')}}</h2>
 		<d2l-assessments-list assessment-items={{assessments}}></d2l-assessments-list>
+
+		<template is="dom-if" if="[[_showRequestFailedError]]">
+			<div class="error-message">{{localize('requestFailedErr')}}</div>
+		</template>
 	</template>
 
 	<script>
@@ -53,6 +50,11 @@ Widget to display upcoming assessments
 					value: function() {
 						return [];
 					}
+				},
+
+				_showRequestFailedError: {
+					type: Boolean,
+					value: false
 				}
 			},
 
@@ -90,10 +92,10 @@ Widget to display upcoming assessments
 			_onResponse: function(response) {
 
 				if (response.detail.status === 200) {
-
 					this.set('assessments', response.detail.xhr.response);
 					this.notifyPath('assessments.*');
-
+				} else {
+					this.set('_showRequestFailedError', true);
 				}
 			}
 		});
