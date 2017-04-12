@@ -92,7 +92,8 @@
 			},
 
 			_onResponse: function(response) {
-				if (response.detail.status === 200) {
+				if (response.detail.status === 200 || response.detail.status === 304) {
+					this.set('_showRequestFailedError', false);
 					this.set('assessments', response.detail.xhr.response);
 					this.notifyPath('assessments.*');
 				} else {
@@ -103,6 +104,7 @@
 			_onError: function() {
 				this.set('_showRequestFailedError', true);
 			}
+
 		});
 
 	</script>
