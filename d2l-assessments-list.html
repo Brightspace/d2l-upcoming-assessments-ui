@@ -43,7 +43,7 @@
 			_onAssessmentItemsChanged: function(newItems) {
 				var groupedItems = {};
 
-				if (!newItems.base.length) {
+				if (!newItems.base && !newItems.base.length) {
 					return;
 				}
 

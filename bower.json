@@ -4,12 +4,15 @@
   "main": "d2l-upcoming-assessments.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.6.0",
-    "app-localize-behavior": "PolymerElements/app-localize-behavior#~0.10.0"
+    "app-localize-behavior": "PolymerElements/app-localize-behavior#~0.10.0",
+    "d2l-ajax": "^3.3.0",
+    "d2l-colors": "^2.2.3",
+    "d2l-typography": "^5.3.0",
+    "d2l-icons": "^3.1.2"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "web-component-tester": "^4.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "d2l-demo-template": "~0.0.11"
   }
 }

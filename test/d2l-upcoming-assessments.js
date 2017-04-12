@@ -1,4 +1,4 @@
-/* global describe, it, fixture, expect, beforeEach */
+/* global describe, it, fixture, expect, beforeEach, afterEach, sinon */
 
 'use strict';
 
@@ -20,31 +20,47 @@ describe('<d2l-upcoming-assessments>', function() {
 
 	describe('fetching data', function() {
 
-		it('doesn\'t display an error message when request for data is successful', function() {
-			element._onResponse({
-				detail: {
-					status: 200,
-					xhr: {
-						response: []
-					}
-				}
-			});
+		var server;
 
-			element.$$('template').render();
-
-			expect(element.$$('.error-message')).to.not.exist;
+		beforeEach(function() {
+			server = sinon.fakeServer.create();
+			server.respondImmediately = true;
 		});
 
-		it('displays an error message when request for data fails', function() {
-			element._onResponse({
-				detail: {
-					status: 404
-				}
+		afterEach(function() {
+			server.restore();
+		});
+
+		it('doesn\'t display an error message when request for data is successful', function(done) {
+			server.respondWith(
+				'GET',
+				fixture('valid-endpoint').endpoint,
+				[200, {'content-type': 'application/json'}, '[]']
+			);
+
+			element = fixture('valid-endpoint');
+
+			setTimeout(function() {
+				expect(element.$$('.error-message')).to.not.exist;
+				done();
 			});
 
-			element.$$('template').render();
+		});
 
-			expect(element.$$('.error-message')).to.exist;
+		it('displays an error message when request for data fails', function(done) {
+			server.respondWith(
+				'GET',
+				fixture('valid-endpoint').endpoint,
+				[404, {}, '']
+			);
+
+			element = fixture('valid-endpoint');
+
+			setTimeout(function() {
+				expect(element.$$('.error-message')).to.exist;
+				done();
+			});
+
 		});
 
 	});
