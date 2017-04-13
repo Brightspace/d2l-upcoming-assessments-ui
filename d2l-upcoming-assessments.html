@@ -97,7 +97,7 @@
 					this.set('assessments', response.detail.xhr.response);
 					this.notifyPath('assessments.*');
 				} else {
-					this.set('_showRequestFailedError', true);
+					this._onError();
 				}
 			},
 
