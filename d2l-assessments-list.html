@@ -12,10 +12,8 @@
 				background-color: var(--d2l-color-gypsum);
 			}
 		</style>
-		<template is="dom-repeat" items="[[_toArray(assessmentItemsGrouped)]]">
-			<template is="dom-repeat" items="[[item.value]]">
-				<d2l-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
-			</template>
+		<template is="dom-repeat" items="[[assessmentItems]]">
+			<d2l-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
 		</template>
 	</template>
 
@@ -32,39 +30,7 @@
 					value: function() {
 						return [];
 					}
-				},
-				assessmentItemsGrouped: Object
-			},
-
-			observers: [
-				'_onAssessmentItemsChanged(assessmentItems.*)'
-			],
-
-			_onAssessmentItemsChanged: function(newItems) {
-				var groupedItems = {};
-
-				if (!newItems.base && !newItems.base.length) {
-					return;
 				}
-
-				for (var i = 0; i < newItems.base.length; i++) {
-					if (!groupedItems[newItems.base[i].dueDate]) {
-						groupedItems[newItems.base[i].dueDate] = [];
-					}
-
-					groupedItems[newItems.base[i].dueDate].push(newItems.base[i]);
-				}
-
-				this.set('assessmentItemsGrouped', groupedItems);
-			},
-
-			_toArray: function(obj) {
-				return Object.keys(obj).map(function(key) {
-					return {
-						name: key,
-						value: obj[key]
-					};
-				});
 			}
 
 		});
