@@ -11,12 +11,17 @@
 			.date-header {
 				background-color: var(--d2l-color-gypsum);
 			}
+
+			@media (max-width: 767px) {
+				d2l-assessments-list-item:nth-of-type(4) {
+					display: none;
+				}
+			}
 		</style>
 		<template is="dom-repeat" items="[[assessmentItems]]">
 			<d2l-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
 		</template>
 	</template>
-
 	<script>
 		'use strict';
 

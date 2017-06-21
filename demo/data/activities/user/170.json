@@ -1,0 +1,11 @@
+{
+    "entities": [ ],
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/data/activities/user/170.json"
+        }
+    ]
+}

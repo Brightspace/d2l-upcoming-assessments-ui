@@ -37,21 +37,6 @@
 			}
 		</style>
 
-		<iron-ajax
-			id="assessmentsRequest"
-			url="[[assessmentsUrl]]"
-			handle-as="json"
-			on-iron-ajax-response="_onAssessmentsResponse"
-			on-iron-ajax-error="_onError">
-		</iron-ajax>
-
-		<iron-ajax
-			id="userRequest"
-			url="[[userUrl]]"
-			handle-as="json"
-			on-iron-ajax-response="_onUserResponse"
-			on-iron-ajax-error="_onError">
-		</iron-ajax>
 
 		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
 			<div class="no-upcoming-assessments">[[_noUpcomingAssessmentsMessage]]</div>
@@ -82,6 +67,7 @@
 		</d2l-simple-overlay>
 	</template>
 
+	<script src="../../fetch/fetch.js"></script>
 	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
 	<script>
 		'use strict';
@@ -90,9 +76,9 @@
 			is: 'd2l-upcoming-assessments',
 
 			properties: {
-				assessmentsUrl: String,
 				userUrl: String,
 				token: String,
+				lmsUrl: String,
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -114,44 +100,108 @@
 			],
 
 			observers: [
-				'_onAssessmentsUrlChanged(assessmentsUrl, token)',
-				'_onUserUrlChanged(userUrl, token)'
+				'_onApiConfigChanged(userUrl, lmsUrl, token)'
 			],
 
-			_onAssessmentsResponse: function(response) {
-				if (response.detail.status === 200 || response.detail.status === 304) {
-					this._showError = false;
-					this.set('_assessments', response.detail.xhr.response);
-				} else {
-					this._onError();
+			_getInfo: function() {
+				var self = this;
+
+				if (window.d2lfetch) {
+					return window.d2lfetch.fetch(new Request(self.userUrl, {
+						headers: { Authorization: 'Bearer ' + self.token }
+					}))
+					.then(self._getJson)
+					.then(function(response) {
+
+						var userEntity = self._parseEntity(response);
+
+						self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
+						self._showError = false;
+						self._noUpcomingAssessmentsMessage = self.localize('noUpcomingAssessments', 'userName', self._userName);
+						self._noAssessmentsInThisTimeFrame = self.localize('noAssessmentsInThisTimeFrame', 'userName', this._userName);
+
+
+						var myActivitiesLink = (userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities') || {}).href;
+
+						if (myActivitiesLink) {
+							return self._fetchEntity(myActivitiesLink);
+						}
+					})
+					.then(function(activities) {
+						var requests = [];
+
+						var orgPromiseMap = new Map();
+
+						activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
+							if (assignment.getSubEntityByClass('due-date')) {
+
+								var assignmentLink = assignment.getLinkByRel('https://api.brightspace.com/rels/assignment').href;
+								var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
+
+								if (!orgUnitLink) {
+									// bleh
+									var activityUsageLink = assignment.getLinkByRel('https://api.brightspace.com/rels/activity-usage').href;
+									orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
+								}
+
+								var orgUnitRequest = orgPromiseMap.get(orgUnitLink);
+
+								if (!orgUnitRequest) {
+									orgUnitRequest = self._fetchEntity(orgUnitLink);
+									orgPromiseMap.set(orgUnitLink, orgUnitRequest);
+								}
+
+								var assignmentRequest = self._fetchEntity(assignmentLink);
+
+								var request = new Promise(function(resolve) {
+									Promise.all([assignmentRequest, orgUnitRequest])
+										.then(function(response) {
+											var activity = response[0];
+											var organization = response[1];
+
+											resolve({
+												name: activity.properties.name,
+												dueDate: activity.properties.dueDate,
+												courseName: organization.properties.name
+											});
+										});
+								});
+
+								requests.push(request);
+							}
+						});
+
+						return Promise.all(requests);
+					})
+					.then(function(activities) {
+						activities.sort(function(a, b) {
+							return a.dueDate > b.dueDate;
+						});
+
+						var currDate = new Date().getTime();
+						var basicListActivities = activities
+								.slice(0, 4)
+								.filter(function(activity) {
+									var activityDate = new Date(activity.dueDate);
+									var diffInMs = activityDate - currDate;
+
+									return (diffInMs > 0) && (Math.ceil(diffInMs / 86400000) <= 14);
+								});
+
+						self.set('_assessments', basicListActivities);
+					})
+					.catch(function() {
+						self._onError();
+					});
 				}
 			},
 
-			_onUserResponse: function(response) {
-				if (response.detail.status === 200 || response.detail.status === 304) {
-					var userEntity = window.D2L.Hypermedia.Siren.Parse(response.detail.xhr.response);
-
-					this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
-					this._showError = false;
-					this._noUpcomingAssessmentsMessage = this.localize('noUpcomingAssessments', 'userName', this._userName);
-					this._noAssessmentsInThisTimeFrame = this.localize('noAssessmentsInThisTimeFrame', 'userName', this._userName);
-				} else {
-					this._onError();
-				}
+			_onError: function() {
+				this._showError = true;
 			},
 
-			_getAssessmentsInfo: function() {
-				this.$.assessmentsRequest.headers = {
-					Authorization: 'Bearer ' + this.token
-				};
-				this.$.assessmentsRequest.generateRequest();
-			},
-
-			_getUserInfo: function() {
-				this.$.userRequest.headers = {
-					Authorization: 'Bearer ' + this.token
-				};
-				this.$.userRequest.generateRequest();
+			_onApiConfigChanged: function() {
+				this.debounce('getInfo', this._getInfo, this._debounceTime);
 			},
 
 			_onError: function() {
@@ -180,7 +230,53 @@
 				this.$['view-all-assignments-overlay'].open();
 			},
 
-			_debounceTime: 250
+			_getJson: function(response) {
+				if (response.ok) {
+					return response.json();
+				}
+				return Promise.reject(response.status + ' ' + response.statusText);
+			},
+
+			_debounceTime: 250,
+
+			_fetchEntity: function(url) {
+				var request = new Request(url, {
+					headers: new Headers({
+						Accept: 'application/vnd.siren+json',
+						Authorization: 'Bearer ' + this.token
+					})
+				});
+
+				return window.d2lfetch
+					.fetch(request)
+					.then(function(response) {
+						if (response.ok) {
+							return response.json();
+						}
+						return Promise.reject(response.status);
+					})
+					.then(function(response) {
+						return window.D2L.Hypermedia.Siren.Parse(response);
+					});
+			},
+
+			_parseEntity: function(entity) {
+				return window.D2L.Hypermedia.Siren.Parse(entity);
+			},
+
+			_getCDNScript: function(packageName, version, componentName) {
+				componentName = componentName || packageName;
+
+				return new Promise(function(resolve, reject) {
+					var script = document.createElement('script');
+					script.async = true;
+					script.src = 'https://s.brightspace.com/lib/' + packageName + '/' + version + '/' + componentName + '.js';
+					script.onload = function() { resolve();	};
+					script.onerror = function(reason) { reject(reason); };
+
+					document.head.appendChild(script);
+				});
+			}
 		});
 
 	</script>

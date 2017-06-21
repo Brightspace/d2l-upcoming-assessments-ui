@@ -5,6 +5,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+		<script>
+			'use strict';
+			window.d2lfetch = {
+				fetch: function(req) {
+					return window.fetch(req.url);
+				}
+			};
+		</script>
 
 		<link rel="import" href="../../d2l-demo-template/d2l-demo-template.html">
 		<link rel="import" href="../components/d2l-upcoming-assessments.html">
@@ -25,20 +33,22 @@
 			<div class="d2l-demo-fixture">
 				<h2>With Assessments</h2>
 				<d2l-upcoming-assessments
-					assessments-url="data/assessments.json"
-					user-url="data/user.json"
+					user-url="data/user.withactivities.json"
+					lms-url="http://localhost:8080/components/d2l-upcoming-assessments/demo/data"
 					token="foozleberries">
 				</d2l-upcoming-assessments>
 
 				<h2>Empty State</h2>
 				<d2l-upcoming-assessments
-					user-url="data/user.json"
+					user-url="data/user.noactivities.json"
+					lms-url="http://localhost:8080/components/d2l-upcoming-assessments/demo/data"
 					token="foozleberries">
 				</d2l-upcoming-assessments>
 
 				<h2>Error State</h2>
 				<d2l-upcoming-assessments
 					user-url="does-not-exist.json"
+					lms-url="http://localhost:8080/components/d2l-upcoming-assessments/demo/data"
 					token="foozleberries">
 				</d2l-upcoming-assessments>
 			</div>

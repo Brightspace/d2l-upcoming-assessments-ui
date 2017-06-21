@@ -12,9 +12,7 @@
 				display: flex;
 				flex-direction: row;
 				width: calc(100% - 29px);
-				height: 70px;
-				margin-left: 15px;
-				margin-right: 14px;
+				margin: 10px 0;
 				justify-content: space-between;
 				align-items: center;
 				background-color: var(--d2l-color-white);
@@ -47,24 +45,23 @@
 			}
 
 			iron-icon.separator-icon {
-				opacity: 0.5;
+				opacity: 0.8;
 				width: 18px;
 				height: 18px;
 			}
 
 			.due-date {
-				line-height: 1;
+				font-weight: bolder;
 			}
 
 		</style>
 			<div class="info-container">
-				<h3 class="assessment-title">{{assessmentItem.title}}</h3>
+				<h3 class="assessment-title">{{assessmentItem.name}}</h3>
 				<div class="assessment-info">
 					<div class="course-name">{{assessmentItem.courseName}}</div>
 					<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-					<div class="item-type">{{assessmentItem.itemType}}</div>
+					<div class="due-date">[[_getDateString(assessmentItem.dueDate)]]</div>
 				</div>
-				<div class="assessment-info due-date">{{localize('dueDate', 'dueDate', assessmentItem.dueDate)}}</div>
 			</div>
 			<template is="dom-if" if="{{_isCompleted(assessmentItem)}}">
 				<iron-icon class="completion-icon" icon="d2l-tier1:check"></iron-icon>
@@ -88,6 +85,26 @@
 
 		_isCompleted: function(item) {
 			return item.isCompleted;
+		},
+
+		_getDateString: function(dueDateUTC) {
+			var currentDate = new Date();
+			var tomorrow = new Date(new Date().setDate(currentDate.getDate() + 1));
+			var dueDate = new Date(dueDateUTC);
+			var dueDateString;
+
+			if (dueDate.getDate() === currentDate.getDate()) {
+				dueDateString = this.localize('today');
+			} else if (dueDate.getDate() === tomorrow.getDate()) {
+				dueDateString = this.localize('tomorrow');
+			} else {
+				dueDateString = dueDate.toLocaleDateString(this.locale, {
+					month: 'long',
+					day: 'numeric'
+				});
+			}
+
+			return this.localize('dueDate', 'dueDate', dueDateString);
 		}
 
 	});
