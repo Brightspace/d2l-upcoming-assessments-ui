@@ -1,5 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../d2l-ajax/d2l-ajax.html">
+<link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../src/localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
@@ -20,23 +21,42 @@
 				margin-left: 0px;
 				margin-right: 15px;
 			}
+
+			.error-message, .no-upcoming-assessments {
+				@apply --d2l-body-compact-text;
+			}
 		</style>
 
 		<d2l-ajax
-			auto
-			url="{{endpoint}}"
+			id="assessmentsRequest"
+			url="[[assessmentsUrl]]"
 			handle-as="json"
-			on-iron-ajax-response="_onResponse"
+			on-iron-ajax-response="_onAssessmentsResponse"
 			on-iron-ajax-error="_onError">
 		</d2l-ajax>
 
-		<d2l-assessments-list assessment-items={{assessments}}></d2l-assessments-list>
+		<d2l-ajax
+			id="userRequest"
+			url="[[userUrl]]"
+			handle-as="json"
+			on-iron-ajax-response="_onUserResponse"
+			on-iron-ajax-error="_onError">
+		</d2l-ajax>
 
-		<template is="dom-if" if="[[_showRequestFailedError]]">
-			<div class="error-message">{{localize('requestFailedErr')}}</div>
+		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
+			<div class="no-upcoming-assessments">[[_noUpcomingAssessmentsMessage]]</div>
+		</template>
+
+		<template is="dom-if" if="[[_hasUpcomingAssessments(_assessments)]]">
+			<d2l-assessments-list assessment-items=[[_assessments]]></d2l-assessments-list>
+		</template>
+
+		<template is="dom-if" if="[[_showError]]">
+			<div class="error-message">[[localize('errorMessage')]]</div>
 		</template>
 	</template>
 
+	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
 	<script>
 		'use strict';
 
@@ -44,64 +64,75 @@
 			is: 'd2l-upcoming-assessments',
 
 			properties: {
-				endpoint: String,
-
-				assessments: {
+				assessmentsUrl: String,
+				userUrl: String,
+				token: String,
+				_assessments: {
 					type: Array,
 					value: function() {
 						return [];
 					}
 				},
-
-				_showRequestFailedError: {
+				_userName: String,
+				_showError: {
 					type: Boolean,
 					value: false
-				}
+				},
+				_noUpcomingAssessmentsMessage: String
 			},
 
 			behaviors: [
-				window.D2L.UpcomingAssessments.LocalizeBehavior
+				window.D2L.UpcomingAssessments.LocalizeBehavior,
+				window.D2L.Hypermedia.HMConstantsBehavior
 			],
 
-			ready: function() {
-				this.$$('d2l-assessments-list').assessmentItems = [{
-					'title': 'Math Assignment',
-					'courseName': 'Math',
-					'itemType': 'Assignment',
-					'dueDate': '2017-04-05',
-					'isCompleted': true
-				}, {
-					'title': 'Math Quiz',
-					'courseName': 'Math',
-					'itemType': 'Quiz',
-					'dueDate': '2017-04-06'
-				}, {
-					'title': 'Science Quiz',
-					'courseName': 'Science',
-					'itemType': 'Quiz',
-					'dueDate': '2017-04-08',
-					'isCompleted': true
-				}, {
-					'title': 'History Assignment',
-					'courseName': 'History',
-					'itemType': 'Assignment',
-					'dueDate': '2017-04-08',
-					'isCompleted': true
-				}];
+			observers: [
+				'_onAssessmentsUrlChanged(assessmentsUrl, token)',
+				'_onUserUrlChanged(userUrl, token)'
+			],
+
+			_onAssessmentsResponse: function(response) {
+				if (response.detail.status === 200 || response.detail.status === 304) {
+					this._showError = false;
+					this.set('_assessments', response.detail.xhr.response);
+					this.notifyPath('_assessments.*');
+				} else {
+					this._onError();
+				}
 			},
 
-			_onResponse: function(response) {
+			_onUserResponse: function(response) {
 				if (response.detail.status === 200 || response.detail.status === 304) {
-					this.set('_showRequestFailedError', false);
-					this.set('assessments', response.detail.xhr.response);
-					this.notifyPath('assessments.*');
+					var userEntity = window.D2L.Hypermedia.Siren.Parse(response.detail.xhr.response);
+
+					this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
+					this._showError = false;
+					this._noUpcomingAssessmentsMessage = this.localize('noUpcomingAssessments', 'userName', this._userName);
 				} else {
 					this._onError();
 				}
 			},
 
 			_onError: function() {
-				this.set('_showRequestFailedError', true);
+				this._showError = true;
+			},
+
+			_onAssessmentsUrlChanged: function(assessmentsUrl, token) {
+				this.$.assessmentsRequest.headers = {
+					Authorization: 'Bearer ' + token
+				};
+				this.$.assessmentsRequest.generateRequest();
+			},
+
+			_onUserUrlChanged: function(userUrl, token) {
+				this.$.userRequest.headers = {
+					Authorization: 'Bearer ' + token
+				};
+				this.$.userRequest.generateRequest();
+			},
+
+			_hasUpcomingAssessments: function() {
+				return this._assessments && this._assessments.length;
 			}
 
 		});

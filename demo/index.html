@@ -8,6 +8,14 @@
 
 		<link rel="import" href="../../d2l-demo-template/d2l-demo-template.html">
 		<link rel="import" href="../components/d2l-upcoming-assessments.html">
+
+		<style>
+			d2l-upcoming-assessments {
+				max-width: 500px;
+				box-shadow: 1px 1px 10px gray;
+				padding: 10px;
+			}
+		</style>
 	</head>
 	<body>
 		<d2l-demo-template title="d2l-upcoming-assessments">
@@ -15,7 +23,24 @@
 				<!-- your actions -->
 			</div>
 			<div class="d2l-demo-fixture">
-				<d2l-upcoming-assessments></d2l-upcoming-assessments>
+				<h2>With Assessments</h2>
+				<d2l-upcoming-assessments
+					assessments-url="data/assessments.json"
+					user-url="data/user.json"
+					token="foozleberries">
+				</d2l-upcoming-assessments>
+
+				<h2>Empty State</h2>
+				<d2l-upcoming-assessments
+					user-url="data/user.json"
+					token="foozleberries">
+				</d2l-upcoming-assessments>
+
+				<h2>Error State</h2>
+				<d2l-upcoming-assessments
+					user-url="does-not-exist.json"
+					token="foozleberries">
+				</d2l-upcoming-assessments>
 			</div>
 		</d2l-demo-template>
 	</body>

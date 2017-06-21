@@ -7,8 +7,10 @@
     "app-localize-behavior": "PolymerElements/app-localize-behavior#~0.10.0",
     "d2l-ajax": "^3.3.0",
     "d2l-colors": "^2.2.3",
+    "d2l-hm-constants-behavior": "git://github.com/Brightspace/d2l-hm-constants-behavior.git#^1.0.8",
     "d2l-typography": "^5.3.0",
     "d2l-icons": "^3.1.2",
+    "fetch": "^2.0.3",
     "iron-icon": "^1.0.12"
   },
   "devDependencies": {
