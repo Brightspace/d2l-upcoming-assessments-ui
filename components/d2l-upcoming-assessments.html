@@ -1,5 +1,5 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../d2l-ajax/d2l-ajax.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../src/localize-behavior.html">
@@ -27,21 +27,21 @@
 			}
 		</style>
 
-		<d2l-ajax
+		<iron-ajax
 			id="assessmentsRequest"
 			url="[[assessmentsUrl]]"
 			handle-as="json"
-			on-iron-ajax-response="_onAssessmentsResponse"
-			on-iron-ajax-error="_onError">
-		</d2l-ajax>
+			on-response="_onAssessmentsResponse"
+			on-error="_onError">
+		</iron-ajax>
 
-		<d2l-ajax
+		<iron-ajax
 			id="userRequest"
 			url="[[userUrl]]"
 			handle-as="json"
-			on-iron-ajax-response="_onUserResponse"
-			on-iron-ajax-error="_onError">
-		</d2l-ajax>
+			on-response="_onUserResponse"
+			on-error="_onError">
+		</iron-ajax>
 
 		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
 			<div class="no-upcoming-assessments">[[_noUpcomingAssessmentsMessage]]</div>
