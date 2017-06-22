@@ -2,13 +2,6 @@ language: node_js
 node_js: 6
 dist: trusty
 sudo: required
-addons:
-  firefox: latest
-  apt:
-    packages:
-    - gdebi
-    - oracle-java8-installer
-    - oracle-java8-set-default
 before_script:
   - npm run test:lint:js
   - npm run test:lint:wc
@@ -19,4 +12,11 @@ env:
   global:
   - REPO_NAME=d2l-upcoming-assessments-ui
   # GITHUB_RELEASE_TOKEN
-  - secure: lgJCKd8BhzOp1vfE3yXkze37wrUly4MsyqUnl7Hba7DuSq75dc6b1A57L92fL62L/84nPPNkv1jJdyypJH929qJEU+aekGMMswRGdKV3AcX42f6/iC/9cHsVO9+grZ70HVlsoMHDJSVWFPJIZ00JIF2rI6Cgufn8bvD6iquaB5tlOZeV2ON2qtUYbHcMQIsdNVTigk3Ve8/SNm0yYbyBf+TOcBnYK0CQzH3dA3kmp/SF7xRnYC2dU/uYYF/L4dV5nIInCc9tOY+G+W5JXpdJUUxGsfWF5VfVbpwKpNgSPVQ/x30BtVvzR5Ew2wjJg5LUgQzcfe/4QqFL6M8ACL2PgGyfyrwX0jN1fh0vFLMGmre/fsCle2XgVnoJ0cKbhXeFH9izX6s1691oZ/4byAVnjX/DDlo+fqqoqTWBHg2duVqJyprFvP36YHHIDk6j6wo/L1dtTgywoswYWeXn3RnOpc21a6hT3vohTrajx44V1c5nAR7HMTC0c1UXkNw3abiGJ5u1f4UxpK1wWw9DbnxnjM/op3OUqgY0LlFKw9g+kNOn7rOjPby0/kUhGFMS8IDcDOiHOG1OgQwu61DCotckpRwBxoV1w+npPxQ7xlaKSelUAGRW6wXRjvaFJEjeUV9D30VAMR+0E/lGCWVydCMYNKyXhjOJp2Q/Cv4BxD4JLIk=
+  - secure: OPWl+i7cWiPrbkThv0YYTJDbh8Wgsi89eK4aL1GGNvngUg95hyTlJecfd3ftLY11AYwyUjcZgJslZB76vsj/o9FNYc4fL4+KzgaOOSZDjIbRV19QRcx23sh7SmCZlv8iJzh8hpftL86uONPvtaNUu3xhsqMWnhAIFcjSuSViIi9RczUK0r5fl25Blxe/ZKUNgoNkgO7ALwwoCqEJc4hSAJDAz4TJrScmVzLVtuFMUjuA2C7bmMS5dxU5ELrD4n2CdaOBDcKp8Brmw70/CyYDMtWhqBqs+8RMGgzeDwTIRBH9iSkbhhHzf9EKUjUhsSPjeghhEyBrDwKcDM7Qc2Zd9xHVqOXoK5N1/6y85JYxk4Qf7UZqwdzwKVsiRWLRhHgcY0bg0YzKjCoQzcyM+J/O6k4UpWxuq4NL/jEPEY75H2rDs2rDtSMlMCxuKF4KFWiievDY6lEOYbkjy93gxDW+EgwKAtGtNo97CXVTJdk0UAep5n6gXtT8lFX/NRdzF7R0obBomlXTnca842c4Kvaz1pv4GEdMCUZyjPUxc42OTLMmlD8hs4Z0IKrsZuNnFSKs5ZENkavnNki1w10AY2Lpr17aV6v7uGx39gFK2YWdnSe2m6a/AMYRcSy8InDxPEnI6qr8MEOojmkAhzuYmnlsJH9qY8N65FxHt6nZaAvb5P8=
+addons:
+  firefox: latest
+  apt:
+    packages:
+    - gdebi
+    - oracle-java8-installer
+    - oracle-java8-set-default
