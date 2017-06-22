@@ -17,6 +17,6 @@ script:
   - 'if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi'
 env:
   global:
+  - REPO_NAME=d2l-upcoming-assessments-ui
   # GITHUB_RELEASE_TOKEN
   - secure: lgJCKd8BhzOp1vfE3yXkze37wrUly4MsyqUnl7Hba7DuSq75dc6b1A57L92fL62L/84nPPNkv1jJdyypJH929qJEU+aekGMMswRGdKV3AcX42f6/iC/9cHsVO9+grZ70HVlsoMHDJSVWFPJIZ00JIF2rI6Cgufn8bvD6iquaB5tlOZeV2ON2qtUYbHcMQIsdNVTigk3Ve8/SNm0yYbyBf+TOcBnYK0CQzH3dA3kmp/SF7xRnYC2dU/uYYF/L4dV5nIInCc9tOY+G+W5JXpdJUUxGsfWF5VfVbpwKpNgSPVQ/x30BtVvzR5Ew2wjJg5LUgQzcfe/4QqFL6M8ACL2PgGyfyrwX0jN1fh0vFLMGmre/fsCle2XgVnoJ0cKbhXeFH9izX6s1691oZ/4byAVnjX/DDlo+fqqoqTWBHg2duVqJyprFvP36YHHIDk6j6wo/L1dtTgywoswYWeXn3RnOpc21a6hT3vohTrajx44V1c5nAR7HMTC0c1UXkNw3abiGJ5u1f4UxpK1wWw9DbnxnjM/op3OUqgY0LlFKw9g+kNOn7rOjPby0/kUhGFMS8IDcDOiHOG1OgQwu61DCotckpRwBxoV1w+npPxQ7xlaKSelUAGRW6wXRjvaFJEjeUV9D30VAMR+0E/lGCWVydCMYNKyXhjOJp2Q/Cv4BxD4JLIk=
-  - REPO_NAME=d2l-upcoming-assessments-ui
