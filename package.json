@@ -8,10 +8,10 @@
   },
   "scripts": {
     "postinstall": "bower install",
-    "test": "npm run test:lint:js && wct",
+    "test": "npm run test:lint:js && npm run test:wct",
     "test:lint:js": "./node_modules/.bin/eslint --ext .js,.html .",
     "test:lint:wc": "polylint --root components/ --no-recursion",
-    "test:no-lint": "wct -p"
+    "test:wct": "wct -p"
   },
   "repository": {
     "type": "git",
