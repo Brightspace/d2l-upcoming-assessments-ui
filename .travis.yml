@@ -3,16 +3,15 @@ node_js: 6
 dist: trusty
 sudo: required
 before_script:
-  - npm run test:lint:js
-  - npm run test:lint:wc
+- npm run test:lint:js
+- npm run test:lint:wc
 script:
-  - xvfb-run wct
-  - 'if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi'
+- xvfb-run wct
+- if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi
 env:
   global:
   - REPO_NAME=d2l-upcoming-assessments-ui
-  # GITHUB_RELEASE_TOKEN
-  - secure: OPWl+i7cWiPrbkThv0YYTJDbh8Wgsi89eK4aL1GGNvngUg95hyTlJecfd3ftLY11AYwyUjcZgJslZB76vsj/o9FNYc4fL4+KzgaOOSZDjIbRV19QRcx23sh7SmCZlv8iJzh8hpftL86uONPvtaNUu3xhsqMWnhAIFcjSuSViIi9RczUK0r5fl25Blxe/ZKUNgoNkgO7ALwwoCqEJc4hSAJDAz4TJrScmVzLVtuFMUjuA2C7bmMS5dxU5ELrD4n2CdaOBDcKp8Brmw70/CyYDMtWhqBqs+8RMGgzeDwTIRBH9iSkbhhHzf9EKUjUhsSPjeghhEyBrDwKcDM7Qc2Zd9xHVqOXoK5N1/6y85JYxk4Qf7UZqwdzwKVsiRWLRhHgcY0bg0YzKjCoQzcyM+J/O6k4UpWxuq4NL/jEPEY75H2rDs2rDtSMlMCxuKF4KFWiievDY6lEOYbkjy93gxDW+EgwKAtGtNo97CXVTJdk0UAep5n6gXtT8lFX/NRdzF7R0obBomlXTnca842c4Kvaz1pv4GEdMCUZyjPUxc42OTLMmlD8hs4Z0IKrsZuNnFSKs5ZENkavnNki1w10AY2Lpr17aV6v7uGx39gFK2YWdnSe2m6a/AMYRcSy8InDxPEnI6qr8MEOojmkAhzuYmnlsJH9qY8N65FxHt6nZaAvb5P8=
+  - secure: Hl4hi1duWW0V7MboF9iY5YrZrpPAjC0cKr5aylylwzm2x9ybOLK82CU/CH2rrYb/fhHvgSfz6bUfGaRRjzTys+m/Z/7l+sge1XOoYGWHLELfZaQvzrEOlp7QRlrsAa8Y1elGTKNRi0Vbw6PNfNMVClD7aWTf8nDZ2j2jM+E6gPzolDnkiOa8Ne+OZFXz+oNUklkzv3karWDixXHywl9nACcRkN3mo6oKb5D4Qr4eEKK+JZYnH46DZI22UqW6rzZSuzcQFlhZxbHVfvqbrQIcTnHHJSA0XUB9fhkRgJxnjn0xvzfhldB5BTU6yzh4WPIHfz8bDpC9QpCqtj8q1Q3ve+n/0nWIR/6+BbgIJTNZWIh8xXKPexlp5AKfTPOD6tWchTM3CPnzT77HtiY8jJBaIYMkEMr3/XS3hcrI4Tl95xD25w29cBZ8Gs08n0TrLKEFcdZUelRlk9JjXitGIMriwspLrVRuCZWZB+4lPuaGbj7t9U+UuVAGQQT00dBTqzd+SjH+4ICcPR48mI6cmDshSiir2tA0Dmdw6j2jgmE4dlqGlVAEpLiYxO8DeFTBp2EJP7PsLWTn+5cfqKv0pRsf3lU/kwdr2vdDYl4rl7kWmMM/gCmEkrnYgNs0TM+Sq8dLqLDQxNkPIe1IRWXWb2QNN635O5SaBgRun982EP2slfY=
 addons:
   firefox: latest
   apt:
