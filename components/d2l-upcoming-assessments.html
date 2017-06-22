@@ -32,7 +32,8 @@
 			url="[[assessmentsUrl]]"
 			handle-as="json"
 			on-response="_onAssessmentsResponse"
-			on-error="_onError">
+			on-error="_onError"
+			debounce-duration="300">
 		</iron-ajax>
 
 		<iron-ajax
@@ -40,7 +41,8 @@
 			url="[[userUrl]]"
 			handle-as="json"
 			on-response="_onUserResponse"
-			on-error="_onError">
+			on-error="_onError"
+			debounce-duration="300">
 		</iron-ajax>
 
 		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
