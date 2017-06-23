@@ -20,53 +20,53 @@ describe('<d2l-upcoming-assessments>', function() {
 
 	describe('fetching data', function() {
 
+		var element;
+		var sandbox;
 		var server;
-		var clock;
 
 		beforeEach(function() {
+			sandbox = sinon.sandbox.create();
 			server = sinon.fakeServer.create();
 			server.respondImmediately = true;
-			clock = sinon.useFakeTimers();
+
+			element = fixture('valid-endpoint');
 		});
 
 		afterEach(function() {
 			server.restore();
-			clock.restore();
+			sandbox.restore();
 		});
 
-		it('doesn\'t display an error message when request for data is successful', function() {
+		it('doesn\'t display an error message when request for data is successful', function(done) {
 			server.respondWith(
 				'GET',
 				fixture('valid-endpoint').endpoint,
 				[200, {'content-type': 'application/json'}, '[]']
 			);
 
-			element = fixture('valid-endpoint');
+			var spy = sinon.spy(element, '_onAssessmentsResponse');
 
-			clock.tick(500);
-
-			setTimeout(function(done) {
+			setTimeout(function() {
+				expect(spy.callCount).to.equal(1);
 				expect(element.$$('.error-message')).to.not.exist;
 				done();
-			});
+			}, 20);
 		});
 
-		it('displays an error message when request for data fails', function() {
+		it('displays an error message when request for data fails', function(done) {
 			server.respondWith(
 				'GET',
 				fixture('valid-endpoint').endpoint,
 				[404, {}, '']
 			);
 
-			element = fixture('valid-endpoint');
+			var spy = sinon.spy(element, '_onError');
 
-			clock.tick(500);
-
-			setTimeout(function(done) {
+			setTimeout(function() {
+				expect(spy.callCount).to.equal(1);
 				expect(element.$$('.error-message')).to.exist;
 				done();
-			});
-
+			}, 20);
 		});
 
 	});

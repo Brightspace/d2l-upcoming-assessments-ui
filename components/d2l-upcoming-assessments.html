@@ -31,16 +31,16 @@
 			id="assessmentsRequest"
 			url="[[assessmentsUrl]]"
 			handle-as="json"
-			on-response="_onAssessmentsResponse"
-			on-error="_onError">
+			on-iron-ajax-response="_onAssessmentsResponse"
+			on-iron-ajax-error="_onError">
 		</iron-ajax>
 
 		<iron-ajax
 			id="userRequest"
 			url="[[userUrl]]"
 			handle-as="json"
-			on-response="_onUserResponse"
-			on-error="_onError">
+			on-iron-ajax-response="_onUserResponse"
+			on-iron-ajax-error="_onError">
 		</iron-ajax>
 
 		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
@@ -67,6 +67,10 @@
 				assessmentsUrl: String,
 				userUrl: String,
 				token: String,
+				debounceTime: {
+					type: Number,
+					value: 250
+				},
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -95,7 +99,6 @@
 				if (response.detail.status === 200 || response.detail.status === 304) {
 					this._showError = false;
 					this.set('_assessments', response.detail.xhr.response);
-					this.notifyPath('_assessments.*');
 				} else {
 					this._onError();
 				}
@@ -132,17 +135,16 @@
 			},
 
 			_onAssessmentsUrlChanged: function() {
-				this.debounce('getAssessmentsInfo', this._getAssessmentsInfo, 250);
+				this.debounce('getAssessmentsInfo', this._getAssessmentsInfo, this.debounceTime);
 			},
 
 			_onUserUrlChanged: function() {
-				this.debounce('getUserInfo', this._getUserInfo, 250);
+				this.debounce('getUserInfo', this._getUserInfo, this.debounceTime);
 			},
 
 			_hasUpcomingAssessments: function() {
-				return this._assessments && this._assessments.length;
+				return this._assessments && this._assessments.length > 0;
 			}
-
 		});
 
 	</script>

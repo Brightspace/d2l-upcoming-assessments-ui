@@ -5,16 +5,15 @@
   "dependencies": {
     "app-localize-behavior": "PolymerElements/app-localize-behavior#^1.0.2",
     "d2l-colors": "^2.2.3",
-    "d2l-hm-constants-behavior": "git://github.com/Brightspace/d2l-hm-constants-behavior.git#^1.0.8",
+    "d2l-hm-constants-behavior": "Brightspace/d2l-hm-constants-behavior#^1.0.8",
     "d2l-icons": "^3.1.2",
     "d2l-typography": "^5.3.0",
     "fetch": "^2.0.3",
     "iron-ajax": "PolymerElements/iron-ajax#^1.4.4",
     "iron-icon": "^1.0.12",
-    "polymer": "Polymer/polymer#^1.6.0"
+    "polymer": "Polymer/polymer#^1.9.2"
   },
   "devDependencies": {
-    "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
     "d2l-demo-template": "~0.0.11"
   }
