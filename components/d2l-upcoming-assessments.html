@@ -67,10 +67,6 @@
 				assessmentsUrl: String,
 				userUrl: String,
 				token: String,
-				debounceTime: {
-					type: Number,
-					value: 250
-				},
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -135,16 +131,18 @@
 			},
 
 			_onAssessmentsUrlChanged: function() {
-				this.debounce('getAssessmentsInfo', this._getAssessmentsInfo, this.debounceTime);
+				this.debounce('getAssessmentsInfo', this._getAssessmentsInfo, this._debounceTime);
 			},
 
 			_onUserUrlChanged: function() {
-				this.debounce('getUserInfo', this._getUserInfo, this.debounceTime);
+				this.debounce('getUserInfo', this._getUserInfo, this._debounceTime);
 			},
 
 			_hasUpcomingAssessments: function() {
 				return this._assessments && this._assessments.length > 0;
-			}
+			},
+
+			_debounceTime: 250
 		});
 
 	</script>

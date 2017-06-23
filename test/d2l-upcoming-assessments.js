@@ -29,7 +29,8 @@ describe('<d2l-upcoming-assessments>', function() {
 			server = sinon.fakeServer.create();
 			server.respondImmediately = true;
 
-			element = fixture('valid-endpoint');
+			element = fixture('basic');
+			element._debounceTime = 10;
 		});
 
 		afterEach(function() {
@@ -38,13 +39,16 @@ describe('<d2l-upcoming-assessments>', function() {
 		});
 
 		it('doesn\'t display an error message when request for data is successful', function(done) {
+			var spy = sinon.spy(element, '_onAssessmentsResponse');
+
+			element.assessmentsUrl = '/some/path/';
+			element.token = 'foozleberries';
+
 			server.respondWith(
 				'GET',
-				fixture('valid-endpoint').endpoint,
+				fixture('basic').endpoint,
 				[200, {'content-type': 'application/json'}, '[]']
 			);
-
-			var spy = sinon.spy(element, '_onAssessmentsResponse');
 
 			setTimeout(function() {
 				expect(spy.callCount).to.equal(1);
@@ -54,13 +58,16 @@ describe('<d2l-upcoming-assessments>', function() {
 		});
 
 		it('displays an error message when request for data fails', function(done) {
+			var spy = sinon.spy(element, '_onError');
+
+			element.assessmentsUrl = '/some/path/';
+			element.token = 'foozleberries';
+
 			server.respondWith(
 				'GET',
-				fixture('valid-endpoint').endpoint,
+				fixture('basic').endpoint,
 				[404, {}, '']
 			);
-
-			var spy = sinon.spy(element, '_onError');
 
 			setTimeout(function() {
 				expect(spy.callCount).to.equal(1);
