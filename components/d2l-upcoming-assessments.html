@@ -1,6 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
+<link rel="import" href="../../d2l-link/d2l-link.html">
+<link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../src/localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
@@ -22,8 +24,16 @@
 				margin-right: 15px;
 			}
 
-			.error-message, .no-upcoming-assessments {
+			.error-message, .no-upcoming-assessments, .view-all-assignments-link > h3 {
 				@apply --d2l-body-compact-text;
+			}
+
+			.view-all-assignments-link > h3 {
+				margin-bottom: 0;
+			}
+
+			.no-assessments-in-time-frame {
+				text-align: center;
 			}
 		</style>
 
@@ -54,6 +64,22 @@
 		<template is="dom-if" if="[[_showError]]">
 			<div class="error-message">[[localize('errorMessage')]]</div>
 		</template>
+
+		<a class="view-all-assignments-link"
+			is="d2l-link"
+			on-tap="_openAllAssignmentsView"
+			on-keypress="_keypressOpenAllAssignmentsView" >
+			<h3>[[localize('viewAllAssignments')]]</h3>
+		</a>
+
+		<d2l-simple-overlay
+			id="view-all-assignments-overlay"
+			title-name="[[localize('viewAllAssignments')]]"
+			locale="[[locale]]"
+			close-simple-overlay-alt-text="[[localize('closeSimpleOverlayAltText')]]"
+			with-backdrop>
+			<div class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
+		</d2l-simple-overlay>
 	</template>
 
 	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
@@ -78,7 +104,8 @@
 					type: Boolean,
 					value: false
 				},
-				_noUpcomingAssessmentsMessage: String
+				_noUpcomingAssessmentsMessage: String,
+				_noAssessmentsInThisTimeFrame: String
 			},
 
 			behaviors: [
@@ -107,6 +134,7 @@
 					this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
 					this._showError = false;
 					this._noUpcomingAssessmentsMessage = this.localize('noUpcomingAssessments', 'userName', this._userName);
+					this._noAssessmentsInThisTimeFrame = this.localize('noAssessmentsInThisTimeFrame', 'userName', this._userName);
 				} else {
 					this._onError();
 				}
@@ -140,6 +168,16 @@
 
 			_hasUpcomingAssessments: function() {
 				return this._assessments && this._assessments.length > 0;
+			},
+
+			_keypressOpenAllAssignmentsView: function(e) {
+				if ( e.code === 'Space' || e.code === 'Enter' ) {
+					return this._openAllAssignmentsView(e);
+				}
+			},
+
+			_openAllAssignmentsView: function() {
+				this.$['view-all-assignments-overlay'].open();
 			},
 
 			_debounceTime: 250
