@@ -79,6 +79,13 @@
 			properties: {
 				userUrl: String,
 				token: String,
+				ready: {
+					type: Boolean,
+					notify: true,
+					readOnly: true,
+					reflectToAttribute: true,
+					value: false
+				},
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -135,6 +142,9 @@
 					})
 					.catch(function() {
 						self._showError = true;
+					})
+					.then(function() {
+						self._setReady(true);
 					});
 			},
 
