@@ -67,14 +67,12 @@
 		</d2l-simple-overlay>
 	</template>
 
-	<script src="../../fetch/fetch.js"></script>
 	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
 	<script>
 		'use strict';
 
 		Polymer({
 			is: 'd2l-upcoming-assessments',
-
 			properties: {
 				userUrl: String,
 				token: String,
@@ -93,27 +91,21 @@
 				_noUpcomingAssessmentsMessage: String,
 				_noAssessmentsInThisTimeFrame: String
 			},
-
 			behaviors: [
 				window.D2L.UpcomingAssessments.LocalizeBehavior,
 				window.D2L.Hypermedia.HMConstantsBehavior
 			],
-
 			observers: [
 				'_onApiConfigChanged(userUrl, lmsUrl, token)'
 			],
 
+			_debounceTime: 20,
+
 			_getInfo: function() {
 				var self = this;
 
-				return window.d2lfetch.fetch(new Request(self.userUrl, {
-					headers: { Authorization: 'Bearer ' + self.token }
-				}))
-				.then(self._getJson)
-				.then(function(response) {
-
-					var userEntity = self._parseEntity(response);
-
+				return this._fetchEntity(self.userUrl)
+				.then(function(userEntity) {
 					self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
 					self._showError = false;
 					self._noUpcomingAssessmentsMessage = self.localize('noUpcomingAssessments', 'userName', self._userName);
@@ -128,7 +120,6 @@
 				})
 				.then(function(activities) {
 					var requests = [];
-
 					var orgPromiseMap = new Map();
 
 					activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
@@ -179,13 +170,13 @@
 
 					var currDate = new Date().getTime();
 					var basicListActivities = activities
-							.slice(0, 4)
-							.filter(function(activity) {
-								var activityDate = new Date(activity.dueDate);
-								var diffInMs = activityDate - currDate;
+						.slice(0, 4)
+						.filter(function(activity) {
+							var activityDate = new Date(activity.dueDate);
+							var diffInMs = activityDate - currDate;
 
-								return (diffInMs > 0) && (Math.ceil(diffInMs / 86400000) <= 14);
-							});
+							return (diffInMs > 0) && (Math.ceil(diffInMs / 86400000) <= 14);
+						});
 
 					self.set('_assessments', basicListActivities);
 				})
@@ -222,8 +213,6 @@
 				}
 				return Promise.reject(response.status + ' ' + response.statusText);
 			},
-
-			_debounceTime: 20,
 
 			_fetchEntity: function(url) {
 				var request = new Request(url, {
