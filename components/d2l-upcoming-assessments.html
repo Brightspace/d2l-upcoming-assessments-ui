@@ -141,7 +141,7 @@
 				this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
 				this._showError = false;
 
-				var myActivitiesLink = (userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities') || {}).href;
+				var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
 
 				if (myActivitiesLink) {
 					return this._fetchEntity(myActivitiesLink);
@@ -156,12 +156,12 @@
 				activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
 					if (assignment.getSubEntityByClass('due-date')) {
 
-						var assignmentLink = assignment.getLinkByRel('https://api.brightspace.com/rels/assignment').href;
+						var assignmentLink = assignment.getLinkByRel(self.HypermediaRels.assignment).href;
 						var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
 
 						if (!orgUnitLink) {
 							// bleh
-							var activityUsageLink = assignment.getLinkByRel('https://api.brightspace.com/rels/activity-usage').href;
+							var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.activityUsage).href;
 							orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
 						}
 
