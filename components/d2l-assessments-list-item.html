@@ -68,6 +68,7 @@
 			</template>
 	</template>
 
+	<script src="../../moment/min/moment.min.js"></script>
 	<script>
 	'use strict';
 
@@ -88,20 +89,17 @@
 		},
 
 		_getDateString: function(dueDateUTC) {
-			var currentDate = new Date();
-			var tomorrow = new Date(new Date().setDate(currentDate.getDate() + 1));
-			var dueDate = new Date(dueDateUTC);
+			var currentDateTime = moment();
+			var activityDueDateTime = moment(dueDateUTC);
+			var calendarDateDiff = activityDueDateTime.startOf('day').diff(currentDateTime.startOf('day'), 'days');
 			var dueDateString;
 
-			if (dueDate.getDate() === currentDate.getDate()) {
+			if (calendarDateDiff === 0) {
 				dueDateString = this.localize('today');
-			} else if (dueDate.getDate() === tomorrow.getDate()) {
+			} else if (calendarDateDiff === 1) {
 				dueDateString = this.localize('tomorrow');
 			} else {
-				dueDateString = dueDate.toLocaleDateString(this.locale, {
-					month: 'long',
-					day: 'numeric'
-				});
+				dueDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(activityDueDateTime.toDate());
 			}
 
 			return this.localize('dueDate', 'dueDate', dueDateString);

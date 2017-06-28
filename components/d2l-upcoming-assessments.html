@@ -68,6 +68,7 @@
 	</template>
 
 	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
+	<script src="../../moment/min/moment.min.js"></script>
 	<script>
 		'use strict';
 
@@ -204,14 +205,17 @@
 						return a.dueDate > b.dueDate;
 					});
 
-				var currDate = new Date().getTime();
+				var currDateTime = moment();
 				var basicListActivities = activities
 					.slice(0, 4)
 					.filter(function(activity) {
-						var activityDate = new Date(activity.dueDate);
-						var diffInMs = activityDate - currDate;
+						var activityDueDate = moment(activity.dueDate);
 
-						return (diffInMs > 0) && (Math.ceil(diffInMs / 86400000) <= 14);
+						if (currDateTime.isBefore(activityDueDate)) {
+							var dateDiff = activityDueDate.diff(currDateTime.startOf('day'), 'days');
+
+							return dateDiff < 14;
+						}
 					});
 
 				this.set('_assessments', basicListActivities);
