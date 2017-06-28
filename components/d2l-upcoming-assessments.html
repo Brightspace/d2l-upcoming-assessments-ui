@@ -73,6 +73,7 @@
 
 		Polymer({
 			is: 'd2l-upcoming-assessments',
+
 			properties: {
 				userUrl: String,
 				token: String,
@@ -88,13 +89,18 @@
 					type: Boolean,
 					value: false
 				},
-				_noUpcomingAssessmentsMessage: String,
+				_noUpcomingAssessmentsMessage: {
+					type: String,
+					computed: 'localize("noUpcomingAssessments", "userName", _userName)'
+				},
 				_noAssessmentsInThisTimeFrame: String
 			},
+
 			behaviors: [
 				window.D2L.UpcomingAssessments.LocalizeBehavior,
 				window.D2L.Hypermedia.HMConstantsBehavior
 			],
+
 			observers: [
 				'_onApiConfigChanged(userUrl, lmsUrl, token)'
 			],
@@ -105,84 +111,18 @@
 				var self = this;
 
 				return this._fetchEntity(self.userUrl)
-				.then(function(userEntity) {
-					self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
-					self._showError = false;
-					self._noUpcomingAssessmentsMessage = self.localize('noUpcomingAssessments', 'userName', self._userName);
-						self._noAssessmentsInThisTimeFrame = self.localize('noAssessmentsInThisTimeFrame', 'userName', this._userName);
-
-
-					var myActivitiesLink = (userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities') || {}).href;
-
-					if (myActivitiesLink) {
-						return self._fetchEntity(myActivitiesLink);
-					}
-				})
-				.then(function(activities) {
-					var requests = [];
-					var orgPromiseMap = new Map();
-
-					activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
-						if (assignment.getSubEntityByClass('due-date')) {
-
-							var assignmentLink = assignment.getLinkByRel('https://api.brightspace.com/rels/assignment').href;
-							var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
-
-							if (!orgUnitLink) {
-								// bleh
-								var activityUsageLink = assignment.getLinkByRel('https://api.brightspace.com/rels/activity-usage').href;
-								orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
-							}
-
-							var orgUnitRequest = orgPromiseMap.get(orgUnitLink);
-
-							if (!orgUnitRequest) {
-								orgUnitRequest = self._fetchEntity(orgUnitLink);
-								orgPromiseMap.set(orgUnitLink, orgUnitRequest);
-							}
-
-							var assignmentRequest = self._fetchEntity(assignmentLink);
-
-							var request = new Promise(function(resolve) {
-								Promise.all([assignmentRequest, orgUnitRequest])
-									.then(function(response) {
-										var activity = response[0];
-										var organization = response[1];
-
-										resolve({
-											name: activity.properties.name,
-											dueDate: activity.properties.dueDate,
-											courseName: organization.properties.name
-										});
-									});
-							});
-
-							requests.push(request);
-						}
+					.then(function(userEntity) {
+						return self._getActivityUsages(userEntity);
+					})
+					.then(function(activities) {
+						return self._getActivityUsagesInfo(activities);
+					})
+					.then(function(activities) {
+						self._updateActivitiesInfo(activities);
+					})
+					.catch(function() {
+						self._onError();
 					});
-
-					return Promise.all(requests);
-				})
-				.then(function(activities) {
-					activities.sort(function(a, b) {
-						return a.dueDate > b.dueDate;
-					});
-
-					var currDate = new Date().getTime();
-					var basicListActivities = activities
-						.slice(0, 4)
-						.filter(function(activity) {
-							var activityDate = new Date(activity.dueDate);
-							var diffInMs = activityDate - currDate;
-
-							return (diffInMs > 0) && (Math.ceil(diffInMs / 86400000) <= 14);
-						});
-
-					self.set('_assessments', basicListActivities);
-				})
-				.catch(function() {
-					self._onError();
-				});
 			},
 
 			_onError: function() {
@@ -195,6 +135,86 @@
 
 			_hasUpcomingAssessments: function() {
 				return this._assessments && this._assessments.length > 0;
+			},
+
+			_getActivityUsages: function(userEntity) {
+				this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
+				this._showError = false;
+
+				var myActivitiesLink = (userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities') || {}).href;
+
+				if (myActivitiesLink) {
+					return this._fetchEntity(myActivitiesLink);
+				}
+			},
+
+			_getActivityUsagesInfo: function(activities) {
+				var requests = [];
+				var orgPromiseMap = new Map();
+				var self = this;
+
+				activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
+					if (assignment.getSubEntityByClass('due-date')) {
+
+						var assignmentLink = assignment.getLinkByRel('https://api.brightspace.com/rels/assignment').href;
+						var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
+
+						if (!orgUnitLink) {
+							// bleh
+							var activityUsageLink = assignment.getLinkByRel('https://api.brightspace.com/rels/activity-usage').href;
+							orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
+						}
+
+						var orgUnitRequest = orgPromiseMap.get(orgUnitLink);
+
+						if (!orgUnitRequest) {
+							orgUnitRequest = self._fetchEntity(orgUnitLink);
+							orgPromiseMap.set(orgUnitLink, orgUnitRequest);
+						}
+
+						var assignmentRequest = self._fetchEntity(assignmentLink);
+
+						var request = new Promise(function(resolve) {
+							Promise.all([assignmentRequest, orgUnitRequest])
+								.then(function(response) {
+									var activity = response[0];
+									var organization = response[1];
+
+									resolve({
+										name: activity.properties.name,
+										dueDate: activity.properties.dueDate,
+										courseName: organization.properties.name
+									});
+								});
+						});
+
+						requests.push(request);
+					}
+				});
+
+				return Promise.all(requests);
+			},
+
+			_updateActivitiesInfo: function(activities) {
+				activities = activities
+					.filter(function(activity){
+						return activity.dueDate != null;
+					})
+					.sort(function(a, b) {
+						return a.dueDate > b.dueDate;
+					});
+
+				var currDate = new Date().getTime();
+				var basicListActivities = activities
+					.slice(0, 4)
+					.filter(function(activity) {
+						var activityDate = new Date(activity.dueDate);
+						var diffInMs = activityDate - currDate;
+
+						return (diffInMs > 0) && (Math.ceil(diffInMs / 86400000) <= 14);
+					});
+
+				this.set('_assessments', basicListActivities);
 			},
 
 			_keypressOpenAllAssignmentsView: function(e) {
