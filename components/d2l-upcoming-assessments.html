@@ -196,6 +196,9 @@
 			},
 
 			_updateActivitiesInfo: function(activities) {
+				var msPerDay = 86400000;
+				var currentDateTime = new Date();
+
 				activities = activities
 					.filter(function(activity) {
 						return activity.dueDate;
@@ -204,15 +207,14 @@
 						return a.dueDate > b.dueDate;
 					});
 
-				var currentDateTime = new Date();
 				var basicListActivities = activities
 					.slice(0, 4)
 					.filter(function(activity) {
 						var activityDueDate = new Date(activity.dueDate);
 
 						if (activityDueDate - currentDateTime > 0) {
-							var startOfCurrentDay = currentDateTime.setHours(0, 0, 0, 0);
-							var dateDiff = Math.floor((activityDueDate - startOfCurrentDay) / (86400000));
+							var startOfWeek = new Date(currentDateTime.setHours(currentDateTime.getDay() * -24)).setHours(0, 0, 0, 0);
+							var dateDiff = Math.floor((activityDueDate - startOfWeek) / msPerDay);
 
 							return dateDiff < 14;
 						}

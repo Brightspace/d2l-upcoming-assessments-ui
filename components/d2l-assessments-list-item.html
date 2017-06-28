@@ -88,9 +88,10 @@
 		},
 
 		_getDateString: function(dueDateUTC) {
+			var msPerDay = 86400000;
 			var activityDueDateTime = new Date(dueDateUTC);
 			var startOfToday = new Date().setHours(0, 0, 0, 0);
-			var calendarDateDiff = Math.floor((activityDueDateTime - startOfToday) / (86400000));
+			var calendarDateDiff = Math.floor((activityDueDateTime - startOfToday) / msPerDay);
 			var dueDateString;
 
 			if (calendarDateDiff === 0) {
