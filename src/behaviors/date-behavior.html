@@ -17,7 +17,7 @@
 				var currentDateTime = new Date();
 				var activityDueDateTime = new Date(activity.dueDate);
 
-				if (activityDueDateTime - new Date(currentDateTime).getTime() > 0) {
+				if (activityDueDateTime - currentDateTime > 0) {
 					var startOfDay = new Date(currentDateTime).setHours(0, 0, 0, 0);
 					var startOfWeek = new Date(startOfDay).setHours(currentDateTime.getDay() * -24);
 

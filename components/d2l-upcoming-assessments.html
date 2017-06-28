@@ -40,7 +40,7 @@
 
 
 		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
-			<div class="no-upcoming-assessments">[[_noUpcomingAssessmentsMessage]]</div>
+			<div class="no-upcoming-assessments">[[_noUpcomingAssessments]]</div>
 		</template>
 
 		<template is="dom-if" if="[[_hasUpcomingAssessments(_assessments)]]">
@@ -90,11 +90,14 @@
 					type: Boolean,
 					value: false
 				},
-				_noUpcomingAssessmentsMessage: {
+				_noUpcomingAssessments: {
 					type: String,
 					computed: 'localize("noUpcomingAssessments", "userName", _userName)'
 				},
-				_noAssessmentsInThisTimeFrame: String
+				_noAssessmentsInThisTimeFrame: {
+					type: String,
+					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _userName)'
+				}
 			},
 
 			behaviors: [
