@@ -51,12 +51,14 @@
 			<div class="error-message">[[localize('errorMessage')]]</div>
 		</template>
 
-		<a class="view-all-assignments-link"
-			is="d2l-link"
-			on-tap="_openAllAssignmentsView"
-			on-keypress="_keypressOpenAllAssignmentsView" >
-			<h3>[[localize('viewAllAssignments')]]</h3>
-		</a>
+		<template is="dom-if" if="[[!_showError]]">
+			<a class="view-all-assignments-link"
+				is="d2l-link"
+				on-tap="_openAllAssignmentsView"
+				on-keypress="_keypressOpenAllAssignmentsView" >
+				<h3>[[localize('viewAllAssignments')]]</h3>
+			</a>
+		</template>
 
 		<d2l-simple-overlay
 			id="view-all-assignments-overlay"
