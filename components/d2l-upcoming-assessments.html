@@ -199,7 +199,6 @@
 			},
 
 			_updateActivitiesInfo: function(activities) {
-				var msPerDay = 86400000;
 				var self = this;
 
 				activities = activities
@@ -214,7 +213,7 @@
 					.filter(function(activity) {
 						return self.isActivityUpcoming(activity);
 					})
-					.slice(0, 4)
+					.slice(0, 4);
 
 				this.set('_assessments', basicListActivities);
 			},
