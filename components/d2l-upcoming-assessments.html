@@ -4,7 +4,8 @@
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
-<link rel="import" href="../src/localize-behavior.html">
+<link rel="import" href="../src/behaviors/date-behavior.html">
+<link rel="import" href="../src/behaviors/localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
 
 <dom-module id="d2l-upcoming-assessments">
@@ -97,6 +98,7 @@
 			},
 
 			behaviors: [
+				window.D2L.UpcomingAssessments.DateBehavior,
 				window.D2L.UpcomingAssessments.LocalizeBehavior,
 				window.D2L.Hypermedia.HMConstantsBehavior
 			],
@@ -154,42 +156,43 @@
 				var self = this;
 
 				activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
-					if (assignment.getSubEntityByClass('due-date')) {
-
-						var assignmentLink = assignment.getLinkByRel(self.HypermediaRels.assignment).href;
-						var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
-
-						if (!orgUnitLink) {
-							// bleh
-							var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.activityUsage).href;
-							orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
-						}
-
-						var orgUnitRequest = orgPromiseMap.get(orgUnitLink);
-
-						if (!orgUnitRequest) {
-							orgUnitRequest = self._fetchEntity(orgUnitLink);
-							orgPromiseMap.set(orgUnitLink, orgUnitRequest);
-						}
-
-						var assignmentRequest = self._fetchEntity(assignmentLink);
-
-						var request = new Promise(function(resolve) {
-							Promise.all([assignmentRequest, orgUnitRequest])
-								.then(function(response) {
-									var activity = response[0];
-									var organization = response[1];
-
-									resolve({
-										name: activity.properties.name,
-										dueDate: activity.properties.dueDate,
-										courseName: organization.properties.name
-									});
-								});
-						});
-
-						requests.push(request);
+					if (!assignment.getSubEntityByClass('due-date')) {
+						return;
 					}
+
+					var assignmentLink = assignment.getLinkByRel(self.HypermediaRels.assignment).href;
+					var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
+
+					if (!orgUnitLink) {
+						// bleh
+						var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.activityUsage).href;
+						orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
+					}
+
+					var orgUnitRequest = orgPromiseMap.get(orgUnitLink);
+
+					if (!orgUnitRequest) {
+						orgUnitRequest = self._fetchEntity(orgUnitLink);
+						orgPromiseMap.set(orgUnitLink, orgUnitRequest);
+					}
+
+					var assignmentRequest = self._fetchEntity(assignmentLink);
+
+					var request = new Promise(function(resolve) {
+						Promise.all([assignmentRequest, orgUnitRequest])
+							.then(function(response) {
+								var activity = response[0];
+								var organization = response[1];
+
+								resolve({
+									name: activity.properties.name,
+									dueDate: activity.properties.dueDate,
+									courseName: organization.properties.name
+								});
+							});
+					});
+
+					requests.push(request);
 				});
 
 				return Promise.all(requests);
@@ -197,7 +200,7 @@
 
 			_updateActivitiesInfo: function(activities) {
 				var msPerDay = 86400000;
-				var currentDateTime = new Date();
+				var self = this;
 
 				activities = activities
 					.filter(function(activity) {
@@ -208,18 +211,10 @@
 					});
 
 				var basicListActivities = activities
-					.slice(0, 4)
 					.filter(function(activity) {
-						var activityDueDateTime = new Date(activity.dueDate);
-
-						if (activityDueDateTime - currentDateTime > 0) {
-							var startOfDay = new Date(currentDateTime).setHours(0, 0, 0, 0);
-							var startOfWeek = new Date(startOfDay).setHours(currentDateTime.getDay() * -24);
-							var dateDiff = Math.floor((activityDueDateTime - startOfWeek) / msPerDay);
-
-							return dateDiff < 14;
-						}
-					});
+						return self.isActivityUpcoming(activity);
+					})
+					.slice(0, 4)
 
 				this.set('_assessments', basicListActivities);
 			},
@@ -232,13 +227,6 @@
 
 			_openAllAssignmentsView: function() {
 				this.$['view-all-assignments-overlay'].open();
-			},
-
-			_getJson: function(response) {
-				if (response.ok) {
-					return response.json();
-				}
-				return Promise.reject(response.status + ' ' + response.statusText);
 			},
 
 			_fetchEntity: function(url) {
@@ -260,10 +248,6 @@
 					.then(function(response) {
 						return window.D2L.Hypermedia.Siren.Parse(response);
 					});
-			},
-
-			_parseEntity: function(entity) {
-				return window.D2L.Hypermedia.Siren.Parse(entity);
 			}
 		});
 
