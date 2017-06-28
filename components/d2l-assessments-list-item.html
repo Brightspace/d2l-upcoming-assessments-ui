@@ -89,9 +89,9 @@
 
 		_getDateString: function(dueDateUTC) {
 			var msPerDay = 86400000;
-			var activityDueDateTime = new Date(dueDateUTC);
-			var startOfToday = new Date().setHours(0, 0, 0, 0);
-			var calendarDateDiff = Math.floor((activityDueDateTime - startOfToday) / msPerDay);
+			var activityDueDate = new Date(dueDateUTC);
+			var startOfDay = new Date().setHours(0, 0, 0, 0);
+			var calendarDateDiff = Math.floor((activityDueDate - startOfDay) / msPerDay);
 			var dueDateString;
 
 			if (calendarDateDiff === 0) {
@@ -99,7 +99,7 @@
 			} else if (calendarDateDiff === 1) {
 				dueDateString = this.localize('tomorrow');
 			} else {
-				dueDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(activityDueDateTime);
+				dueDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(activityDueDate);
 			}
 
 			return this.localize('dueDateShort', 'dueDate', dueDateString);

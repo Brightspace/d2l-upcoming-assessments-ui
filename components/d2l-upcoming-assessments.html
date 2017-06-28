@@ -210,11 +210,12 @@
 				var basicListActivities = activities
 					.slice(0, 4)
 					.filter(function(activity) {
-						var activityDueDate = new Date(activity.dueDate);
+						var activityDueDateTime = new Date(activity.dueDate);
 
-						if (activityDueDate - currentDateTime > 0) {
-							var startOfWeek = new Date(currentDateTime.setHours(currentDateTime.getDay() * -24)).setHours(0, 0, 0, 0);
-							var dateDiff = Math.floor((activityDueDate - startOfWeek) / msPerDay);
+						if (activityDueDateTime - currentDateTime > 0) {
+							var startOfDay = new Date(currentDateTime).setHours(0, 0, 0, 0);
+							var startOfWeek = new Date(startOfDay).setHours(currentDateTime.getDay() * -24);
+							var dateDiff = Math.floor((activityDueDateTime - startOfWeek) / msPerDay);
 
 							return dateDiff < 14;
 						}
