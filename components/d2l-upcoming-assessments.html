@@ -68,7 +68,6 @@
 	</template>
 
 	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
-	<script src="../../moment/min/moment.min.js"></script>
 	<script>
 		'use strict';
 
@@ -198,21 +197,22 @@
 
 			_updateActivitiesInfo: function(activities) {
 				activities = activities
-					.filter(function(activity){
-						return activity.dueDate != null;
+					.filter(function(activity) {
+						return activity.dueDate;
 					})
 					.sort(function(a, b) {
 						return a.dueDate > b.dueDate;
 					});
 
-				var currDateTime = moment();
+				var currentDateTime = new Date();
 				var basicListActivities = activities
 					.slice(0, 4)
 					.filter(function(activity) {
-						var activityDueDate = moment(activity.dueDate);
+						var activityDueDate = new Date(activity.dueDate);
 
-						if (currDateTime.isBefore(activityDueDate)) {
-							var dateDiff = activityDueDate.diff(currDateTime.startOf('day'), 'days');
+						if (activityDueDate - currentDateTime > 0) {
+							var startOfCurrentDay = currentDateTime.setHours(0, 0, 0, 0);
+							var dateDiff = Math.floor((activityDueDate - startOfCurrentDay) / (86400000));
 
 							return dateDiff < 14;
 						}
