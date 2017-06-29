@@ -7,6 +7,7 @@
 <link rel="import" href="../src/behaviors/date-behavior.html">
 <link rel="import" href="../src/behaviors/localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
+<link rel="import" href="d2l-all-assessments-list.html">
 
 <dom-module id="d2l-upcoming-assessments">
 	<template>
@@ -103,7 +104,9 @@
 					</div>
 				</d2l-simple-overlay-close-button>
 			</div>
-			<div class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
+			<d2l-all-assessments-list assessment-items=[[_allActivities]]></d2l-all-assessments-list>
+			<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
+
 		</d2l-simple-overlay>
 	</template>
 
@@ -125,6 +128,12 @@
 					value: false
 				},
 				_assessments: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				},
+				_allActivities: {
 					type: Array,
 					value: function() {
 						return [];
@@ -198,6 +207,7 @@
 				return !showError && (!assessments || assessments.length <= 0);
 			},
 
+
 			_getUserActivityUsages: function(userEntity) {
 				var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
 
@@ -261,6 +271,7 @@
 								resolve({
 									name: activity.properties.name,
 									dueDate: activity.properties.dueDate,
+									instructions: activity.properties.instructions,
 									courseName: organization.properties.name
 								});
 							});
@@ -290,6 +301,7 @@
 					.slice(0, 4);
 
 				this.set('_assessments', basicListActivities);
+				this.set('_allActivities', activities);
 			},
 
 			_keypressOpenAllAssignmentsView: function(e) {

@@ -1,0 +1,110 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
+<link rel="import" href="../src/behaviors/date-behavior.html">
+<link rel="import" href="../src/behaviors/localize-behavior.html">
+<link rel="import" href="d2l-all-assessments-list-item.html">
+
+<dom-module id="d2l-all-assessments-list">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+
+			.list-container {
+				width: 70%;
+				min-width: 300px;
+				margin: auto;
+			}
+
+			.date-header {
+				@apply --d2l-body-compact-text;
+				font-weight: 300;
+				font-size: 12px;
+			}
+		</style>
+		<div class="list-container">
+			<template is="dom-repeat" items="[[_assessmentItemBuckets]]">
+				<div class="date-header">[[_getDueDateString(item.1)]]</div>
+				<template is="dom-repeat" items="[[item.1]]">
+					<d2l-all-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
+				</template>
+			</template>
+		</div>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+
+			is: 'd2l-all-assessments-list',
+
+			properties: {
+				assessmentItems: {
+					type: Array,
+					value: function() {
+						return [];
+					},
+					observer: '_onAssessmentItemsChanged'
+				},
+
+				_assessmentItemBuckets: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				}
+			},
+
+			behaviors: [
+				window.D2L.UpcomingAssessments.DateBehavior,
+				window.D2L.UpcomingAssessments.LocalizeBehavior
+			],
+
+			_onAssessmentItemsChanged: function(assessmentItems) {
+				if (!this.assessmentItems) {
+					return;
+				}
+
+				var dates = new Map();
+
+				for(var i = 0; i < assessmentItems.length; i++) {
+					var dateString = new Date(assessmentItems[i].dueDate).toDateString();
+
+					console.log(dateString);
+
+					if(!dates.get(dateString)) {
+						dates.set(dateString, []);
+					}
+
+					dates.get(dateString).push(assessmentItems[i]);
+				}
+
+				this._assessmentItemBuckets = Array.from(dates);
+			},
+
+			_getDueDateString: function(activity) {
+				console.dir(activity);
+				var dueDateString;
+				var dateStringPrefix;
+				var calendarDateDiff = this.getDateDiffInCalendarDays(activity[0].dueDate);
+
+				dueDateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(activity[0].dueDate));
+
+				if (calendarDateDiff === 0) {
+					dateStringPrefix = this.localize('today');
+				} else if (calendarDateDiff === 1) {
+					dateStringPrefix = this.localize('tomorrow');
+				}
+
+				if (dateStringPrefix) {
+					return this.localize('dueDateLongImminent', 'prefix', dateStringPrefix, 'dueDate', dueDateString);
+				}
+
+				return dueDateString;
+
+			}
+
+		});
+	</script>
+</dom-module>

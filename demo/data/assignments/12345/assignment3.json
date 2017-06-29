@@ -4,7 +4,7 @@
     ],
     "properties": {
         "name": "Homework 3",
-        "instructions": "Third homework assignment.",
+        "instructions": "Third homework assignment. This one has a pretty long description to make sure that the text formatting stuff works well, and yeah, I can't think of anything else to write. This should be long enough, right? Right.",
         "dueDate": "2017-07-01T05:00:00.000Z"
     },
     "links": [
