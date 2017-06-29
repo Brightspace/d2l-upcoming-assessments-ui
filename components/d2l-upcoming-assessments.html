@@ -157,7 +157,7 @@
 
 			_getActivityUsagesInfo: function(activities) {
 				var requests = [];
-				var orgPromiseMap = new Map();
+				var orgPromiseMap = {};
 				var self = this;
 
 				activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
@@ -174,11 +174,11 @@
 						orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
 					}
 
-					var orgUnitRequest = orgPromiseMap.get(orgUnitLink);
+					var orgUnitRequest = orgPromiseMap[orgUnitLink];
 
 					if (!orgUnitRequest) {
 						orgUnitRequest = self._fetchEntity(orgUnitLink);
-						orgPromiseMap.set(orgUnitLink, orgUnitRequest);
+						orgPromiseMap[orgUnitLink] = orgUnitRequest;
 					}
 
 					var assignmentRequest = self._fetchEntity(assignmentLink);
