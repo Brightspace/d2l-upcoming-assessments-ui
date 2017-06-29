@@ -203,7 +203,7 @@
 						return;
 					}
 
-					var assignmentLink = responses.getLinkByRel(self.HypermediaRels.assignment).href;
+					var assignmentLink = response.activityUsage.getLinkByRel(self.HypermediaRels.assignment).href;
 					var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
 
 					if (!orgUnitRequest) {
@@ -211,7 +211,7 @@
 						orgPromiseMap[response.orgUnitLink] = orgUnitRequest;
 					}
 
-					var assignmentRequest = self._fetchEntity(response.assignmentLink);
+					var assignmentRequest = self._fetchEntity(assignmentLink);
 
 					var request = new Promise(function(resolve) {
 						Promise.all([assignmentRequest, orgUnitRequest])

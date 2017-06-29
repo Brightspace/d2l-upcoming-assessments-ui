@@ -35,7 +35,7 @@
             "rel": [
                 "https://api.brightspace.com/rels/assignment"
             ],
-            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.assignments.api.dev.brightspace.com/6606/folders/4"
+            "href": "data/assignments/12345/assignment2.json"
         }
     ]
 }
