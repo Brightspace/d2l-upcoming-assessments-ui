@@ -28,7 +28,7 @@
 			/*
 			* Returns the number of calendar days between the give date, and either the reference date if supplied, or now
 			*/
-			getDateDiffInCalendarDays(date, reference) {
+			getDateDiffInCalendarDays: function(date, reference) {
 				var referenceDate = reference ? new Date(reference) : new Date();
 				var activityDueDate = new Date(date);
 				var startOfDay = referenceDate.setHours(0, 0, 0, 0);
