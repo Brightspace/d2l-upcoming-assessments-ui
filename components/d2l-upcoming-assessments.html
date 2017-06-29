@@ -39,11 +39,11 @@
 		</style>
 
 
-		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
+		<template is="dom-if" if="[[_showNoUpcomingAssessmentsMessage(_assessments, _showError)]]">
 			<div class="no-upcoming-assessments">[[_noUpcomingAssessments]]</div>
 		</template>
 
-		<template is="dom-if" if="[[_hasUpcomingAssessments(_assessments)]]">
+		<template is="dom-if" if="[[_showUpcomingAssessments(_assessments, _showError)]]">
 			<d2l-assessments-list assessment-items=[[_assessments]]></d2l-assessments-list>
 		</template>
 
@@ -119,10 +119,13 @@
 
 				return this._fetchEntity(self.userUrl)
 					.then(function(userEntity) {
-						return self._getActivityUsages(userEntity);
+						return self._getUserActivityUsages(userEntity);
 					})
 					.then(function(activities) {
 						return self._getActivityUsagesInfo(activities);
+					})
+					.then(function(activities) {
+						return self._getUserActivityUsageInfo(activities);
 					})
 					.then(function(activities) {
 						self._updateActivitiesInfo(activities);
@@ -140,11 +143,15 @@
 				this.debounce('getInfo', this._getInfo, this._debounceTime);
 			},
 
-			_hasUpcomingAssessments: function() {
-				return this._assessments && this._assessments.length > 0;
+			_showUpcomingAssessments: function(assessments, showError) {
+				return !showError && assessments && assessments.length > 0;
 			},
 
-			_getActivityUsages: function(userEntity) {
+			_showNoUpcomingAssessmentsMessage: function(assessments, showError) {
+				return !showError && (!assessments || assessments.length <= 0);
+			},
+
+			_getUserActivityUsages: function(userEntity) {
 				this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
 				this._showError = false;
 
@@ -157,7 +164,6 @@
 
 			_getActivityUsagesInfo: function(activities) {
 				var requests = [];
-				var orgPromiseMap = {};
 				var self = this;
 
 				activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
@@ -165,23 +171,47 @@
 						return;
 					}
 
-					var assignmentLink = assignment.getLinkByRel(self.HypermediaRels.assignment).href;
 					var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
+					var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.activityUsage).href;
 
 					if (!orgUnitLink) {
 						// bleh
-						var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.activityUsage).href;
 						orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
 					}
 
-					var orgUnitRequest = orgPromiseMap[orgUnitLink];
+					var activityUsageRequest = self._fetchEntity(activityUsageLink)
+						.then(function(activityUsageEntity) {
+							return {
+								activityUsage: activityUsageEntity,
+								orgUnitLink: orgUnitLink
+							};
+						});
 
-					if (!orgUnitRequest) {
-						orgUnitRequest = self._fetchEntity(orgUnitLink);
-						orgPromiseMap[orgUnitLink] = orgUnitRequest;
+					requests.push(activityUsageRequest);
+				});
+
+				return Promise.all(requests);
+			},
+
+			_getUserActivityUsageInfo: function(responses) {
+				var requests = [];
+				var orgPromiseMap = {};
+				var self = this;
+
+				responses.forEach(function(response) {
+					if (!response.activityUsage.hasClass('published')) {
+						return;
 					}
 
-					var assignmentRequest = self._fetchEntity(assignmentLink);
+					var assignmentLink = responses.getLinkByRel(self.HypermediaRels.assignment).href;
+					var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
+
+					if (!orgUnitRequest) {
+						orgUnitRequest = self._fetchEntity(response.orgUnitLink);
+						orgPromiseMap[response.orgUnitLink] = orgUnitRequest;
+					}
+
+					var assignmentRequest = self._fetchEntity(response.assignmentLink);
 
 					var request = new Promise(function(resolve) {
 						Promise.all([assignmentRequest, orgUnitRequest])

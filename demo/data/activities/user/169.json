@@ -36,7 +36,7 @@
                     "rel": [
                         "https://api.brightspace.com/rels/activity-usage"
                     ],
-                    "href": "whatever-the-url-is/activities/some-activity/usages/123"
+                    "href": "data/activities/assignment4/usages/123.json"
                 }
             ],
             "rel": [
@@ -85,7 +85,7 @@
                     "rel": [
                         "https://api.brightspace.com/rels/activity-usage"
                     ],
-                    "href": "whatever-the-url-is/activities/some-activity/usages/123"
+                    "href": "data/activities/assignment2/usages/123.json"
                 }
             ],
             "rel": [
@@ -134,7 +134,7 @@
                     "rel": [
                         "https://api.brightspace.com/rels/activity-usage"
                     ],
-                    "href": "whatever-the-url-is/activities/some-activity/usages/123"
+                    "href": "data/activities/assignment3/usages/123.json"
                 }
             ],
             "rel": [
@@ -177,7 +177,7 @@
                     "rel": [
                         "https://api.brightspace.com/rels/activity-usage"
                     ],
-                    "href": "whatever-the-url-is/activities/some-activity/usages/123"
+                    "href": "data/activities/assignment1/usages/123.json"
                 }
             ],
             "rel": [
