@@ -5,7 +5,7 @@
   "dependencies": {
     "app-localize-behavior": "PolymerElements/app-localize-behavior#^1.0.2",
     "d2l-colors": "^2.2.3",
-    "d2l-hm-constants-behavior": "Brightspace/d2l-hm-constants-behavior#^1.0.8",
+    "d2l-hm-constants-behavior": "Brightspace/d2l-hm-constants-behavior#^1.0.13",
     "d2l-icons": "^3.1.2",
     "d2l-link": "^3.5.1",
     "d2l-simple-overlay": "Brightspace/simple-overlay#1.0.0",
