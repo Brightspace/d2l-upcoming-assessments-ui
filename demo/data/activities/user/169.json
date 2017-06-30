@@ -34,7 +34,7 @@
                 },
                 {
                     "rel": [
-                        "https://activities.brightspace.com/rels/activity-usage"
+                        "https://activities.api.brightspace.com/rels/activity-usage"
                     ],
                     "href": "data/activities/assignment4/usages/123.json"
                 }
@@ -83,7 +83,7 @@
                 },
                 {
                     "rel": [
-                        "https://activities.brightspace.com/rels/activity-usage"
+                        "https://activities.api.brightspace.com/rels/activity-usage"
                     ],
                     "href": "data/activities/assignment2/usages/123.json"
                 }
@@ -132,7 +132,7 @@
                 },
                 {
                     "rel": [
-                        "https://activities.brightspace.com/rels/activity-usage"
+                        "https://activities.api.brightspace.com/rels/activity-usage"
                     ],
                     "href": "data/activities/assignment3/usages/123.json"
                 }
@@ -175,7 +175,7 @@
                 },
                 {
                     "rel": [
-                        "https://activities.brightspace.com/rels/activity-usage"
+                        "https://activities.api.brightspace.com/rels/activity-usage"
                     ],
                     "href": "data/activities/assignment1/usages/123.json"
                 }
