@@ -3,6 +3,7 @@
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
+<link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay-close-button.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../src/localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
@@ -19,12 +20,24 @@
 				margin-left: 15px;
 			}
 
+			d2l-simple-overlay-close-button {
+				line-height: 60px;
+				padding: 0px;
+			}
+
+			d2l-simple-overlay-close-button span {
+				text-transform: uppercase;
+			}
+
 			:host-context([dir="rtl"]) h2 {
 				margin-left: 0px;
 				margin-right: 15px;
 			}
 
-			.error-message, .no-upcoming-assessments, .view-all-assignments-link > h3 {
+			.error-message,
+			.no-upcoming-assessments,
+			.view-all-assignments-link > h3,
+			.view-all-container {
 				@apply --d2l-body-compact-text;
 			}
 
@@ -34,6 +47,17 @@
 
 			.no-assessments-in-time-frame {
 				text-align: center;
+			}
+
+			.view-all-container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				box-sizing: border-box;
+				padding: 0 30px;
+				margin-left: auto;
+				margin-right: auto;
+				max-width: 1230px;
 			}
 		</style>
 
@@ -76,8 +100,14 @@
 			id="view-all-assignments-overlay"
 			title-name="[[localize('viewAllAssignments')]]"
 			locale="[[locale]]"
-			close-simple-overlay-alt-text="[[localize('closeSimpleOverlayAltText')]]"
+			close-simple-overlay-alt-text="[[localize('closeSimpleOverlayText')]]"
 			with-backdrop>
+			<div class="view-all-container" slot="headerSlot">
+				<d2l-simple-overlay-close-button>
+					<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
+					<span>[[localize('closeSimpleOverlayText')]]</span>
+				</d2l-simple-overlay-close-button>
+			</div>
 			<div class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
 		</d2l-simple-overlay>
 	</template>
