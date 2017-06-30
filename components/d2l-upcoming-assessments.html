@@ -1,5 +1,4 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../iron-ajax/iron-ajax.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
@@ -116,9 +115,12 @@
 
 			_getInfo: function() {
 				var self = this;
+				var userName;
 
 				return this._fetchEntity(self.userUrl)
 					.then(function(userEntity) {
+						userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
+
 						return self._getUserActivityUsages(userEntity);
 					})
 					.then(function(activities) {
@@ -129,14 +131,12 @@
 					})
 					.then(function(activities) {
 						self._updateActivitiesInfo(activities);
+						self._userName = userName;
+						self._showError = false;
 					})
 					.catch(function() {
-						self._onError();
+						self._showError = true;
 					});
-			},
-
-			_onError: function() {
-				this._showError = true;
 			},
 
 			_onApiConfigChanged: function() {
@@ -152,9 +152,6 @@
 			},
 
 			_getUserActivityUsages: function(userEntity) {
-				this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
-				this._showError = false;
-
 				var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
 
 				if (myActivitiesLink) {
@@ -264,24 +261,25 @@
 			},
 
 			_fetchEntity: function(url) {
-				var request = new Request(url, {
-					headers: new Headers({
-						Accept: 'application/vnd.siren+json',
-						Authorization: 'Bearer ' + this.token
-					})
-				});
+				var token = this.token;
 
-				return window.d2lfetch
-					.fetch(request)
-					.then(function(response) {
-						if (response.ok) {
-							return response.json();
+				return new Promise(function(resolve, reject) {
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', url);
+					xhr.setRequestHeader('Accept', 'application/vnd.siren+json');
+					xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+					xhr.addEventListener('load', function() {
+						if (xhr.status === 200 || xhr.status === 304) {
+							resolve(window.D2L.Hypermedia.Siren.Parse(xhr.responseText));
+						} else {
+							reject(xhr.error || xhr.status);
 						}
-						return Promise.reject(response.status);
-					})
-					.then(function(response) {
-						return window.D2L.Hypermedia.Siren.Parse(response);
 					});
+					xhr.addEventListener('error', function() {
+						reject(xhr.error || xhr.status);
+					});
+					xhr.send();
+				});
 			}
 		});
 
