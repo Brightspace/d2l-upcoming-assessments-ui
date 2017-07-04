@@ -124,6 +124,13 @@
 					reflectToAttribute: true,
 					value: false
 				},
+				totalCount: {
+					type: Number,
+					notify: true,
+					readOnly: true,
+					reflectToAttribute: true,
+					value: 0
+				},
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -283,12 +290,13 @@
 						return a.dueDate > b.dueDate;
 					});
 
-				var basicListActivities = activities
+				var upcomingActivities = activities
 					.filter(function(activity) {
 						return self.isActivityUpcoming(activity);
-					})
-					.slice(0, 4);
+					});
+				this._setTotalCount(upcomingActivities.length);
 
+				var basicListActivities = upcomingActivities.slice(0, 4);
 				this.set('_assessments', basicListActivities);
 			},
 
