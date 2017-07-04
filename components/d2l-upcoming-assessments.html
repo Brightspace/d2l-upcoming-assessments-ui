@@ -79,7 +79,6 @@
 			properties: {
 				userUrl: String,
 				token: String,
-				lmsUrl: String,
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -108,7 +107,7 @@
 			],
 
 			observers: [
-				'_onApiConfigChanged(userUrl, lmsUrl, token)'
+				'_onApiConfigChanged(userUrl, token)'
 			],
 
 			_debounceTime: 20,
@@ -170,11 +169,6 @@
 
 					var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
 					var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
-
-					if (!orgUnitLink) {
-						// bleh
-						orgUnitLink = self.lmsUrl + '/d2l/api/hm/organizations/' + /usages\/([0-9]+)/.exec(activityUsageLink)[1];
-					}
 
 					var activityUsageRequest = self._fetchEntity(activityUsageLink)
 						.then(function(activityUsageEntity) {
