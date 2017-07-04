@@ -3,7 +3,8 @@
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../../d2l-colors/d2l-colors.html">
 <link rel="import" href="../../d2l-icons/tier1-icons.html">
-<link rel="import" href="../src/localize-behavior.html">
+<link rel="import" href="../src/behaviors/date-behavior.html">
+<link rel="import" href="../src/behaviors/localize-behavior.html">
 
 <dom-module id="d2l-assessments-list-item">
 	<template>
@@ -12,9 +13,7 @@
 				display: flex;
 				flex-direction: row;
 				width: calc(100% - 29px);
-				height: 70px;
-				margin-left: 15px;
-				margin-right: 14px;
+				margin: 10px 0;
 				justify-content: space-between;
 				align-items: center;
 				background-color: var(--d2l-color-white);
@@ -47,24 +46,23 @@
 			}
 
 			iron-icon.separator-icon {
-				opacity: 0.5;
+				opacity: 0.8;
 				width: 18px;
 				height: 18px;
 			}
 
 			.due-date {
-				line-height: 1;
+				font-weight: bolder;
 			}
 
 		</style>
 			<div class="info-container">
-				<h3 class="assessment-title">{{assessmentItem.title}}</h3>
+				<h3 class="assessment-title">{{assessmentItem.name}}</h3>
 				<div class="assessment-info">
 					<div class="course-name">{{assessmentItem.courseName}}</div>
 					<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-					<div class="item-type">{{assessmentItem.itemType}}</div>
+					<div class="due-date">[[_getDateString(assessmentItem.dueDate)]]</div>
 				</div>
-				<div class="assessment-info due-date">{{localize('dueDate', 'dueDate', assessmentItem.dueDate)}}</div>
 			</div>
 			<template is="dom-if" if="{{_isCompleted(assessmentItem)}}">
 				<iron-icon class="completion-icon" icon="d2l-tier1:check"></iron-icon>
@@ -83,11 +81,27 @@
 		},
 
 		behaviors: [
+			window.D2L.UpcomingAssessments.DateBehavior,
 			window.D2L.UpcomingAssessments.LocalizeBehavior
 		],
 
 		_isCompleted: function(item) {
 			return item.isCompleted;
+		},
+
+		_getDateString: function(dueDateUTC) {
+			var dueDateString;
+			var calendarDateDiff = this.getDateDiffInCalendarDays(dueDateUTC);
+
+			if (calendarDateDiff === 0) {
+				dueDateString = this.localize('today');
+			} else if (calendarDateDiff === 1) {
+				dueDateString = this.localize('tomorrow');
+			} else {
+				dueDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(new Date(dueDateUTC));
+			}
+
+			return this.localize('dueDateShort', 'dueDate', dueDateString);
 		}
 
 	});

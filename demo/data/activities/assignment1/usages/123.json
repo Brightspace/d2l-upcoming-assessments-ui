@@ -1,0 +1,41 @@
+{
+    "class": [
+        "activity",
+        "assignment-activity",
+        "published"
+    ],
+    "entities": [
+        {
+            "class": [
+                "date",
+                "due-date"
+            ],
+            "properties": {
+                "date": "2017-06-30T17:00:00.000Z"
+            },
+            "rel": [
+                "https://api.brightspace.com/rels/date"
+            ]
+        }
+    ],
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.activities.api.dev.brightspace.com/activities/6606_Assignments_2000_4/usages/6606"
+        },
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.activities.api.dev.brightspace.com/activities/6606_Assignments_2000_4/usages/6606"
+        },
+        {
+            "rel": [
+                "https://api.brightspace.com/rels/assignment"
+            ],
+            "href": "data/assignments/12345/assignment1.json"
+        }
+    ]
+}

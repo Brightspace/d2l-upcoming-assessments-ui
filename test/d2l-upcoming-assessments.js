@@ -41,7 +41,7 @@ describe('<d2l-upcoming-assessments>', function() {
 		it('doesn\'t display an error message when request for data is successful', function(done) {
 			var spy = sinon.spy(element, '_onAssessmentsResponse');
 
-			element.assessmentsUrl = '/some/path/';
+			element.userUrl = '/some/path/';
 			element.token = 'foozleberries';
 
 			server.respondWith(
@@ -60,7 +60,7 @@ describe('<d2l-upcoming-assessments>', function() {
 		it('displays an error message when request for data fails', function(done) {
 			var spy = sinon.spy(element, '_onError');
 
-			element.assessmentsUrl = '/some/path/';
+			element.userUrl = '/some/path/';
 			element.token = 'foozleberries';
 
 			server.respondWith(

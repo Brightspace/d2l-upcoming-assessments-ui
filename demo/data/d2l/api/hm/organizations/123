@@ -1,0 +1,130 @@
+{
+    "class": [
+        "active",
+        "course-offering"
+    ],
+    "properties": {
+        "name": "Intro to Computer Science 1",
+        "code": "CS115",
+        "startDate": null,
+        "endDate": null,
+        "isActive": true
+    },
+    "entities": [
+        {
+            "class": [
+                "color"
+            ],
+            "properties": {
+                "description": "vibrant",
+                "hexString": "#007B90"
+            },
+            "rel": [
+                "https://api.brightspace.com/rels/color"
+            ]
+        },
+        {
+            "class": [
+                "course-image"
+            ],
+            "rel": [
+                "https://api.brightspace.com/rels/organization-image"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.organizations.api.dev.brightspace.com/121355/image?version=%2fimages%2f31edc286-1e96-4144-8a5e-7ad85aa3532f"
+        }
+    ],
+    "links": [
+        {
+            "rel": [
+                "https://activities.api.brightspace.com/rels/organization-activities"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.activities.api.dev.brightspace.com/activityusages/121355"
+        },
+        {
+            "rel": [
+                "https://activities.api.brightspace.com/rels/my-organization-activities"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.activities.api.dev.brightspace.com/activityusages/121355/users/169?start=636341094899870000&end=636353190899870000"
+        },
+        {
+            "rel": [
+                "https://api.brightspace.com/rels/sequence"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.sequences.api.dev.brightspace.com/121355"
+        },
+        {
+            "rel": [
+                "https://api.brightspace.com/rels/discussions"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.discussions.api.dev.brightspace.com/121355"
+        },
+        {
+            "rel": [
+                "https://assignments.api.brightspace.com/rels/assignments"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.assignments.api.dev.brightspace.com/121355"
+        },
+        {
+            "rel": [
+                "https://api.brightspace.com/rels/enrollments"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.enrollments.api.dev.brightspace.com/organizations/121355"
+        },
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.organizations.api.dev.brightspace.com/121355"
+        },
+        {
+            "rel": [
+                "https://api.brightspace.com/rels/organization-homepage"
+            ],
+            "href": "http://WL81-apalaniuk:44453/d2l/home/121355",
+            "type": "text/html"
+        },
+        {
+            "rel": [
+                "https://api.brightspace.com/rels/course-offering-info-page"
+            ],
+            "href": "http://WL81-apalaniuk:44453/d2l/lp/manageCourses/course_offering_info_viewedit.d2l?ou=121355",
+            "type": "text/html"
+        },
+        {
+            "rel": [
+                "https://themes.api.brightspace.com/rels/theme"
+            ],
+            "class": [
+                "active",
+                "theme"
+            ],
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.themes.api.dev.brightspace.com/121355/3"
+        }
+    ],
+    "actions": [
+        {
+            "name": "set-catalog-image",
+            "method": "POST",
+            "href": "http://WL81-apalaniuk:44453/d2l/api/lp/1.9/courses/121355/image",
+            "fields": [
+                {
+                    "name": "imagePath",
+                    "type": "text",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "name": "add-homepage-banner",
+            "method": "PUT",
+            "href": "https://0d98ac28-6df3-49fe-8b50-00ec94686e74.organizations.api.dev.brightspace.com/121355",
+            "fields": [
+                {
+                    "name": "showCourseBanner",
+                    "type": "hidden",
+                    "value": true
+                }
+            ]
+        }
+    ]
+}

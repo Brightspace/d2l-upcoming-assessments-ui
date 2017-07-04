@@ -1,0 +1,35 @@
+{
+    "class":[
+        "user"
+    ],
+    "entities":[
+        {
+            "class":[
+                "display",
+                "name"
+            ],
+            "properties":{
+                "name":"Jane Doe"
+            },
+            "rel":[
+                "https://api.brightspace.com/rels/display-name"
+            ]
+        },
+        {
+            "properties":{
+                "name":"Jane"
+            },
+            "rel":[
+                "https://api.brightspace.com/rels/first-name"
+            ]
+        }
+    ],
+    "links":[
+       {
+            "rel": [
+                "https://activities.api.brightspace.com/rels/my-activities"
+            ],
+            "href": "/demo/data/activities/user/169.json"
+        }
+    ]
+}

@@ -1,0 +1,196 @@
+{
+    "entities": [
+        {
+            "class": [
+                "activity",
+                "user-assignment-activity"
+            ],
+            "entities": [
+                {
+                    "class": [
+                        "date",
+                        "due-date"
+                    ],
+                    "properties": {
+                        "date": "2017-06-28T23:00:00.000Z"
+                    },
+                    "rel": [
+                        "https://api.brightspace.com/rels/date"
+                    ]
+                }
+            ],
+            "links": [
+                {
+                    "rel": [
+                        "self"
+                    ],
+                    "href": "not-used-dont-bother"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/assignment"
+                    ],
+                    "href": "data/assignments/12345/assignment4.json"
+                },
+                {
+                    "rel": [
+                        "https://activities.api.brightspace.com/rels/activity-usage"
+                    ],
+                    "href": "data/activities/assignment4/usages/123.json"
+                }
+            ],
+            "rel": [
+                "https://api.brightspace.com/rels/user-activity-usage"
+            ]
+        },
+        {
+            "class": [
+                "activity",
+                "user-assignment-activity"
+            ],
+            "entities": [
+                {
+                    "class": [
+                        "date",
+                        "due-date"
+                    ],
+                    "properties": {
+                        "date": "2017-06-29T23:00:00.000Z"
+                    },
+                    "rel": [
+                        "https://api.brightspace.com/rels/date"
+                    ]
+                }
+            ],
+            "links": [
+                {
+                    "rel": [
+                        "self"
+                    ],
+                    "href": "not-used-dont-bother"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/assignment"
+                    ],
+                    "href": "data/assignments/12345/assignment2.json"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/organization"
+                    ],
+                    "href": "data/organizations/123.json"
+                },
+                {
+                    "rel": [
+                        "https://activities.api.brightspace.com/rels/activity-usage"
+                    ],
+                    "href": "data/activities/assignment2/usages/123.json"
+                }
+            ],
+            "rel": [
+                "https://api.brightspace.com/rels/user-activity-usage"
+            ]
+        },
+        {
+            "class": [
+                "activity",
+                "user-assignment-activity"
+            ],
+            "entities": [
+                {
+                    "class": [
+                        "date",
+                        "due-date"
+                    ],
+                    "properties": {
+                        "date": "2017-07-03T23:00:00.000Z"
+                    },
+                    "rel": [
+                        "https://api.brightspace.com/rels/date"
+                    ]
+                }
+            ],
+            "links": [
+                {
+                    "rel": [
+                        "self"
+                    ],
+                    "href": "not-used-dont-bother"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/assignment"
+                    ],
+                    "href": "data/assignments/12345/assignment3.json"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/organization"
+                    ],
+                    "href": "data/organizations/123.json"
+                },
+                {
+                    "rel": [
+                        "https://activities.api.brightspace.com/rels/activity-usage"
+                    ],
+                    "href": "data/activities/assignment3/usages/123.json"
+                }
+            ],
+            "rel": [
+                "https://api.brightspace.com/rels/user-activity-usage"
+            ]
+        },
+        {
+            "class": [
+                "activity",
+                "user-assignment-activity"
+            ],
+            "entities": [
+                {
+                    "class": [
+                        "date",
+                        "due-date"
+                    ],
+                    "properties": {
+                        "date": "2017-06-24T23:00:00.000Z"
+                    },
+                    "rel": [
+                        "https://api.brightspace.com/rels/date"
+                    ]
+                }
+            ],
+            "links": [
+                {
+                    "rel": [
+                        "self"
+                    ],
+                    "href": "not-used-dont-bother"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/assignment"
+                    ],
+                    "href": "data/assignments/12345/assignment1.json"
+                },
+                {
+                    "rel": [
+                        "https://activities.api.brightspace.com/rels/activity-usage"
+                    ],
+                    "href": "data/activities/assignment1/usages/123.json"
+                }
+            ],
+            "rel": [
+                "https://api.brightspace.com/rels/user-activity-usage"
+            ]
+        }
+    ],
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/data/activities/user/169.json"
+        }
+    ]
+}

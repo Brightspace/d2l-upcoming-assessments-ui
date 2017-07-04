@@ -1,11 +1,11 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../iron-ajax/iron-ajax.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay-close-button.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
-<link rel="import" href="../src/localize-behavior.html">
+<link rel="import" href="../src/behaviors/date-behavior.html">
+<link rel="import" href="../src/behaviors/localize-behavior.html">
 <link rel="import" href="d2l-assessments-list.html">
 
 <dom-module id="d2l-upcoming-assessments">
@@ -61,27 +61,12 @@
 			}
 		</style>
 
-		<iron-ajax
-			id="assessmentsRequest"
-			url="[[assessmentsUrl]]"
-			handle-as="json"
-			on-iron-ajax-response="_onAssessmentsResponse"
-			on-iron-ajax-error="_onError">
-		</iron-ajax>
 
-		<iron-ajax
-			id="userRequest"
-			url="[[userUrl]]"
-			handle-as="json"
-			on-iron-ajax-response="_onUserResponse"
-			on-iron-ajax-error="_onError">
-		</iron-ajax>
-
-		<template is="dom-if" if="[[!_hasUpcomingAssessments(_assessments)]]">
-			<div class="no-upcoming-assessments">[[_noUpcomingAssessmentsMessage]]</div>
+		<template is="dom-if" if="[[_showNoUpcomingAssessmentsMessage(_assessments, _showError)]]">
+			<div class="no-upcoming-assessments">[[_noUpcomingAssessments]]</div>
 		</template>
 
-		<template is="dom-if" if="[[_hasUpcomingAssessments(_assessments)]]">
+		<template is="dom-if" if="[[_showUpcomingAssessments(_assessments, _showError)]]">
 			<d2l-assessments-list assessment-items=[[_assessments]]></d2l-assessments-list>
 		</template>
 
@@ -89,12 +74,14 @@
 			<div class="error-message">[[localize('errorMessage')]]</div>
 		</template>
 
-		<a class="view-all-assignments-link"
-			is="d2l-link"
-			on-tap="_openAllAssignmentsView"
-			on-keypress="_keypressOpenAllAssignmentsView" >
-			<h3>[[localize('viewAllAssignments')]]</h3>
-		</a>
+		<template is="dom-if" if="[[!_showError]]">
+			<a class="view-all-assignments-link"
+				is="d2l-link"
+				on-tap="_openAllAssignmentsView"
+				on-keypress="_keypressOpenAllAssignmentsView" >
+				<h3>[[localize('viewAllAssignments')]]</h3>
+			</a>
+		</template>
 
 		<d2l-simple-overlay
 			id="view-all-assignments-overlay"
@@ -120,7 +107,6 @@
 			is: 'd2l-upcoming-assessments',
 
 			properties: {
-				assessmentsUrl: String,
 				userUrl: String,
 				token: String,
 				_assessments: {
@@ -134,70 +120,158 @@
 					type: Boolean,
 					value: false
 				},
-				_noUpcomingAssessmentsMessage: String,
-				_noAssessmentsInThisTimeFrame: String
+				_noUpcomingAssessments: {
+					type: String,
+					computed: 'localize("noUpcomingAssessments", "userName", _userName)'
+				},
+				_noAssessmentsInThisTimeFrame: {
+					type: String,
+					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _userName)'
+				}
 			},
 
 			behaviors: [
+				window.D2L.UpcomingAssessments.DateBehavior,
 				window.D2L.UpcomingAssessments.LocalizeBehavior,
 				window.D2L.Hypermedia.HMConstantsBehavior
 			],
 
 			observers: [
-				'_onAssessmentsUrlChanged(assessmentsUrl, token)',
-				'_onUserUrlChanged(userUrl, token)'
+				'_onApiConfigChanged(userUrl, token)'
 			],
 
-			_onAssessmentsResponse: function(response) {
-				if (response.detail.status === 200 || response.detail.status === 304) {
-					this._showError = false;
-					this.set('_assessments', response.detail.xhr.response);
-				} else {
-					this._onError();
+			_debounceTime: 20,
+
+			_getInfo: function() {
+				var self = this;
+				var userName;
+
+				return this._fetchEntity(self.userUrl)
+					.then(function(userEntity) {
+						userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
+
+						return self._getUserActivityUsages(userEntity);
+					})
+					.then(function(activities) {
+						return self._getActivityUsagesInfo(activities);
+					})
+					.then(function(activities) {
+						return self._getUserActivityUsageInfo(activities);
+					})
+					.then(function(activities) {
+						self._updateActivitiesInfo(activities);
+						self._userName = userName;
+						self._showError = false;
+					})
+					.catch(function() {
+						self._showError = true;
+					});
+			},
+
+			_onApiConfigChanged: function() {
+				this.debounce('getInfo', this._getInfo, this._debounceTime);
+			},
+
+			_showUpcomingAssessments: function(assessments, showError) {
+				return !showError && assessments && assessments.length > 0;
+			},
+
+			_showNoUpcomingAssessmentsMessage: function(assessments, showError) {
+				return !showError && (!assessments || assessments.length <= 0);
+			},
+
+			_getUserActivityUsages: function(userEntity) {
+				var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
+
+				if (myActivitiesLink) {
+					return this._fetchEntity(myActivitiesLink);
 				}
 			},
 
-			_onUserResponse: function(response) {
-				if (response.detail.status === 200 || response.detail.status === 304) {
-					var userEntity = window.D2L.Hypermedia.Siren.Parse(response.detail.xhr.response);
+			_getActivityUsagesInfo: function(activities) {
+				var requests = [];
+				var self = this;
 
-					this._userName = (userEntity.getSubEntityByRel(this.HypermediaRels.firstName) || { properties: {} }).properties.name;
-					this._showError = false;
-					this._noUpcomingAssessmentsMessage = this.localize('noUpcomingAssessments', 'userName', this._userName);
-					this._noAssessmentsInThisTimeFrame = this.localize('noAssessmentsInThisTimeFrame', 'userName', this._userName);
-				} else {
-					this._onError();
-				}
+				activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
+					if (!assignment.getSubEntityByClass('due-date')) {
+						return;
+					}
+
+					var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
+					var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
+
+					var activityUsageRequest = self._fetchEntity(activityUsageLink)
+						.then(function(activityUsageEntity) {
+							return {
+								activityUsage: activityUsageEntity,
+								orgUnitLink: orgUnitLink
+							};
+						});
+
+					requests.push(activityUsageRequest);
+				});
+
+				return Promise.all(requests);
 			},
 
-			_getAssessmentsInfo: function() {
-				this.$.assessmentsRequest.headers = {
-					Authorization: 'Bearer ' + this.token
-				};
-				this.$.assessmentsRequest.generateRequest();
+			_getUserActivityUsageInfo: function(responses) {
+				var requests = [];
+				var orgPromiseMap = {};
+				var self = this;
+
+				responses.forEach(function(response) {
+					if (!response.activityUsage.hasClass('published')) {
+						return;
+					}
+
+					var assignmentLink = response.activityUsage.getLinkByRel(self.HypermediaRels.assignment).href;
+					var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
+
+					if (!orgUnitRequest) {
+						orgUnitRequest = self._fetchEntity(response.orgUnitLink);
+						orgPromiseMap[response.orgUnitLink] = orgUnitRequest;
+					}
+
+					var assignmentRequest = self._fetchEntity(assignmentLink);
+
+					var request = new Promise(function(resolve) {
+						Promise.all([assignmentRequest, orgUnitRequest])
+							.then(function(response) {
+								var activity = response[0];
+								var organization = response[1];
+
+								resolve({
+									name: activity.properties.name,
+									dueDate: activity.properties.dueDate,
+									courseName: organization.properties.name
+								});
+							});
+					});
+
+					requests.push(request);
+				});
+
+				return Promise.all(requests);
 			},
 
-			_getUserInfo: function() {
-				this.$.userRequest.headers = {
-					Authorization: 'Bearer ' + this.token
-				};
-				this.$.userRequest.generateRequest();
-			},
+			_updateActivitiesInfo: function(activities) {
+				var self = this;
 
-			_onError: function() {
-				this._showError = true;
-			},
+				activities = activities
+					.filter(function(activity) {
+						return activity.dueDate;
+					})
+					.sort(function(a, b) {
+						return a.dueDate > b.dueDate;
+					});
 
-			_onAssessmentsUrlChanged: function() {
-				this.debounce('getAssessmentsInfo', this._getAssessmentsInfo, this._debounceTime);
-			},
+				var basicListActivities = activities
+					.filter(function(activity) {
+						return self.isActivityUpcoming(activity);
+					})
+					.slice(0, 4);
 
-			_onUserUrlChanged: function() {
-				this.debounce('getUserInfo', this._getUserInfo, this._debounceTime);
-			},
-
-			_hasUpcomingAssessments: function() {
-				return this._assessments && this._assessments.length > 0;
+				this.set('_assessments', basicListActivities);
 			},
 
 			_keypressOpenAllAssignmentsView: function(e) {
@@ -210,7 +284,27 @@
 				this.$['view-all-assignments-overlay'].open();
 			},
 
-			_debounceTime: 250
+			_fetchEntity: function(url) {
+				var token = this.token;
+
+				return new Promise(function(resolve, reject) {
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', url);
+					xhr.setRequestHeader('Accept', 'application/vnd.siren+json');
+					xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+					xhr.addEventListener('load', function() {
+						if (xhr.status === 200 || xhr.status === 304) {
+							resolve(window.D2L.Hypermedia.Siren.Parse(xhr.responseText));
+						} else {
+							reject(xhr.error || xhr.status);
+						}
+					});
+					xhr.addEventListener('error', function() {
+						reject(xhr.error || xhr.status);
+					});
+					xhr.send();
+				});
+			}
 		});
 
 	</script>

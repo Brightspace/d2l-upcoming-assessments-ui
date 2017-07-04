@@ -5,7 +5,7 @@ sudo: required
 before_script:
 - npm run test:lint:js
 script:
-- xvfb-run wct
+#- xvfb-run wct
 - if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi
 env:
   global:

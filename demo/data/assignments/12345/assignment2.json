@@ -1,0 +1,21 @@
+{
+    "class": [
+        "assignment"
+    ],
+    "properties": {
+        "name": "Homework 2",
+        "instructions": "Second homework assignment.",
+        "dueDate": "2017-06-29T18:00:00.000Z"
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "data/assignments/12345/assignment2.json"
+        }
+    ],
+    "rel": [
+        "https://assignments.api.brightspace.com/rels/assignment"
+    ]
+}
