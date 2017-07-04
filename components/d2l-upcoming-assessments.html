@@ -224,10 +224,12 @@
 
 					var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
 					var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
+					var activityIsComplete = !!assignment.getSubEntityByClass('complete');
 
 					var activityUsageRequest = self._fetchEntity(activityUsageLink)
 						.then(function(activityUsageEntity) {
 							return {
+								activityIsComplete: activityIsComplete,
 								activityUsage: activityUsageEntity,
 								orgUnitLink: orgUnitLink
 							};
@@ -251,6 +253,7 @@
 
 					var assignmentLink = response.activityUsage.getLinkByRel(self.HypermediaRels.assignment).href;
 					var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
+					var activityIsComplete = response.activityIsComplete;
 
 					if (!orgUnitRequest) {
 						orgUnitRequest = self._fetchEntity(response.orgUnitLink);
@@ -268,7 +271,8 @@
 								resolve({
 									name: activity.properties.name,
 									dueDate: activity.properties.dueDate,
-									courseName: organization.properties.name
+									courseName: organization.properties.name,
+									isCompleted: activityIsComplete
 								});
 							});
 					});
