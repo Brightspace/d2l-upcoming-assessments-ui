@@ -9,9 +9,6 @@
 		<style>
 			:host {
 				display: block;
-			}
-
-			.list-container {
 				width: 70%;
 				min-width: 300px;
 				margin: auto;
@@ -22,15 +19,24 @@
 				font-weight: 300;
 				font-size: 12px;
 			}
+
+			@media (max-width: 767px) {
+				:host {
+					margin: 0 -30px;
+					width: calc(100% + 60px);
+				}
+
+				.date-header {
+					margin-left: 30px;
+				}
+			}
 		</style>
-		<div class="list-container">
 			<template is="dom-repeat" items="[[_assessmentItemBuckets]]">
 				<div class="date-header">[[_getDueDateString(item.1)]]</div>
 				<template is="dom-repeat" items="[[item.1]]">
 					<d2l-all-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
 				</template>
 			</template>
-		</div>
 	</template>
 	<script>
 		'use strict';
