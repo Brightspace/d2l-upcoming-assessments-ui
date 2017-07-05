@@ -59,6 +59,12 @@
 				margin-right: auto;
 				max-width: 1230px;
 			}
+
+			.overlay-close-button-content-wrapper {
+				display: inline-flex;
+				align-items: center;
+				vertical-align: middle;
+			}
 		</style>
 
 
@@ -91,8 +97,10 @@
 			with-backdrop>
 			<div class="view-all-container" slot="header">
 				<d2l-simple-overlay-close-button>
-					<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
-					<span>[[localize('closeSimpleOverlayText')]]</span>
+					<div class="overlay-close-button-content-wrapper">
+						<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
+						<span>[[localize('closeSimpleOverlayText')]]</span>
+					</div>
 				</d2l-simple-overlay-close-button>
 			</div>
 			<div class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
