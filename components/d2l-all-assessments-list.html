@@ -68,12 +68,10 @@
 
 				var dates = new Map();
 
-				for(var i = 0; i < assessmentItems.length; i++) {
+				for (var i = 0; i < assessmentItems.length; i++) {
 					var dateString = new Date(assessmentItems[i].dueDate).toDateString();
 
-					console.log(dateString);
-
-					if(!dates.get(dateString)) {
+					if (!dates.get(dateString)) {
 						dates.set(dateString, []);
 					}
 
@@ -84,7 +82,6 @@
 			},
 
 			_getDueDateString: function(activity) {
-				console.dir(activity);
 				var dueDateString;
 				var dateStringPrefix;
 				var calendarDateDiff = this.getDateDiffInCalendarDays(activity[0].dueDate);
