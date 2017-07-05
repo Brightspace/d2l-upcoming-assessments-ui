@@ -207,6 +207,9 @@
 				return !showError && (!assessments || assessments.length <= 0);
 			},
 
+			_hasActivities: function(assessments) {
+				return assessments && assessments.length;
+			},
 
 			_getUserActivityUsages: function(userEntity) {
 				var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
