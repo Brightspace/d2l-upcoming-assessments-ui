@@ -50,28 +50,9 @@
 				padding-right: 100px;
 			}
 
-			.info-container {
-				display: flex;
-				justify-content: space-between;
-				width: 100%;
-				padding-right: 100px;
-			}
-
-			.item-header {
-				justify-content: space-between;
-			}
-
-			.critical-info {
-				align-self: flex-start;
-				color: var(--d2l-color-olivine);;
-				border: 1px solid var(--d2l-color-olivine);;
-				border-radius: 6px;
-				padding: 5px 20px;
-				margin-top: -5px;
-				text-transform: uppercase;
-			}
-			.critical-info:empty {
-				display: none;
+			:host-context([dir="rtl"]) .instructions {
+				padding-right: 0px;
+				padding-left: 100px;
 			}
 
 			@media (max-width: 767px) {
@@ -84,21 +65,14 @@
 				.instructions-row {
 					display: none;
 				}
-
-				.info-container {
-					padding-right: 30px;
-				}
 			}
 
 		</style>
 			<div class="row">
 				<d2l-icon class="activity-icon" icon="d2l-tier3:assignments"></d2l-icon>
 				<div class="info-container">
-					<div class="item-header">
-						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
-						<div class="course-name">[[assessmentItem.courseName]]</div>
-					</div>
-					<div class="critical-info">[[_getCriticalInfo(assessmentItem)]]</div>
+					<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+					<div class="course-name">[[assessmentItem.courseName]]</div>
 				</div>
 			</div>
 			<div class="row instructions-row">
@@ -121,45 +95,7 @@
 		behaviors: [
 			window.D2L.UpcomingAssessments.DateBehavior,
 			window.D2L.UpcomingAssessments.LocalizeBehavior
-		],
-
-		_isCompleted: function(item) {
-			return item.isCompleted;
-		},
-
-		_getDateString: function(dueDateUTC) {
-			var dueDateString;
-
-
-			if (calendarDateDiff === 0) {
-				dueDateString = this.localize('today');
-			} else if (calendarDateDiff === 1) {
-				dueDateString = this.localize('tomorrow');
-			} else {
-				dueDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(new Date(dueDateUTC));
-			}
-
-			return this.localize('dueDateShort', 'dueDate', dueDateString);
-		},
-
-		_getCriticalInfo: function(assessmentItem) {
-			if (assessmentItem.isComplete) {
-				return this.localize('complete');
-			}
-
-			var dueDateString;
-			var calendarDateDiff = this.getDateDiffInCalendarDays(assessmentItem.dueDate);
-
-			if (calendarDateDiff === 0) {
-				dueDateString = this.localize('today');
-			} else if (calendarDateDiff === 1) {
-				dueDateString = this.localize('tomorrow');
-			}
-
-			if (dueDateString) {
-				return this.localize('dueDateShort', 'dueDate', dueDateString);
-			}
-		}
+		]
 
 	});
 	</script>
