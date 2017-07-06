@@ -12,7 +12,7 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-06-28T23:00:00.000Z"
+                        "date": "2017-07-06T23:00:00.000Z"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -31,6 +31,12 @@
                         "https://api.brightspace.com/rels/assignment"
                     ],
                     "href": "data/assignments/12345/assignment4.json"
+                },
+                {
+                    "rel": [
+                        "https://api.brightspace.com/rels/organization"
+                    ],
+                    "href": "data/organizations/123.json"
                 },
                 {
                     "rel": [
@@ -55,7 +61,7 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-06-29T23:00:00.000Z"
+                        "date": "2017-07-07T23:00:00.000Z"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -89,7 +95,7 @@
                 }
             ],
             "rel": [
-                "https://api.brightspace.com/rels/user-activity-usage"
+                "https://activities.api.brightspace.com/rels/user-activity-usage"
             ]
         },
         {
@@ -104,7 +110,7 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-07-03T23:00:00.000Z"
+                        "date": "2017-07-12T23:00:00.000Z"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -138,7 +144,7 @@
                 }
             ],
             "rel": [
-                "https://api.brightspace.com/rels/user-activity-usage"
+                "https://activities.api.brightspace.com/rels/user-activity-usage"
             ]
         },
         {
@@ -153,7 +159,7 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-06-24T23:00:00.000Z"
+                        "date": "2017-07-13T23:00:00.000Z"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -175,13 +181,19 @@
                 },
                 {
                     "rel": [
+                        "https://api.brightspace.com/rels/organization"
+                    ],
+                    "href": "data/organizations/123.json"
+                },
+                {
+                    "rel": [
                         "https://activities.api.brightspace.com/rels/activity-usage"
                     ],
                     "href": "data/activities/assignment1/usages/123.json"
                 }
             ],
             "rel": [
-                "https://api.brightspace.com/rels/user-activity-usage"
+                "https://activities.api.brightspace.com/rels/user-activity-usage"
             ]
         }
     ],
