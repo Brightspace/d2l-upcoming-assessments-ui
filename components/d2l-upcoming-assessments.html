@@ -6,8 +6,8 @@
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../src/behaviors/date-behavior.html">
 <link rel="import" href="../src/behaviors/localize-behavior.html">
-<link rel="import" href="d2l-assessments-list.html">
 <link rel="import" href="d2l-all-assessments-list.html">
+<link rel="import" href="d2l-assessments-list.html">
 
 <dom-module id="d2l-upcoming-assessments">
 	<template>
@@ -216,8 +216,8 @@
 				return !showError && (!assessments || assessments.length <= 0);
 			},
 
-			_hasActivities: function(assessments) {
-				return assessments && assessments.length > 0;
+			_hasActivities: function(activities) {
+				return activities && activities.length > 0;
 			},
 
 			_getUserActivityUsages: function(userEntity) {
@@ -353,7 +353,7 @@
 			},
 
 			_updateCloseSimpleOverlayText: function(isMobile) {
-				this._closeSimpleOverlayText = isMobile
+								this._closeSimpleOverlayText = isMobile
 					? this.localize('closeSimpleOverlayTextMobile')
 					: this.localize('closeSimpleOverlayText');
 			}
