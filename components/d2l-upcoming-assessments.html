@@ -69,26 +69,24 @@
 		</style>
 
 
-		<template is="dom-if" if="[[_showNoUpcomingAssessmentsMessage(_assessments, _showError)]]">
-			<div class="no-upcoming-assessments">[[_noUpcomingAssessments]]</div>
-		</template>
+		<div class="no-upcoming-assessments"
+			 hidden$="[[!_showNoUpcomingAssessmentsMessage(_assessments, _showError)]]">
+			 [[_noUpcomingAssessments]]
+		</div>
 
 		<template is="dom-if" if="[[_showUpcomingAssessments(_assessments, _showError)]]">
 			<d2l-assessments-list assessment-items=[[_assessments]]></d2l-assessments-list>
 		</template>
 
-		<template is="dom-if" if="[[_showError]]">
-			<div class="error-message">[[localize('errorMessage')]]</div>
-		</template>
+		<div hidden$="[[!_showError]]" class="error-message">[[localize('errorMessage')]]</div>
 
-		<template is="dom-if" if="[[!_showError]]">
-			<a class="view-all-assignments-link"
-				is="d2l-link"
-				on-tap="_openAllAssignmentsView"
-				on-keypress="_keypressOpenAllAssignmentsView" >
-				<h3>[[localize('viewAllAssignments')]]</h3>
-			</a>
-		</template>
+		<a class="view-all-assignments-link"
+			is="d2l-link"
+			on-tap="_openAllAssignmentsView"
+			on-keypress="_keypressOpenAllAssignmentsView"
+			hidden$=[[_showError]]>
+			<h3>[[localize('viewAllAssignments')]]</h3>
+		</a>
 
 		<d2l-simple-overlay
 			id="view-all-assignments-overlay"
@@ -104,7 +102,9 @@
 					</div>
 				</d2l-simple-overlay-close-button>
 			</div>
-			<d2l-all-assessments-list hidden$="[[!_hasActivities(_allActivities)]]" assessment-items=[[_allActivities]]></d2l-all-assessments-list>
+			<template is="dom-if" if="[[_hasActivities(_allActivities)]]">
+				<d2l-all-assessments-list assessment-items=[[_allActivities]]></d2l-all-assessments-list>
+			</template>
 			<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
 
 		</d2l-simple-overlay>
@@ -353,7 +353,7 @@
 			},
 
 			_updateCloseSimpleOverlayText: function(isMobile) {
-								this._closeSimpleOverlayText = isMobile
+				this._closeSimpleOverlayText = isMobile
 					? this.localize('closeSimpleOverlayTextMobile')
 					: this.localize('closeSimpleOverlayText');
 			}
