@@ -22,16 +22,6 @@
 			.assessment-title {
 				@apply --d2l-heading-3;
 				margin: 0;
-				font-size: 16px;
-				font-weight: normal;
-			}
-
-			.assessment-info {
-				@apply --d2l-body-standard-text;
-				font-size: 12px;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
 			}
 
 			.row {
@@ -40,7 +30,11 @@
 			}
 
 			.course-name {
-				line-height: 1;
+				@apply --d2l-body-standard-text;
+				font-size: 0.7rem;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
 			}
 
 			iron-icon.completion-icon {
@@ -55,22 +49,30 @@
 				height: 18px;
 			}
 
+			iron-icon.activity-icon {
+				width: 30px;
+				height: 30px;
+			}
+
 			iron-icon.activity-icon, .spacer {
-				flex: 0 0 75px;
+				flex: 0 0 100px;
 			}
 
 			.instructions {
 				@apply --d2l-body-compact-text;
-				font-size: 14px;
+				font-size: 0.7rem;
 				font-weight: 300;
-				margin-top: 1rem;
+				margin-top: 12px;
 				max-height: 2.4rem;
 				overflow: hidden;
+				padding-right: 100px;
 			}
 
 			@media (max-width: 767px) {
 				:host {
 					border-radius: 0px;
+					border-left: 0px;
+					border-right: 0px;
 				}
 
 				.instructions-row {
@@ -82,10 +84,8 @@
 			<div class="row">
 				<iron-icon class="activity-icon" icon="d2l-tier3:assignments"></iron-icon>
 				<div class="info-container">
-					<h3 class="assessment-title">{{assessmentItem.name}}</h3>
-					<div class="assessment-info">
-						<div class="course-name">{{assessmentItem.courseName}}</div>
-					</div>
+					<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+					<div class="course-name">[[assessmentItem.courseName]]</div>
 				</div>
 			</div>
 			<div class="row instructions-row">

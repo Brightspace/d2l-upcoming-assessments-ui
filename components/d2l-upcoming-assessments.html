@@ -100,7 +100,7 @@
 				<d2l-simple-overlay-close-button>
 					<div class="overlay-close-button-content-wrapper">
 						<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
-						<span>[[localize('closeSimpleOverlayText')]]</span>
+						<span>[[_closeSimpleOverlayText]]</span>
 					</div>
 				</d2l-simple-overlay-close-button>
 			</div>
@@ -120,7 +120,7 @@
 			properties: {
 				userUrl: String,
 				token: String,
-				ready: {
+				loaded: {
 					type: Boolean,
 					notify: true,
 					readOnly: true,
@@ -151,6 +151,9 @@
 				_noAssessmentsInThisTimeFrame: {
 					type: String,
 					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _userName)'
+				},
+				_closeSimpleOverlayText: {
+					type: String
 				}
 			},
 
@@ -163,6 +166,12 @@
 			observers: [
 				'_onApiConfigChanged(userUrl, token)'
 			],
+
+			ready: function() {
+				var mql = window.matchMedia('(max-width: 767px)');
+				this._updateCloseSimpleOverlayText(mql.matches);
+				mql.addListener(this._mobileBreakpointListener.bind(this));
+			},
 
 			_debounceTime: 20,
 
@@ -191,7 +200,7 @@
 						self._showError = true;
 					})
 					.then(function() {
-						self._setReady(true);
+						self._setLoaded(true);
 					});
 			},
 
@@ -337,6 +346,16 @@
 					});
 					xhr.send();
 				});
+			},
+
+			_mobileBreakpointListener: function(mqlevent) {
+				this._updateCloseSimpleOverlayText(mqlevent.matches);
+			},
+
+			_updateCloseSimpleOverlayText: function(isMobile) {
+				this._closeSimpleOverlayText = isMobile
+					? this.localize('closeSimpleOverlayTextMobile')
+					: this.localize('closeSimpleOverlayText');
 			}
 		});
 
