@@ -1,5 +1,5 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../d2l-icon/d2l-icon.html">
+<link rel="import" href="../../d2l-icons/d2l-icon.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../../d2l-colors/d2l-colors.html">
 <link rel="import" href="../../d2l-icons/tier3-icons.html">
@@ -52,23 +52,26 @@
 
 			.info-container {
 				display: flex;
-				flex-direction: column;
+				justify-content: space-between;
 				width: 100%;
 				padding-right: 100px;
 			}
 
 			.item-header {
-				display: inline-flex;
 				justify-content: space-between;
 			}
 
 			.critical-info {
-				align-self: center;
+				align-self: flex-start;
 				color: var(--d2l-color-olivine);;
 				border: 1px solid var(--d2l-color-olivine);;
-				padding: 5px 20px;
 				border-radius: 6px;
+				padding: 5px 20px;
+				margin-top: -5px;
 				text-transform: uppercase;
+			}
+			.critical-info:empty {
+				display: none;
 			}
 
 			@media (max-width: 767px) {
@@ -93,9 +96,9 @@
 				<div class="info-container">
 					<div class="item-header">
 						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
-						<span class="critical-info">[[_getCriticalInfo(assessmentItem)]]</span>
+						<div class="course-name">[[assessmentItem.courseName]]</div>
 					</div>
-					<div class="course-name">[[assessmentItem.courseName]]</div>
+					<div class="critical-info">[[_getCriticalInfo(assessmentItem)]]</div>
 				</div>
 			</div>
 			<div class="row instructions-row">
@@ -126,7 +129,7 @@
 
 		_getDateString: function(dueDateUTC) {
 			var dueDateString;
-			var calendarDateDiff = this.getDateDiffInCalendarDays(dueDateUTC);
+
 
 			if (calendarDateDiff === 0) {
 				dueDateString = this.localize('today');
@@ -139,8 +142,23 @@
 			return this.localize('dueDateShort', 'dueDate', dueDateString);
 		},
 
-		_getCriticalInfo: function() {
-			return 'Completed';
+		_getCriticalInfo: function(assessmentItem) {
+			if (assessmentItem.isComplete) {
+				return this.localize('complete');
+			}
+
+			var dueDateString;
+			var calendarDateDiff = this.getDateDiffInCalendarDays(assessmentItem.dueDate);
+
+			if (calendarDateDiff === 0) {
+				dueDateString = this.localize('today');
+			} else if (calendarDateDiff === 1) {
+				dueDateString = this.localize('tomorrow');
+			}
+
+			if (dueDateString) {
+				return this.localize('dueDateShort', 'dueDate', dueDateString);
+			}
 		}
 
 	});
