@@ -127,6 +127,13 @@
 					reflectToAttribute: true,
 					value: false
 				},
+				totalCount: {
+					type: Number,
+					notify: true,
+					readOnly: true,
+					reflectToAttribute: true,
+					value: 0
+				},
 				_assessments: {
 					type: Array,
 					value: function() {
@@ -239,10 +246,12 @@
 
 					var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
 					var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
+					var activityIsComplete = !!assignment.getSubEntityByClass('complete');
 
 					var activityUsageRequest = self._fetchEntity(activityUsageLink)
 						.then(function(activityUsageEntity) {
 							return {
+								activityIsComplete: activityIsComplete,
 								activityUsage: activityUsageEntity,
 								orgUnitLink: orgUnitLink
 							};
@@ -266,6 +275,7 @@
 
 					var assignmentLink = response.activityUsage.getLinkByRel(self.HypermediaRels.assignment).href;
 					var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
+					var activityIsComplete = response.activityIsComplete;
 
 					if (!orgUnitRequest) {
 						orgUnitRequest = self._fetchEntity(response.orgUnitLink);
@@ -282,9 +292,10 @@
 
 								resolve({
 									name: activity.properties.name,
+                  courseName: organization.properties.name,
 									dueDate: activity.properties.dueDate,
 									instructions: activity.properties.instructions,
-									courseName: organization.properties.name
+									isCompleted: activityIsComplete
 								});
 							});
 					});
@@ -306,12 +317,13 @@
 						return a.dueDate > b.dueDate;
 					});
 
-				var basicListActivities = activities
+				var upcomingActivities = activities
 					.filter(function(activity) {
 						return self.isActivityUpcoming(activity);
-					})
-					.slice(0, 4);
+					});
+				this._setTotalCount(upcomingActivities.length);
 
+				var basicListActivities = upcomingActivities.slice(0, 4);
 				this.set('_assessments', basicListActivities);
 				this.set('_allActivities', activities);
 			},
