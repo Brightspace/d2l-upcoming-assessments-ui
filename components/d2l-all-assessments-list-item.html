@@ -50,6 +50,27 @@
 				padding-right: 100px;
 			}
 
+			.info-container {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				padding-right: 100px;
+			}
+
+			.item-header {
+				display: inline-flex;
+				justify-content: space-between;
+			}
+
+			.critical-info {
+				align-self: center;
+				color: var(--d2l-color-olivine);;
+				border: 1px solid var(--d2l-color-olivine);;
+				padding: 5px 20px;
+				border-radius: 6px;
+				text-transform: uppercase;
+			}
+
 			@media (max-width: 767px) {
 				:host {
 					border-radius: 0px;
@@ -60,13 +81,20 @@
 				.instructions-row {
 					display: none;
 				}
+
+				.info-container {
+					padding-right: 30px;
+				}
 			}
 
 		</style>
 			<div class="row">
 				<d2l-icon class="activity-icon" icon="d2l-tier3:assignments"></d2l-icon>
 				<div class="info-container">
-					<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+					<div class="item-header">
+						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+						<span class="critical-info">[[_getCriticalInfo(assessmentItem)]]</span>
+					</div>
 					<div class="course-name">[[assessmentItem.courseName]]</div>
 				</div>
 			</div>
@@ -109,6 +137,10 @@
 			}
 
 			return this.localize('dueDateShort', 'dueDate', dueDateString);
+		},
+
+		_getCriticalInfo: function() {
+			return 'Completed';
 		}
 
 	});
