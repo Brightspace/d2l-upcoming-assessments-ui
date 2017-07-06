@@ -1,8 +1,7 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../iron-icon/iron-icon.html">
+<link rel="import" href="../../d2l-icon/d2l-icon.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../../d2l-colors/d2l-colors.html">
-<link rel="import" href="../../d2l-icons/tier1-icons.html">
 <link rel="import" href="../../d2l-icons/tier3-icons.html">
 <link rel="import" href="../src/behaviors/date-behavior.html">
 <link rel="import" href="../src/behaviors/localize-behavior.html">
@@ -37,24 +36,7 @@
 				align-items: center;
 			}
 
-			iron-icon.completion-icon {
-				fill: var(--d2l-color-olivine);
-				width: 18px;
-				height: 18px;
-			}
-
-			iron-icon.separator-icon {
-				opacity: 0.8;
-				width: 18px;
-				height: 18px;
-			}
-
-			iron-icon.activity-icon {
-				width: 30px;
-				height: 30px;
-			}
-
-			iron-icon.activity-icon, .spacer {
+			.activity-icon, .spacer {
 				flex: 0 0 100px;
 			}
 
@@ -82,7 +64,7 @@
 
 		</style>
 			<div class="row">
-				<iron-icon class="activity-icon" icon="d2l-tier3:assignments"></iron-icon>
+				<d2l-icon class="activity-icon" icon="d2l-tier3:assignments"></d2l-icon>
 				<div class="info-container">
 					<h3 class="assessment-title">[[assessmentItem.name]]</h3>
 					<div class="course-name">[[assessmentItem.courseName]]</div>
