@@ -1,0 +1,99 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
+<link rel="import" href="../src/behaviors/date-behavior.html">
+
+<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
+<script>
+	'use strict';
+
+	window.D2L = window.D2L || {};
+	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
+
+	/*
+	* @polymerBehavior window.D2L.UpcomingAssessments.UpcomingAssessmentsCountBehavior
+	*/
+	var upcomingAssessmentsCountBehaviorImpl = {
+
+		properties: {
+			userUrl: String,
+			token: String,
+			totalCount: {
+				type: Number,
+				notify: true,
+				readOnly: true,
+				reflectToAttribute: true,
+				value: 0
+			}
+		},
+
+		observers: [
+			'_onApiConfigChanged(userUrl, token)'
+		],
+
+		_debounceTime: 20,
+
+		_getInfo: function() {
+			var self = this;
+
+			return this._fetchEntity(self.userUrl)
+				.then(function(userEntity) {
+					return self._getUserActivityUsages(userEntity);
+				})
+				.then(function(activities) {
+					self._setTotalCount(
+						(activities.getSubEntitiesByClass('user-assignment-activity') || [])
+						.map(function(assignment) {
+							return {
+								dueDate: ((assignment.getSubEntityByClass('due-date') || {}).properties || {}).date
+							};
+						})
+						.filter(function(item) {
+							return self.isActivityUpcoming(item);
+						})
+						.length
+					);
+				});
+		},
+
+		_onApiConfigChanged: function() {
+			this.debounce('getInfo', this._getInfo, this._debounceTime);
+		},
+
+		_getUserActivityUsages: function(userEntity) {
+			var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
+
+			if (myActivitiesLink) {
+				return this._fetchEntity(myActivitiesLink);
+			}
+		},
+
+		_fetchEntity: function(url) {
+			var token = this.token;
+
+			return new Promise(function(resolve, reject) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url);
+				xhr.setRequestHeader('Accept', 'application/vnd.siren+json');
+				xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+				xhr.addEventListener('load', function() {
+					if (xhr.status === 200 || xhr.status === 304) {
+						resolve(window.D2L.Hypermedia.Siren.Parse(xhr.responseText));
+					} else {
+						reject(xhr.error || xhr.status);
+					}
+				});
+				xhr.addEventListener('error', function() {
+					reject(xhr.error || xhr.status);
+				});
+				xhr.send();
+			});
+		}
+	};
+
+	window.D2L.UpcomingAssessments.UpcomingAssessmentsCountBehavior = [
+		window.D2L.UpcomingAssessments.DateBehavior,
+		window.D2L.Hypermedia.HMConstantsBehavior,
+		upcomingAssessmentsCountBehaviorImpl
+	];
+
+</script>
