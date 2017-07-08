@@ -23,6 +23,13 @@
 				readOnly: true,
 				reflectToAttribute: true,
 				value: 0
+			},
+			overdueCount: {
+				type: Number,
+				notify: true,
+				readOnly: true,
+				reflectToAttribute: true,
+				value: 0
 			}
 		},
 
@@ -40,18 +47,12 @@
 					return self._getUserActivityUsages(userEntity);
 				})
 				.then(function(activities) {
-					self._setTotalCount(
-						(activities.getSubEntitiesByClass('user-assignment-activity') || [])
-						.map(function(assignment) {
-							return {
-								dueDate: ((assignment.getSubEntityByClass('due-date') || {}).properties || {}).date
-							};
-						})
-						.filter(function(item) {
-							return self.isActivityUpcoming(item);
-						})
-						.length
-					);
+					self._setTotalCount(self._getTotalCount(activities));
+
+					return self._getOverdueActivities(activities);
+				})
+				.then(function(overdueActivities) {
+					self._setOverdueCount(self._getOverdueCount(overdueActivities));
 				});
 		},
 
@@ -65,6 +66,32 @@
 			if (myActivitiesLink) {
 				return this._fetchEntity(myActivitiesLink);
 			}
+		},
+
+		_getOverdueActivities: function(activities) {
+			var overdueActivitiesLink = (activities.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;
+
+			if (overdueActivitiesLink) {
+				return this._fetchEntity(overdueActivitiesLink);
+			}
+		},
+
+		_getTotalCount: function(activities) {
+			var self = this;
+			return (activities.getSubEntitiesByClass('user-assignment-activity') || [])
+				.map(function(assignment) {
+					return {
+						dueDate: ((assignment.getSubEntityByClass('due-date') || {}).properties || {}).date
+					};
+				})
+				.filter(function(item) {
+					return self.isActivityUpcoming(item);
+				})
+				.length;
+		},
+
+		_getOverdueCount: function(overdueActivities) {
+			return (overdueActivities.getSubEntitiesByClass('user-assignment-activity') || []).length;
 		},
 
 		_fetchEntity: function(url) {
