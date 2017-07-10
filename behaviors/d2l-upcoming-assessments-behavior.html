@@ -1,0 +1,163 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
+<link rel="import" href="./date-behavior.html">
+
+<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
+<script>
+	'use strict';
+
+	window.D2L = window.D2L || {};
+	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
+
+	/*
+	* @polymerBehavior window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior
+	*/
+	var upcomingAssessmentsBehaviorImpl = {
+
+		_getActivityUsagesInfo: function(activities, token) {
+			var requests = [];
+			var self = this;
+
+			activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
+				if (!assignment.getSubEntityByClass('due-date')) {
+					return;
+				}
+
+				var orgUnitLink = (assignment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
+				var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
+				var activityIsComplete = !!assignment.getSubEntityByClass('complete');
+
+				var activityUsageRequest = self._fetchEntity(activityUsageLink, token)
+					.then(function(activityUsageEntity) {
+						return {
+							activityIsComplete: activityIsComplete,
+							activityUsage: activityUsageEntity,
+							orgUnitLink: orgUnitLink
+						};
+					});
+
+				requests.push(activityUsageRequest);
+			});
+
+			return Promise.all(requests);
+		},
+
+		_getUserActivityUsageInfo: function(responses, token) {
+			var requests = [];
+			var orgPromiseMap = {};
+			var self = this;
+
+			responses.forEach(function(response) {
+				if (!response.activityUsage.hasClass('published')) {
+					return;
+				}
+
+				var assignmentLink = response.activityUsage.getLinkByRel(self.HypermediaRels.assignment).href;
+				var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
+				var activityIsComplete = response.activityIsComplete;
+
+				if (!orgUnitRequest) {
+					orgUnitRequest = self._fetchEntity(response.orgUnitLink, token);
+					orgPromiseMap[response.orgUnitLink] = orgUnitRequest;
+				}
+
+				var assignmentRequest = self._fetchEntity(assignmentLink, token);
+
+				var request = new Promise(function(resolve) {
+					Promise.all([assignmentRequest, orgUnitRequest])
+						.then(function(response) {
+							var activity = response[0];
+							var organization = response[1];
+
+							resolve({
+								name: activity.properties.name,
+								courseName: organization.properties.name,
+								dueDate: activity.properties.dueDate,
+								instructions: activity.properties.instructions,
+								isCompleted: activityIsComplete
+							});
+						});
+				});
+
+				requests.push(request);
+			});
+
+			return Promise.all(requests);
+		},
+
+		_getOverdueActivitiesList: function(userUrl, token) {
+			var self = this;
+
+			return this._fetchEntity(userUrl, token)
+				.then(function(userEntity) {
+					return self._getUserActivityUsages(userEntity);
+				})
+				.then(function(activities) {
+					self._setTotalCount(self._getTotalCount(activities));
+
+					return self._getOverdueActivities(activities);
+				});
+		},
+
+		_getUserActivityUsages: function(userEntity, token) {
+			var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
+
+			if (myActivitiesLink) {
+				return this._fetchEntity(myActivitiesLink, token);
+			}
+		},
+
+		_getOverdueActivities: function(activities, token) {
+			var overdueActivitiesLink = (activities.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;
+
+			if (overdueActivitiesLink) {
+				return this._fetchEntity(overdueActivitiesLink, token);
+			}
+		},
+
+		_getTotalCount: function(activities) {
+			var self = this;
+			return (activities.getSubEntitiesByClass('user-assignment-activity') || [])
+				.map(function(assignment) {
+					return {
+						dueDate: ((assignment.getSubEntityByClass('due-date') || {}).properties || {}).date
+					};
+				})
+				.filter(function(item) {
+					return self.isActivityUpcoming(item);
+				})
+				.length;
+		},
+
+		_getOverdueCount: function(overdueActivities) {
+			return (overdueActivities.getSubEntitiesByClass('user-assignment-activity') || []).length;
+		},
+
+		_fetchEntity: function(url, token) {
+			return new Promise(function(resolve, reject) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url);
+				xhr.setRequestHeader('Accept', 'application/vnd.siren+json');
+				xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+				xhr.addEventListener('load', function() {
+					if (xhr.status === 200 || xhr.status === 304) {
+						resolve(window.D2L.Hypermedia.Siren.Parse(xhr.responseText));
+					} else {
+						reject(xhr.error || xhr.status);
+					}
+				});
+				xhr.addEventListener('error', function() {
+					reject(xhr.error || xhr.status);
+				});
+				xhr.send();
+			});
+		}
+	};
+
+	window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior = [
+		window.D2L.UpcomingAssessments.DateBehavior,
+		window.D2L.Hypermedia.HMConstantsBehavior,
+		upcomingAssessmentsBehaviorImpl
+	];
+
+</script>
