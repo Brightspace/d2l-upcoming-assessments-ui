@@ -3,7 +3,7 @@ node_js: 6
 dist: trusty
 sudo: required
 before_script:
-- npm run test:lint:js
+- npm run test
 script:
 #- xvfb-run wct
 - if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi
