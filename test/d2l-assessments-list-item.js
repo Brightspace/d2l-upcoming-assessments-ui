@@ -5,15 +5,17 @@
 describe('<d2l-assessments-list-item>', function() {
 
 	var assessmentItem = {
-		'title': 'Math Quiz',
+		'name': 'Math Quiz',
 		'courseName': 'Math',
+		'instructions': 'Do the math quiz pls, k thx.',
 		'itemType': 'Quiz',
 		'dueDate': '2017-04-06'
 	};
 
 	var completedAssessmentItem = {
-		'title': 'Math Quiz',
+		'name': 'Math Quiz',
 		'courseName': 'Math',
+		'instructions': 'Do the math quiz pls, k thx.',
 		'itemType': 'Quiz',
 		'dueDate': '2017-04-06',
 		'isCompleted': true
@@ -35,10 +37,8 @@ describe('<d2l-assessments-list-item>', function() {
 
 			element.set('assessmentItem', assessmentItem);
 
-			expect(element.$$('.assessment-title').textContent).to.equal(assessmentItem.title);
+			expect(element.$$('.assessment-title').textContent).to.equal(assessmentItem.name);
 			expect(element.$$('.course-name').textContent).to.equal(assessmentItem.courseName);
-			expect(element.$$('.item-type').textContent).to.equal(assessmentItem.itemType);
-			expect(element.$$('.due-date').textContent).to.contain(assessmentItem.dueDate);
 		});
 
 		it('has a completion checkmark when completed', function() {
