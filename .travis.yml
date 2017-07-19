@@ -3,13 +3,20 @@ node_js: 6
 dist: trusty
 sudo: required
 before_script:
-- npm run test
+- npm run test:lint:js
+- export CHROME_BIN=/usr/bin/google-chrome
+- wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+- sudo gdebi --non-interactive google-chrome*.deb
 script:
-#- xvfb-run wct
+- set -e
+- xvfb-run wct test/unit --skip-plugin sauce
+- 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then xvfb-run wct test/unit --skip-plugin local; fi'
 - if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi
 env:
   global:
   - REPO_NAME=d2l-upcoming-assessments-ui
+  #SAUCE_USERNAME
+  - secure: zzxeqWVP2sqEm4ovR9jeXE8INQdWSmV6sPSjBe2K8hxdG/hCA9Lzu/2S1bSV5fFcugXZ9UXMTxwus/b9Eo46qg0AfCB1poBIfWeroeFu83TpsI+WsVSaIh5/W3Z29nX/BFyroFCb1kj8B7rIOvl6/C/yQVqg1lD4vzcMI7/V5kU7nA+MRkE+Z08zUxK8KPdZYxi9TZ9gsOP14zTSYRqotg706sOmFIdzCd5yp+B2GgRkHzZY2S6C3+I3wp/77hz7eXzFzW0nX7XOnQqC/fiEw+EYg4JitYJmpfvgetOTOCxHIPTLn8qUXkk2qTALVZS6+oTgtYZaGxQngUMx3tbuMUeWGgPingB5kZtutWYv542lX4zUgrPe6VVhdshykm7KsXDluUP13784dHR8XduDV+QN7698YFSMkr4NnOyqYyEiFjeP5R0jnhAIqVYThl5mRlAb5Jhk16GZjGb39R76WuwfLZe8bKOcaHwRfZLHWscDLIAstw0GTECnJPv0LROcFcDZ1FtSpOvFCkkIRD+veRGptN9QGHi4mQsgG3tBFCWvKKIusfqS7YUI5Yat2zNlFGgWhbGFFVSKxQrLBha3DhkJf044D4RBoDqqz1VI8XkAW70RjxEtg3TZc9vWL4aCysC2Zb1Md+5kY4upd6aHmkoN/s1HK3sehdP662zmQ0I=
 addons:
   firefox: latest
   apt:
