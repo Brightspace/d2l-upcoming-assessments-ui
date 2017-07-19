@@ -9,8 +9,8 @@ before_script:
 - sudo gdebi --non-interactive google-chrome*.deb
 script:
 - set -e
-- xvfb-run wct test/unit --skip-plugin sauce
-- 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then xvfb-run wct test/unit --skip-plugin local; fi'
+- xvfb-run wct test --skip-plugin sauce
+- 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then xvfb-run wct test --skip-plugin local; fi'
 - if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi
 env:
   global:
