@@ -9,6 +9,7 @@
   "scripts": {
     "postinstall": "bower install",
     "test": "npm run test:lint:js && npm run test:wct",
+    "test:local": "npm run test:lint:js && npm run test:wct:local",
     "test:lint:js": "./node_modules/.bin/eslint --ext .js,.html .",
     "test:lint:wc": "polymer lint --root components/*",
     "test:wct": "polymer test -p",

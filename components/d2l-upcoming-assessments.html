@@ -214,6 +214,9 @@
 					.then(function(activities) {
 						return self._getActivityInfo(activities);
 					})
+					.catch(function() {
+						self._showError = true;
+					})
 					.then(function() {
 						if (!self._showError) {
 							self._userName = userName;
@@ -312,7 +315,7 @@
 
 			_loadActivitiesForPeriod(periodUrl) {
 				if (!periodUrl) {
-					return;
+					return Promise.resolve();
 				}
 
 				var self = this;

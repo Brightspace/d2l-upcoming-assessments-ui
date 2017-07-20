@@ -5,6 +5,14 @@
 describe('<d2l-upcoming-assessments>', function() {
 
 	var element;
+	var nextPeriodUrl = '/some/period/beyond/now/';
+	var previousPeriodUrl = '/some/period/before/now/';
+	var activities = {
+		properties: {
+			start: '2017-07-19T16:20:07.567Z',
+			end: '2017-08-02T16:20:07.567Z'
+		}
+	};
 
 	beforeEach(function() {
 		element = fixture('basic');
@@ -76,6 +84,79 @@ describe('<d2l-upcoming-assessments>', function() {
 			}, 20);
 		});
 		*/
+
+		describe('_getActivityInfo', function() {
+
+			it('sets the nextPeriodUrl if the link exists on the provided activities object', function() {
+				activities.getLinkByRel = sandbox.stub().withArgs('https://activities.api.brightspace.com/rels/next-period').returns({ href: nextPeriodUrl });
+				activities.getSubEntitiesByClass = sandbox.stub().returns([]);
+				return element._getActivityInfo(activities)
+					.then(function() {
+						expect(element._nextPeriodUrl).to.equal(nextPeriodUrl);
+					});
+			});
+
+			it('sets the previousPeriodUrl if the link exists on the provided activities object', function() {
+				activities.getLinkByRel = sandbox.stub().withArgs('https://activities.api.brightspace.com/rels/previous-period').returns({ href: previousPeriodUrl });
+				activities.getSubEntitiesByClass = sandbox.stub().returns([]);
+				return element._getActivityInfo(activities)
+					.then(function() {
+						expect(element._previousPeriodUrl).to.equal(previousPeriodUrl);
+					});
+			});
+
+		});
+
+		describe('_goNext', function() {
+			it('invokes _loadActivitiesForPeriod with the nextPeriodUrl', function() {
+				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve());
+				element._nextPeriodUrl = nextPeriodUrl;
+				return element._goNext()
+					.then(function() {
+						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(nextPeriodUrl);
+					});
+			});
+		});
+
+		describe('_goPrev', function() {
+			it('invokes _loadActivitiesForPeriod with the previousPeriodUrl', function() {
+				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve());
+				element._previousPeriodUrl = previousPeriodUrl;
+				return element._goPrev()
+					.then(function() {
+						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(previousPeriodUrl);
+					});
+			});
+		});
+
+		describe('_loadActivitiesForPeriod', function() {
+
+			it('does nothing if the provided url was not set', function() {
+				element._fetchEntity = sandbox.stub();
+				return element._loadActivitiesForPeriod()
+					.then(function() {
+						expect(element._fetchEntity).to.not.have.been.called;
+					});
+			});
+
+			it('calls _fetchEntity for the provided url', function() {
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				return element._loadActivitiesForPeriod(nextPeriodUrl)
+					.then(function() {
+						expect(element._fetchEntity).to.have.been.calledWith(nextPeriodUrl);
+					});
+			});
+
+			it('calls _getActivityInfo with the retrieved activities response', function() {
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				element._getActivityInfo = sandbox.spy();
+				return element._loadActivitiesForPeriod(nextPeriodUrl)
+					.then(function() {
+						expect(element._getActivityInfo).to.have.been.calledWith(activities);
+					});
+			});
+
+		});
 
 	});
 
