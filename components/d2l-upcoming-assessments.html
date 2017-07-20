@@ -327,8 +327,15 @@
 			},
 
 			_getFormattedPeriodText: function(startDate, endDate) {
-				var startDateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(startDate));
-				var endDateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(endDate));
+				var startDateDate = new Date(startDate);
+				var endDateDate = new Date(endDate);
+				var startDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(startDateDate);
+
+				var endDateFormatOptions = { day: 'numeric' };
+				if (startDateDate.getMonth() !== endDateDate.getMonth()) {
+					endDateFormatOptions.month = 'long';
+				}
+				var endDateString = new Intl.DateTimeFormat(this.locale, endDateFormatOptions).format(endDateDate);
 
 				return this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
 			},
