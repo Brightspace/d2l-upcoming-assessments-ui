@@ -1,6 +1,7 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
+<link rel="import" href="../../d2l-page-load-progress/d2l-page-load-progress.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay-close-button.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
@@ -20,6 +21,10 @@
 			h2 {
 				font-weight: normal;
 				margin-left: 15px;
+			}
+
+			d2l-simple-overlay {
+				border-top: 0;
 			}
 
 			d2l-simple-overlay-close-button {
@@ -104,13 +109,16 @@
 			close-simple-overlay-alt-text="[[localize('closeSimpleOverlayText')]]"
 			no-cancel-on-outside-click
 			with-backdrop>
-			<div class="view-all-container" slot="header">
-				<d2l-simple-overlay-close-button>
-					<div class="overlay-close-button-content-wrapper">
-						<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
-						<span>[[_closeSimpleOverlayText]]</span>
-					</div>
-				</d2l-simple-overlay-close-button>
+			<div slot="header">
+				<d2l-page-load-progress id="allAssignmentsProgressBar" autostart color="#003b71"></d2l-page-load-progress>
+				<div class="view-all-container">
+					<d2l-simple-overlay-close-button>
+						<div class="overlay-close-button-content-wrapper">
+							<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
+							<span>[[_closeSimpleOverlayText]]</span>
+						</div>
+					</d2l-simple-overlay-close-button>
+				</div>
 			</div>
 			<div class="period-selection-container">
 				<a is="d2l-link" on-tap="_goPrev" on-keypress="_keypressGoPrev">[[localize('goPreviousText')]]</a>
@@ -197,6 +205,8 @@
 				var mql = window.matchMedia('(max-width: 767px)');
 				this._updateCloseSimpleOverlayText(mql.matches);
 				mql.addListener(this._mobileBreakpointListener.bind(this));
+
+				this.$.allAssignmentsProgressBar.finish();
 			},
 
 			_debounceTime: 20,
@@ -320,9 +330,15 @@
 
 				var self = this;
 
+				var progress = this.$.allAssignmentsProgressBar;
+				progress.start();
+
 				return this._fetchEntity(periodUrl, this.token)
 					.then(function(activities) {
 						return self._getActivityInfo(activities);
+					})
+					.then(function() {
+						progress.finish();
 					});
 			},
 
