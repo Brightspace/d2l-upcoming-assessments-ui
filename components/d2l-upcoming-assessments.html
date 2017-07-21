@@ -350,7 +350,8 @@
 				var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
 				var endDateString;
 				if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
-					endDateString = endDateDate.getDate();
+					//endDateString = endDateDate.getDate();
+					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
 				} else {
 					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
 				}
