@@ -40,6 +40,28 @@
 				flex: 0 0 100px;
 			}
 
+			.completion-info {
+				align-self: flex-start;
+				margin-right: 30px;
+				color: var(--d2l-color-olivine);
+				border: 1px solid var(--d2l-color-olivine);
+				border-radius: 6px;
+				padding: 7px 20px 2px 20px;
+				margin-top: -5px;
+				text-transform: uppercase;
+			}
+
+			[dir="rtl"] .completion-info {
+				margin-right: 0px;
+				margin-left: 30px;
+			}
+
+			.activity-info {
+				display: inline-flex;
+				flex: 1;
+				align-items: center;
+			}
+
 			.instructions {
 				@apply --d2l-body-compact-text;
 				font-size: 0.8rem;
@@ -69,10 +91,15 @@
 
 		</style>
 		<div class="row">
-			<d2l-icon class="activity-icon" icon="d2l-tier3:assignments"></d2l-icon>
-			<div class="info-container">
-				<h3 class="assessment-title">[[assessmentItem.name]]</h3>
-				<div class="course-name">[[assessmentItem.courseName]]</div>
+			<div class="activity-info">
+				<d2l-icon class="activity-icon" icon="d2l-tier3:assignments"></d2l-icon>
+				<div class="info-container">
+					<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+					<div class="course-name">[[assessmentItem.courseName]]</div>
+				</div>
+			</div>
+			<div class="completion-info" hidden$="[[!assessmentItem.isCompleted]]">
+				[[localize('activityComplete')]]
 			</div>
 		</div>
 		<div class="row instructions-row">

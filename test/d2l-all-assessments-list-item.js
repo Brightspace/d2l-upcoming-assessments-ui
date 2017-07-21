@@ -2,7 +2,7 @@
 
 'use strict';
 
-describe('<d2l-assessments-list-item>', function() {
+describe('<d2l-all-assessments-list-item>', function() {
 
 	var assessmentItem = {
 		'name': 'Math Quiz',
@@ -25,38 +25,29 @@ describe('<d2l-assessments-list-item>', function() {
 
 		it('can be instantiated', function() {
 			var element = fixture('basic');
-			expect(element.is).to.equal('d2l-assessments-list-item');
+			expect(element.is).to.equal('d2l-all-assessments-list-item');
 		});
 
 	});
 
 	describe('item rendering', function() {
-
-		it('renders the correct data', function() {
-			var element = fixture('basic');
-
-			element.set('assessmentItem', assessmentItem);
-
-			expect(element.$$('.assessment-title').textContent).to.equal(assessmentItem.name);
-			expect(element.$$('.course-name').textContent).to.equal(assessmentItem.courseName);
-		});
-
-		it('has a completion checkmark when completed', function() {
+		it('has a completion indicator when completed', function() {
 			var element = fixture('basic');
 
 			element.set('assessmentItem', completedAssessmentItem);
-			element.$$('template').render();
+			Polymer.dom.flush();
 
-			expect(element.$$('.completion-icon')).to.exist;
+			expect(element.$$('.completion-info')).to.exist;
+			expect(element.$$('.completion-info').getAttribute('hidden')).to.be.null;
 		});
 
-		it('doesn\'t have a completion checkmark when not completed', function() {
+		it('doesn\'t have a completion indicator when not completed', function() {
 			var element = fixture('basic');
 
 			element.set('assessmentItem', assessmentItem);
-			element.$$('template').render();
+			Polymer.dom.flush();
 
-			expect(element.$$('.completion-icon')).to.not.exist;
+			expect(element.$$('.completion-info').getAttribute('hidden')).to.not.be.null;
 		});
 
 	});
