@@ -349,11 +349,11 @@
 
 				var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
 				var endDateString;
-				//if (startDateDate.getMonth() === endDateDate.getMonth()) {
-				//	endDateString = endDateDate.getDate();
-				//} else {
-				endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
-				//}
+				if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
+					endDateString = endDateDate.getDate();
+				} else {
+					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
+				}
 
 				return this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
 			},
