@@ -66,24 +66,22 @@ describe('<d2l-upcoming-assessments>', function() {
 		// 	}, 20);
 		// });
 
-		/*
-		it.skip('displays an error message when request for data fails', function(done) {
-			element.userUrl = '/some/path/';
-			element.token = 'foozleberries';
+		// it('displays an error message when request for data fails', function(done) {
+		// 	element.userUrl = '/some/path/';
+		// 	element.token = 'foozleberries';
 
-			server.respondWith(
-				'GET',
-				fixture('basic').endpoint,
-				[404, {}, '']
-			);
+		// 	server.respondWith(
+		// 		'GET',
+		// 		fixture('basic').endpoint,
+		// 		[404, {}, '']
+		// 	);
 
-			setTimeout(function() {
-				expect(element._showError).to.equal(true);
-				expect(element.$$('.error-message')).to.exist;
-				done();
-			}, 20);
-		});
-		*/
+		// 	setTimeout(function() {
+		// 		expect(element._showError).to.equal(true);
+		// 		expect(element.$$('.error-message')).to.exist;
+		// 		done();
+		// 	}, 20);
+		// });
 
 		describe('_getActivityInfo', function() {
 
