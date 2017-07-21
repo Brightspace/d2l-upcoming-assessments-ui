@@ -1,5 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
+<link rel="import" href="../../d2l-intl/d2l-intl.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-page-load-progress/d2l-page-load-progress.html">
 <link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
@@ -345,18 +346,14 @@
 			_getFormattedPeriodText: function(startDate, endDate) {
 				var startDateDate = new Date(startDate);
 				var endDateDate = new Date(endDate);
-				var startDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(startDateDate);
 
-				var endDateFormatOptions = { month: 'long', day: 'numeric' };
-				// MAYBE SAFARI NO LIKEY getMonth()
-				// if (startDateDate.getMonth() !== endDateDate.getMonth()) {
-				// 	endDateFormatOptions.month = 'long';
-				// }
-				var endDateString = new Intl.DateTimeFormat(this.locale, endDateFormatOptions).format(endDateDate);
-
-				// SAFARI IS HAPPY WITH THIS
-				// var startDateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(startDate));
-				// var endDateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(endDate));
+				var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
+				var endDateString;
+				if (startDateDate.getMonth() === endDateDate.getMonth()) {
+					endDateString = endDateDate.getDate();
+				} else {
+					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
+				}
 
 				return this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
 			},
