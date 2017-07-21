@@ -2,15 +2,16 @@ extends:
   - brightspace
 env:
   browser: true
-  es6: true
   node: true
 plugins:
   - html
 rules:
   no-var: off
 globals:
-  Polymer: true
-  WCT: true
   a11ySuite: true
   expect: true
-  
+  Map: true
+  Polymer: true
+  Promise: true
+  WCT: true
+
