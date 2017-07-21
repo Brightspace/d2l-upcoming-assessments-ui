@@ -58,7 +58,8 @@ describe('<d2l-upcoming-assessments>', function() {
 		// 	}, 20);
 		// });
 
-		it('displays an error message when request for data fails', function(done) {
+		/*
+		it.skip('displays an error message when request for data fails', function(done) {
 			element.userUrl = '/some/path/';
 			element.token = 'foozleberries';
 
@@ -74,6 +75,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				done();
 			}, 20);
 		});
+		*/
 
 	});
 
