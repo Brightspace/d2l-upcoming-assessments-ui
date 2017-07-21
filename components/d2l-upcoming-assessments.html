@@ -347,7 +347,7 @@
 				var endDateDate = new Date(endDate);
 				var startDateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(startDateDate);
 
-				var endDateFormatOptions = { day: 'numeric' };
+				var endDateFormatOptions = { month: 'long', day: 'numeric' };
 				// MAYBE SAFARI NO LIKEY getMonth()
 				// if (startDateDate.getMonth() !== endDateDate.getMonth()) {
 				// 	endDateFormatOptions.month = 'long';
