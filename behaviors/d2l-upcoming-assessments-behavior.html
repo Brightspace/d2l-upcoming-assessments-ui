@@ -74,7 +74,8 @@
 								courseName: organization.properties.name,
 								dueDate: activity.properties.dueDate,
 								instructions: activity.properties.instructionsText || activity.properties.instructions,
-								isCompleted: activityIsComplete
+								isCompleted: activityIsComplete,
+								isDueToday: !activityIsComplete && self.getDateDiffInCalendarDays(activity.properties.dueDate) === 0
 							});
 						});
 				});

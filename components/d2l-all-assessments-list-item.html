@@ -40,17 +40,26 @@
 				flex: 0 0 100px;
 			}
 
-			.completion-info {
+			.activity-status-badge {
 				font-size: 0.9rem;
 				line-height: 2;
 				align-self: flex-start;
 				margin-right: 30px;
-				color: var(--d2l-color-olivine);
-				border: 1px solid var(--d2l-color-olivine);
+				border: 1px solid;
 				border-radius: 6px;
 				padding: 5px 20px 0 20px;
 				margin-top: -5px;
 				text-transform: uppercase;
+			}
+
+			.completion-info {
+				color: var(--d2l-color-olivine);
+				border-color: var(--d2l-color-olivine);
+			}
+
+			.due-today-info {
+				color: var(--d2l-color-celestine);
+				border-color: var(--d2l-color-celestine);
 			}
 
 			:host-context([dir="rtl"]) .completion-info {
@@ -100,7 +109,10 @@
 					<div class="course-name">[[assessmentItem.courseName]]</div>
 				</div>
 			</div>
-			<div class="completion-info" hidden$="[[!assessmentItem.isCompleted]]">
+			<div class="activity-status-badge due-today-info" hidden$="[[!assessmentItem.isDueToday]]">
+				[[localize('activityDueToday')]]
+			</div>
+			<div class="activity-status-badge completion-info" hidden$="[[!assessmentItem.isCompleted]]">
 				[[localize('activityComplete')]]
 			</div>
 		</div>
