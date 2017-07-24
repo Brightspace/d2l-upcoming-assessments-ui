@@ -50,6 +50,8 @@
 				padding: 5px 20px 0 20px;
 				margin-top: -5px;
 				text-transform: uppercase;
+				min-width: 105px;
+				text-align: center;
 			}
 
 			.completion-info {
@@ -60,6 +62,11 @@
 			.due-today-info {
 				color: var(--d2l-color-celestine);
 				border-color: var(--d2l-color-celestine);
+			}
+
+			.overdue-info {
+				color: var(--d2l-color-cinnabar);
+				border-color: var(--d2l-color-cinnabar);
 			}
 
 			:host-context([dir="rtl"]) .completion-info {
@@ -109,11 +116,14 @@
 					<div class="course-name">[[assessmentItem.courseName]]</div>
 				</div>
 			</div>
+			<div class="activity-status-badge completion-info" hidden$="[[!assessmentItem.isCompleted]]">
+				[[localize('activityComplete')]]
+			</div>
 			<div class="activity-status-badge due-today-info" hidden$="[[!assessmentItem.isDueToday]]">
 				[[localize('activityDueToday')]]
 			</div>
-			<div class="activity-status-badge completion-info" hidden$="[[!assessmentItem.isCompleted]]">
-				[[localize('activityComplete')]]
+			<div class="activity-status-badge overdue-info" hidden$="[[!assessmentItem.isOverdue]]">
+				[[localize('activityOverdue')]]
 			</div>
 		</div>
 		<div class="row instructions-row">

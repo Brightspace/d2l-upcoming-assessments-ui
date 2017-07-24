@@ -16,6 +16,7 @@
 
 		_getActivityUsagesInfo: function(activities, token) {
 			var requests = [];
+			var overduePromiseMap = {};
 			var self = this;
 
 			activities.getSubEntitiesByClass('user-assignment-activity').forEach(function(assignment) {
@@ -27,16 +28,31 @@
 				var activityUsageLink = assignment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
 				var activityIsComplete = !!assignment.getSubEntityByClass('complete');
 
-				var activityUsageRequest = self._fetchEntity(activityUsageLink, token)
-					.then(function(activityUsageEntity) {
-						return {
-							activityIsComplete: activityIsComplete,
-							activityUsage: activityUsageEntity,
-							orgUnitLink: orgUnitLink
-						};
-					});
+				var activityUsageRequest = self._fetchEntity(activityUsageLink, token);
+				var assignmentSelfHref = assignment.getLinkByRel('self').href;
+				var overdueActivitiesRequest = overduePromiseMap[self.HypermediaRels.Activities.overdue];
 
-				requests.push(activityUsageRequest);
+				if (!overdueActivitiesRequest) {
+					overdueActivitiesRequest = self._getOverdueActivities(activities, token);
+					overduePromiseMap[self.HypermediaRels.Activities.overdue] = overdueActivitiesRequest;
+				}
+
+				var request = new Promise(function(resolve) {
+					Promise.all([activityUsageRequest, overdueActivitiesRequest])
+						.then(function(response) {
+							var activityUsageEntity = response[0];
+							var overdueActivitiesEntity = response[1];
+
+							resolve({
+								activityIsComplete: activityIsComplete,
+								activityIsOverdue: overdueActivitiesEntity && overdueActivitiesEntity.getSubEntitiesByClass('user-assignment-activity').some(function(usage) { return usage.getLinkByRel('self').href === assignmentSelfHref; }),
+								activityUsage: activityUsageEntity,
+								orgUnitLink: orgUnitLink
+							});
+						});
+				});
+
+				requests.push(request);
 			});
 
 			return Promise.all(requests);
@@ -55,6 +71,7 @@
 				var assignmentLink = response.activityUsage.getLinkByRel(self.HypermediaRels.assignment).href;
 				var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
 				var activityIsComplete = response.activityIsComplete;
+				var activityIsOverdue = response.activityIsOverdue;
 
 				if (!orgUnitRequest) {
 					orgUnitRequest = self._fetchEntity(response.orgUnitLink, token);
@@ -75,7 +92,8 @@
 								dueDate: activity.properties.dueDate,
 								instructions: activity.properties.instructionsText || activity.properties.instructions,
 								isCompleted: activityIsComplete,
-								isDueToday: !activityIsComplete && self.getDateDiffInCalendarDays(activity.properties.dueDate) === 0
+								isDueToday: !activityIsComplete && !activityIsOverdue && self.getDateDiffInCalendarDays(activity.properties.dueDate) === 0,
+								isOverdue: activityIsOverdue
 							});
 						});
 				});
