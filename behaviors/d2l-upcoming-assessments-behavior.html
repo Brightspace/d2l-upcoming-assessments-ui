@@ -42,10 +42,15 @@
 						.then(function(response) {
 							var activityUsageEntity = response[0];
 							var overdueActivitiesEntity = response[1];
+							var isOverdue = overdueActivitiesEntity && overdueActivitiesEntity
+								.getSubEntitiesByClass('user-assignment-activity')
+								.some(function(usage) {
+									return usage.getLinkByRel('self').href === assignmentSelfHref;
+								});
 
 							resolve({
 								activityIsComplete: activityIsComplete,
-								activityIsOverdue: overdueActivitiesEntity && overdueActivitiesEntity.getSubEntitiesByClass('user-assignment-activity').some(function(usage) { return usage.getLinkByRel('self').href === assignmentSelfHref; }),
+								activityIsOverdue: isOverdue,
 								activityUsage: activityUsageEntity,
 								orgUnitLink: orgUnitLink
 							});
