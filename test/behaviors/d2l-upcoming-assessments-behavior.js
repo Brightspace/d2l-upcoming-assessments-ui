@@ -521,7 +521,7 @@ describe('d2l upcoming assessments behavior', function() {
 					expect(response[0].instructions).to.equal(instructions);
 				});
 		});
-		// TODO: data driven vars here
+
 		[
 			{ isComplete: false, isOverdue: false },
 			{ isComplete: true, isOverdue: false },
