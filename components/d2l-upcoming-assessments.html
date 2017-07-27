@@ -358,27 +358,6 @@
 				return this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
 			},
 
-			_fetchEntity: function(url, token) {
-
-				return new Promise(function(resolve, reject) {
-					var xhr = new XMLHttpRequest();
-					xhr.open('GET', url);
-					xhr.setRequestHeader('Accept', 'application/vnd.siren+json');
-					xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-					xhr.addEventListener('load', function() {
-						if (xhr.status === 200 || xhr.status === 304) {
-							resolve(window.D2L.Hypermedia.Siren.Parse(xhr.responseText));
-						} else {
-							reject(xhr.error || xhr.status);
-						}
-					});
-					xhr.addEventListener('error', function() {
-						reject(xhr.error || xhr.status);
-					});
-					xhr.send();
-				});
-			},
-
 			_mobileBreakpointListener: function(mqlevent) {
 				this._updateCloseSimpleOverlayText(mqlevent.matches);
 			},
