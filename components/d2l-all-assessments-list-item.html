@@ -41,32 +41,26 @@
 			}
 
 			.activity-status-badge {
-				@apply --d2l-body-small-text;
-				line-height: 2;
-				align-self: flex-start;
-				margin-right: 30px;
-				border: 1px solid;
-				border-radius: 6px;
-				padding: 3px 20px 0 20px;
-				margin-top: -5px;
+				color: white;
+				font-size: 0.6rem;
+				font-weight: bold;
+				line-height: 1;
+				margin-right: 10px;
+				padding: 4px 10px 3px 10px;
 				text-transform: uppercase;
-				min-width: 82px;
-				text-align: center;
+				border-radius: 12px;
 			}
 
 			.completion-info {
-				color: var(--d2l-color-olivine);
-				border-color: var(--d2l-color-olivine);
+				background-color: var(--d2l-color-olivine);
 			}
 
 			.due-today-info {
-				color: var(--d2l-color-celestine);
-				border-color: var(--d2l-color-celestine);
+				background-color: var(--d2l-color-celestine);
 			}
 
 			.overdue-info {
-				color: var(--d2l-color-cinnabar);
-				border-color: var(--d2l-color-cinnabar);
+				background-color: var(--d2l-color-cinnabar);
 			}
 
 			:host-context([dir="rtl"]) .completion-info {
@@ -75,6 +69,12 @@
 			}
 
 			.activity-info {
+				display: inline-flex;
+				flex: 1;
+				align-items: center;
+			}
+
+			.meta-info {
 				display: inline-flex;
 				flex: 1;
 				align-items: center;
@@ -113,17 +113,19 @@
 				<d2l-icon class="activity-icon" icon="d2l-tier3:assignments"></d2l-icon>
 				<div class="info-container">
 					<h3 class="assessment-title">[[assessmentItem.name]]</h3>
-					<div class="course-name">[[assessmentItem.courseName]]</div>
+					<div class="meta-info">
+						<div class="activity-status-badge completion-info" hidden$="[[!assessmentItem.isCompleted]]">
+							[[localize('activityComplete')]]
+						</div>
+						<div class="activity-status-badge due-today-info" hidden$="[[!assessmentItem.isDueToday]]">
+							[[localize('activityDueToday')]]
+						</div>
+						<div class="activity-status-badge overdue-info" hidden$="[[!assessmentItem.isOverdue]]">
+							[[localize('activityOverdue')]]
+						</div>
+						<div class="course-name">[[assessmentItem.courseName]]</div>
+					</div>
 				</div>
-			</div>
-			<div class="activity-status-badge completion-info" hidden$="[[!assessmentItem.isCompleted]]">
-				[[localize('activityComplete')]]
-			</div>
-			<div class="activity-status-badge due-today-info" hidden$="[[!assessmentItem.isDueToday]]">
-				[[localize('activityDueToday')]]
-			</div>
-			<div class="activity-status-badge overdue-info" hidden$="[[!assessmentItem.isOverdue]]">
-				[[localize('activityOverdue')]]
 			</div>
 		</div>
 		<div class="row instructions-row">
