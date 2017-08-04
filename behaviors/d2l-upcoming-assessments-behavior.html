@@ -2,6 +2,8 @@
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="./date-behavior.html">
 
+<script src="../bower_components/fetch/fetch.js"></script>
+<script src="https://s.brightspace.com/lib/d2lfetch/1.0.0/d2lfetch.js"></script>
 <script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
 <script>
 	'use strict';
@@ -172,23 +174,22 @@
 		},
 
 		_makeRequest: function(token, url) {
-			return new Promise(function(resolve, reject) {
-				var xhr = new XMLHttpRequest();
-				xhr.open('GET', url);
-				xhr.setRequestHeader('Accept', 'application/vnd.siren+json');
-				xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-				xhr.addEventListener('load', function() {
-					if (xhr.status === 200 || xhr.status === 304) {
-						resolve(window.D2L.Hypermedia.Siren.Parse(xhr.responseText));
-					} else {
-						reject(xhr.error || xhr.status);
-					}
-				});
-				xhr.addEventListener('error', function() {
-					reject(xhr.error || xhr.status);
-				});
-				xhr.send();
+			var request = new Request(url, {
+				headers: new Headers({
+					Accept: 'application/vnd.siren+json',
+					Authorization: 'Bearer ' + token
+				})
 			});
+
+			return window.d2lfetch
+				.fetch(request)
+				.then(function(response) {
+					if (response.ok) {
+						return response.json();
+					}
+					return Promise.reject(response.status);
+				})
+				.then(window.D2L.Hypermedia.Siren.Parse);
 		}
 	};
 
