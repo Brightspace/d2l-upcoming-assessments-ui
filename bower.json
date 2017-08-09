@@ -12,9 +12,9 @@
     "d2l-page-load-progress": "^1.2.3",
     "d2l-simple-overlay": "Brightspace/simple-overlay#1.1.0",
     "d2l-typography": "^5.3.0",
+    "fetch": "^2.0.3",
     "iron-icon": "^1.0.12",
-    "polymer": "Polymer/polymer#^1.9.2",
-    "fetch": "^2.0.3"
+    "polymer": "Polymer/polymer#^1.9.2"
   },
   "devDependencies": {
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
