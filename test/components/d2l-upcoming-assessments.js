@@ -154,6 +154,24 @@ describe('<d2l-upcoming-assessments>', function() {
 					});
 			});
 
+			it('should update the allActivies with the activities in the period', function() {
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				element._getActivityInfo = sandbox.stub().returns(activities);
+				return element._loadActivitiesForPeriod(nextPeriodUrl)
+					.then(function() {
+						expect(element._allActivities).to.equal(activities);
+					});
+			});
+
+			it('should not update the assessments with the activities in the period', function() {
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				element._getActivityInfo = sandbox.stub().returns(activities);
+				return element._loadActivitiesForPeriod(nextPeriodUrl)
+					.then(function() {
+						expect(element._assessments).to.not.equal(activities);
+					});
+			});
+
 		});
 
 	});

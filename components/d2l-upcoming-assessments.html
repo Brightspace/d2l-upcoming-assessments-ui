@@ -263,10 +263,19 @@
 					.catch(function() {
 						self._showError = true;
 					})
-					.then(function() {
+					.then(function(activities) {
 						if (!self._showError) {
 							self._userName = userName;
 						}
+
+						var upcomingActivities = activities.filter(function(activity) {
+							return self.isActivityUpcoming(activity);
+						});
+						self._setTotalCount(upcomingActivities.length);
+						self.set('_assessments', upcomingActivities.slice(0, 4));
+
+						self.set('_allActivities', activities);
+
 						self._setLoaded(true);
 					});
 			},
@@ -283,8 +292,8 @@
 						return self._getUserActivityUsageInfo(activities, self.getToken, self.userUrl);
 					})
 					.then(function(activities) {
-						self._updateActivitiesInfo(activities, self.getToken, self.userUrl);
 						self._showError = false;
+						return self._getActivitiesWithDates(activities, self.getToken, self.userUrl);
 					})
 					.catch(function() {
 						self._showError = true;
@@ -307,26 +316,22 @@
 				return activities && activities.length > 0;
 			},
 
-			_updateActivitiesInfo: function(activities) {
-				var self = this;
-
-				activities = activities
+			_getActivitiesWithDates: function(activities) {
+				return activities
 					.filter(function(activity) {
 						return activity.dueDate || activity.endDate;
 					})
 					.sort(function(a, b) {
 						return (a.dueDate || a.endDate) > (b.dueDate || b.endDate);
 					});
+			},
 
-				var upcomingActivities = activities
+			_getUpcomingActivites: function(activities) {
+				var self = this;
+				return activities
 					.filter(function(activity) {
 						return self.isActivityUpcoming(activity);
 					});
-				this._setTotalCount(upcomingActivities.length);
-
-				var basicListActivities = upcomingActivities.slice(0, 4);
-				this.set('_assessments', basicListActivities);
-				this.set('_allActivities', activities);
 			},
 
 			_keypressOpenAllAssignmentsView: function(e) {
@@ -373,7 +378,8 @@
 					.then(function(activities) {
 						return self._getActivityInfo(activities, self.getToken, self.userUrl);
 					})
-					.then(function() {
+					.then(function(activities) {
+						self.set('_allActivities', activities);
 						progress.finish();
 					});
 			},
