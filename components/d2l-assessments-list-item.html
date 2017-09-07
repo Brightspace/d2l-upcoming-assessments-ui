@@ -92,7 +92,7 @@
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 							<div class="date">[[_getDueDateString(assessmentItem.dueDate)]]</div>
 						</template>
-						<template is="dom-if" if="[[_hasEndDate(assessmentItem)]]">
+						<template is="dom-if" if="[[_showEndDate(assessmentItem)]]">
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 							<div class="date">[[_getEndDateString(assessmentItem.endDate)]]</div>
 						</template>
@@ -126,6 +126,10 @@
 
 		_hasEndDate: function(item) {
 			return !!item.endDate;
+		},
+
+		_showEndDate: function(item) {
+			return !this._hasDueDate(item) && this._hasEndDate(item);
 		},
 
 		_isCompleted: function(item) {
