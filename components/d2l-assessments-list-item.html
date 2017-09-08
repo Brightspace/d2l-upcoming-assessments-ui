@@ -151,6 +151,8 @@
 				dateString = this.localize('today');
 			} else if (calendarDateDiff === 1) {
 				dateString = this.localize('tomorrow');
+			} else if (calendarDateDiff > 1 && calendarDateDiff < 7) {
+				dateString = new Date(dateUTC).toLocaleDateString(this.locale, { weekday: 'long' });
 			} else {
 				dateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(new Date(dateUTC));
 			}

@@ -243,12 +243,14 @@
 			var dateString;
 			var calendarDateDiff = this.getDateDiffInCalendarDays(dateUTC);
 
-			dateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(dateUTC));
-
 			if (calendarDateDiff === 0) {
 				return this.localize('today');
 			} else if (calendarDateDiff === 1) {
 				return this.localize('tomorrow');
+			} else if (calendarDateDiff > 1 && calendarDateDiff < 7) {
+				dateString = new Date(dateUTC).toLocaleDateString(this.locale, { weekday: 'long' });
+			} else {
+				dateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(dateUTC));
 			}
 
 			return dateString;
