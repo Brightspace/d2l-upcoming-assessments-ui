@@ -103,6 +103,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 		[
 			{ date: nowish(0), dateStr: 'today', result: /^Today$/ },
 			{ date: nowish(1), dateStr: 'tomorrow', result: /^Tomorrow$/ },
+			{ date: nowish(5), dateStr: 'date within the week', result: /^.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day.*$/ },
 			// The seemingly-extra characters are to fix weird behavior with Sauce and Microsoft Edge
 			{ date: nowish(10), dateStr: 'future date', result: /^.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day.*, .*[A-Z].* .*\d{1,2}$/ },
 			{ date: nowish(-1), dateStr: 'yesterday', result: /^.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day.*, .*[A-Z].* .*\d{1,2}$/ },

@@ -4,6 +4,12 @@
 
 describe('<d2l-assessments-list-item>', function() {
 
+	function nowish(modifierDays) {
+		var date = new Date();
+		date.setDate(date.getDate() + modifierDays);
+		return date;
+	}
+
 	var quizItem = {
 		'name': 'Math Quiz',
 		'courseName': 'Math',
@@ -83,6 +89,20 @@ describe('<d2l-assessments-list-item>', function() {
 			expect(element.$$('.completion-icon')).to.not.exist;
 		});
 
+	});
+
+	describe('getDateString', function() {
+		[
+			{ date: nowish(0), dateStr: 'today', result: /^Due Today$/ },
+			{ date: nowish(1), dateStr: 'tomorrow', result: /^Due Tomorrow$/ },
+			{ date: nowish(5), dateStr: 'date within the week', result: /^Due.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day.*$/ }
+		].forEach(function(testCase) {
+			it('returns correct string for ' + testCase.dateStr, function() {
+				var element = fixture('basic');
+				var relativeDateString = element._getDateString(testCase.date, 'dueDateShort', 'dueDate');
+				expect(relativeDateString).to.match(testCase.result);
+			});
+		});
 	});
 
 });
