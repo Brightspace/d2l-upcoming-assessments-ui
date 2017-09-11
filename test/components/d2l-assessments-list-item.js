@@ -95,7 +95,7 @@ describe('<d2l-assessments-list-item>', function() {
 		[
 			{ date: nowish(0), dateStr: 'today', result: /^Due Today$/ },
 			{ date: nowish(1), dateStr: 'tomorrow', result: /^Due Tomorrow$/ },
-			{ date: nowish(5), dateStr: 'date within the week', result: /^Due.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day.*$/ }
+			{ date: nowish(5), dateStr: 'date within the week', result: /^Due.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day.*$/ }
 		].forEach(function(testCase) {
 			it('returns correct string for ' + testCase.dateStr, function() {
 				var element = fixture('basic');
