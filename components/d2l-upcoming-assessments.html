@@ -352,6 +352,7 @@
 					.catch(function() {
 						self._showError = true;
 						self._userName = null;
+						return Promise.reject(new Error('Failed to fetch user activities'));
 					});
 			},
 

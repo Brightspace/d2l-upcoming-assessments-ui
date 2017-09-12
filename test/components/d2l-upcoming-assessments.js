@@ -135,7 +135,9 @@ describe('<d2l-upcoming-assessments>', function() {
 			});
 
 			it('calls _fetchEntity for the provided url', function() {
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(
+					window.D2L.Hypermedia.Siren.Parse(activities)
+				));
 				return element._getCustomRangeAction(nextPeriodUrl)
 					.then(function() {
 						expect(element._fetchEntity).to.have.been.calledWith(nextPeriodUrl);
