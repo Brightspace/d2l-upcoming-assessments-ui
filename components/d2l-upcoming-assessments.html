@@ -315,7 +315,11 @@
 			},
 
 			_goPrev: function() {
-				return this._loadActivitiesForPeriod(this._previousPeriodUrl);
+				return this._loadActivitiesForPeriod(this._previousPeriodUrl)
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
+					});
 			},
 
 			_keypressGoPrev: function(e) {
@@ -325,7 +329,11 @@
 			},
 
 			_goNext: function() {
-				return this._loadActivitiesForPeriod(this._nextPeriodUrl);
+				return this._loadActivitiesForPeriod(this._nextPeriodUrl)
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
+					});
 			},
 
 			_keypressGoNext: function(e) {
@@ -336,7 +344,7 @@
 
 			_getCustomRangeAction: function(activitiesUrl) {
 				if (!activitiesUrl) {
-					return Promise.resolve();
+					return Promise.reject();
 				}
 
 				var self = this;
@@ -348,11 +356,6 @@
 						var action = (activities.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
 
 						return self._createActionUrl(action, parameters);
-					})
-					.catch(function() {
-						self._showError = true;
-						self._userName = null;
-						return Promise.reject(new Error('Failed to fetch user activities'));
 					});
 			},
 
@@ -389,7 +392,7 @@
 
 			_loadActivitiesForPeriod: function(periodUrl) {
 				if (!periodUrl) {
-					return Promise.resolve();
+					return Promise.reject();
 				}
 
 				var self = this;
@@ -414,10 +417,6 @@
 					})
 					.then(function(userActivityUsagesInfos) {
 						return self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
-					})
-					.catch(function() {
-						self._showError = true;
-						self._userName = null;
 					})
 					.then(function(activities) {
 						self.set('_allActivities', activities);
