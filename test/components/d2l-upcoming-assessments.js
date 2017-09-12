@@ -125,6 +125,24 @@ describe('<d2l-upcoming-assessments>', function() {
 
 		});
 
+		describe('_getCustomRangeAction', function() {
+			it('does nothing if the provided url was not set', function() {
+				element._fetchEntity = sandbox.stub();
+				return element._getCustomRangeAction()
+					.then(function() {
+						expect(element._fetchEntity).to.not.have.been.called;
+					});
+			});
+
+			it('calls _fetchEntity for the provided url', function() {
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				return element._getCustomRangeAction(nextPeriodUrl)
+					.then(function() {
+						expect(element._fetchEntity).to.have.been.calledWith(nextPeriodUrl);
+					});
+			});
+		});
+
 	});
 
 });

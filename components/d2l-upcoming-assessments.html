@@ -260,7 +260,10 @@
 					.then(function(userEntity) {
 						self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
 						var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
-						return self._loadActivitiesForPeriod(myActivitiesLink)
+						return self._getCustomRangeAction(myActivitiesLink)
+							.then(function(customActivitiesLink) {
+								return self._loadActivitiesForPeriod(customActivitiesLink);
+							})
 							.then(function(activities) {
 								var upcomingActivities = activities
 									.filter(function(activity) {
@@ -329,6 +332,58 @@
 				if ( e.code === 'Space' || e.code === 'Enter' ) {
 					return this._goNext(e);
 				}
+			},
+
+			_getCustomRangeAction: function(activitiesUrl) {
+				if (!activitiesUrl) {
+					return Promise.resolve();
+				}
+
+				var self = this;
+
+				return this._fetchEntity(activitiesUrl, this.getToken, this.userUrl)
+					.then(function(activities) {
+						var parameters = self._getCustomDateRangeParameters();
+
+						var action = (activities.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
+
+						return self._createActionUrl(action, parameters);
+					})
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
+					});
+			},
+
+			_getCustomDateRangeParameters: function() {
+				var currentTime = new Date();
+				var start = currentTime.toISOString();
+				var twoWeeksFromNow = new Date(currentTime.setDate(currentTime.getDate() + 14));
+				var end = twoWeeksFromNow.toISOString();
+
+				return {
+					start: start,
+					end: end
+				};
+			},
+
+			_createActionUrl: function(action, parameters) {
+				var query = {};
+				if (action.fields) {
+					action.fields.forEach(function(field) {
+						if (parameters.hasOwnProperty(field.name)) {
+							query[field.name] = parameters[field.name];
+						} else {
+							query[field.name] = field.value;
+						}
+					});
+				}
+
+				var queryString = Object.keys(query).map(function(key) {
+					return key + '=' + query[key];
+				}).join('&');
+
+				return queryString ? action.href + '?' + queryString : action.href;
 			},
 
 			_loadActivitiesForPeriod: function(periodUrl) {
