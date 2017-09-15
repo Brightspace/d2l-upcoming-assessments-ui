@@ -265,6 +265,8 @@
 								return self._loadActivitiesForPeriod(customActivitiesLink);
 							})
 							.then(function(activities) {
+								activities = activities || [];
+
 								var upcomingActivities = activities
 									.filter(function(activity) {
 										return self.isActivityUpcoming(activity);

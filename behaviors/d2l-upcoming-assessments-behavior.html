@@ -144,6 +144,9 @@
 			if (overdueActivitiesLink) {
 				return this._fetchEntity(overdueActivitiesLink, getToken, userUrl);
 			}
+
+			// API doesn't include the overdue link if user doesn't have any overdue activities
+			return window.D2L.Hypermedia.Siren.Parse({});
 		},
 
 		_fetchEntity: function(url, getToken, userUrl) {
