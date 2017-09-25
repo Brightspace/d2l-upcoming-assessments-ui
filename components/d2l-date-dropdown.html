@@ -1,0 +1,254 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../vaadin-date-picker/vaadin-date-picker-light.html">
+<link rel="import" href="../../d2l-colors/d2l-colors.html">
+<link rel="import" href="../../iron-input/iron-input.html">
+<link rel="import" href="../../iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../d2l-time-picker/d2l-time-picker.html">
+<link rel="import" href="../../d2l-intl/d2l-intl.html">
+<link rel="import" href="../../d2l-offscreen/d2l-offscreen-shared-styles.html">
+<link rel="import" href="../../d2l-polymer-behaviors/d2l-id.html">
+<link rel="import" href="../behaviors/localize-behavior.html">
+
+<dom-module id="d2l-date-dropdown">
+	<template>
+		<custom-style>
+			<style is="custom-style" include="d2l-input-styles d2l-offscreen-shared-styles">
+				:host {
+					display: block;
+				}
+				:host([hide-label]) > label,
+				.d2l-date-picker-description {
+					@apply --d2l-offscreen;
+				}
+				:host(:dir(rtl)) :host([hide-label]) > label,
+				:host(:dir(rtl)) .d2l-date-picker-description {
+					@apply --d2l-offscreen-rtl;
+				}
+				:host-context([dir="rtl"]) :host([hide-label]) > label,
+				:host-context([dir="rtl"]) .d2l-date-picker-description {
+					@apply --d2l-offscreen-rtl;
+				}
+				vaadin-date-picker-light {
+					--primary-color: var(--d2l-color-celestine);
+					--light-primary-color: var(--d2l-color-celestine-plus-1);
+					--dark-theme-background-color: var(--d2l-color-ferrite);
+					--dark-theme-secondary-color: #ffffff;
+					--primary-text-color: var(--d2l-color-ferrite);
+					--secondary-text-color: var(--d2l-color-tungsten);
+					--vaadin-date-picker-overlay: {
+						font-family: inherit;
+						max-height: 355px;
+					};
+					--vaadin-date-picker-yearscroller: {
+						font-family: inherit;
+					};
+					--vaadin-date-picker-header: {
+						font-family: inherit;
+					};
+					--vaadin-date-picker-calendar-title: {
+						font-family: inherit;
+					};
+					--vaadin-date-picker-calendar-cell: {
+						font-family: inherit;
+					};
+					--vaadin-date-picker-footer: {
+						font-family: inherit;
+					};
+					--vaadin-date-picker-calendar: {
+						font-family: inherit;
+					};
+				}
+				label {
+					@apply --d2l-date-picker-label;
+				}
+				input {
+					display: none;
+				}
+
+				span {
+					padding-right: 7px;
+					color: var(--d2l-color-ferrite);
+				}
+
+				a {
+					display: flex;
+					align-items: center;
+				}
+
+				a:hover,
+				a:focus {
+					text-decoration: none;
+				}
+
+				:host-context([dir="rtl"]) span {
+					padding-left: 0px;
+					padding-right: 7px;
+				}
+			</style>
+		</custom-style>
+
+		<label id="[[_labelId]]">{{label}}</label>
+		<vaadin-date-picker-light min="[[min]]" max="[[max]]" value="{{value}}" on-value-changed="handleValueChanged" attr-for-value="value">
+			<iron-a11y-keys target="[[_target]]" keys="enter" on-keys-pressed="_onEnter"></iron-a11y-keys>
+			<iron-a11y-keys target="[[_target]]" keys="up down" on-keys-pressed="_onUpDown"></iron-a11y-keys>
+			<iron-input>
+				<input
+					on-tap="_handleTap"
+					placeholder="{{placeholder}}"
+					class="d2l-input"
+					is="iron-input"
+					type="text"
+					on-focus="_handleFocus"
+					aria-describedby$="[[_descriptionId]]"
+					aria-labelledby$="[[_labelId]]"
+					style="display:none;"
+				>
+				</input>
+				<a
+					is="d2l-link"
+					on-focus="_handleFocus"
+					on-tap="_handleTap"
+					class="currentPeriod">
+					<span class="currentPeriod">[[currentPeriodText]]</span>
+					<d2l-icon icon="d2l-tier1:chevron-down" aria-hidden="true"></d2l-icon>
+				</a>
+				<!-- <div id="[[_descriptionId]]" class="d2l-date-picker-description" >{{description}}</div> -->
+			</iron-input>
+		</vaadin-date-picker-light>
+	</template>
+
+	<script>
+	'use strict';
+
+		Polymer({
+			is: 'd2l-date-dropdown',
+			_target: {
+				type: Object
+			},
+			_descriptionId: {
+				type: String
+			},
+			_labelId: {
+				type: String
+			},
+			behaviors: [
+				window.D2L.UpcomingAssessments.LocalizeBehavior,
+			],
+			properties: {
+				placeholder: {
+					type: String
+				},
+				min: {
+					type: String
+				},
+				max: {
+					type: String
+				},
+				value: {
+					type: String,
+					reflectToAttribute: true,
+					notify: true
+				},
+				label: {
+					type: String
+				},
+				hideLabel: {
+					type: Boolean,
+					value: false,
+					reflectToAttribute: true
+				},
+				description:{
+					type: String
+				},
+				locale: {
+					type: String,
+					value: 'en'
+				},
+				dateFormat: {
+					type: String,
+					value: ''
+				},
+				firstDayOfWeek: {
+					type: Number,
+					value: 0
+				},
+				currentPeriodText: String
+			},
+			observers: [
+				'_localeChanged( locale )'
+			],
+			ready: function() {
+				this._target = this.$$('a');
+				this.addEventListener('iron-overlay-canceled', function(e) {
+					e.stopPropagation();
+				});
+				// this._labelId = D2L.Id.getUniqueId();
+				// this._descriptionId = D2L.Id.getUniqueId();
+			},
+			attached: function() {
+				var buttons = document.getElementsByClassName('vaadin-date-picker-overlay paper-button-0');
+				for (var i = 0; i < buttons.length; i++) {
+					buttons[i].style.fontFamily = 'inherit';
+				}
+			},
+			handleValueChanged: function(e, detail) {
+				this.fire('d2l-date-picker-value-changed', e, detail);
+			},
+			_handleTap: function() {
+				var datepicker = this.$$('vaadin-date-picker-light');
+				if ( !datepicker.opened ) {
+					datepicker._focusOverlayOnOpen = true;
+				}
+			},
+			_onEnter: function(e) {
+				var datepicker = this.$$('vaadin-date-picker-light');
+				if ( !datepicker.opened ) {
+					// A better solution is to add a boolean to the 3rd party open function
+					datepicker._focusOverlayOnOpen = true;
+					datepicker.open();
+					e.detail.keyboardEvent.preventDefault();
+					e.detail.keyboardEvent.stopPropagation();
+				}
+			},
+			_onUpDown: function(e) {
+				var datepicker = this.$$('vaadin-date-picker-light');
+				if ( !datepicker.opened ) {
+					e.detail.keyboardEvent.preventDefault();
+					e.detail.keyboardEvent.stopPropagation();
+				}
+			},
+			focus: function() {
+				var thing = this.$$('a');
+				this.$$('a').focus();
+			},
+			_handleFocus: function() {
+				// in shady DOM the input's "focus" event does not bubble,
+				// so no need to fire it
+				if (!Polymer.Settings.useShadow) {
+					this.dispatchEvent( new CustomEvent(
+							'focus',
+							{bubbles: true, composed: false}
+						) );
+				}
+			},
+			_localeChanged: function( locale ) {
+				this.language = locale;
+			},
+			_merge: function(obj1, obj2) {
+				if (obj2 === undefined || obj2 === null || typeof(obj2) !== 'object') {
+					return obj1;
+				}
+				Object.keys(obj2).forEach( function(i) {
+					if (obj1.hasOwnProperty(i)) {
+						if (typeof(obj2[i]) === 'object' && typeof(obj1[i]) === 'object' ) {
+							this._merge(obj1[i], obj2[i]);
+						} else {
+							obj1[i] = obj2[i];
+						}
+					}
+				}.bind(this));
+				return obj1;
+			}
+		});
+	</script>
+</dom-module>
