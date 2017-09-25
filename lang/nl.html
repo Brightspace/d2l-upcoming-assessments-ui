@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangNlBehavior = {
 		nl: {
-			'closeSimpleOverlayText': 'Terug naar dashboard',
-			'closeSimpleOverlayTextMobile': 'Dashboard',
-			'dueDateShort': 'Uiterste datum {dueDate}',
-			'dueDateLongImminent': '{prefix}: {dueDate}',
-			'errorMessage': 'Er lijkt een probleem op te treden bij het laden van deze widget. We zijn ermee bezig en zullen het probleem zo spoedig mogelijk verhelpen.',
-			'noAssessmentsInThisTimeFrame': '{userName} heeft geen opdrachten die binnen dit tijdskader af moeten zijn.',
-			'noUpcomingAssessments': '{userName} heeft geen komende opdrachten.',
-			'today': 'Vandaag',
-			'tomorrow': 'Morgen',
-			'viewAllAssignments': 'Alle opdrachten weergeven'
+			"activityComplete": "Voltooien",
+			"activityDueToday": "Moet vandaag af",
+			"activityEnded": "Closed",
+			"activityOverdue": "Achterstallig",
+			"assignment": "Opdracht",
+			"closeSimpleOverlayText": "Terug naar dashboard",
+			"closeSimpleOverlayTextMobile": "Dashboard",
+			"currentPeriod": "{startDate} - {endDate}",
+			"dueDateShort": "Uiterste datum {dueDate}",
+			"dueDateLongImminent": "{prefix}: {dueDate}",
+			"endDateShort": "Eindigt op {endDate}",
+			"errorMessage": "Er lijkt een probleem op te treden bij het laden van deze widget. We zijn ermee bezig en zullen het probleem zo spoedig mogelijk verhelpen.",
+			"goNextText": "volgende",
+			"goPreviousText": "vorige",
+			"noAssessmentsInThisTimeFrame": "{userName} heeft geen opdrachten die binnen dit tijdskader af moeten zijn.",
+			"noUpcomingAssessments": "{userName} heeft geen opdrachten die in de komende 2 weken af moeten zijn.",
+			"quiz": "Test",
+			"today": "Vandaag",
+			"tomorrow": "Morgen",
+			"viewAllAssignments": "Al het werk weergeven"
 		}
 	};
 </script>

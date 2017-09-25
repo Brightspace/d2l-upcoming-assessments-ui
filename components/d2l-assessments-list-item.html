@@ -24,7 +24,7 @@
 				@apply --d2l-heading-3;
 				margin: 0;
 				font-size: 16px;
-				line-height: 0.75;
+				line-height: 1.2rem;
 				font-weight: normal;
 			}
 
@@ -34,7 +34,6 @@
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				margin-top: 5px;
 				line-height: 1;
 			}
 
@@ -48,8 +47,8 @@
 
 			iron-icon.separator-icon {
 				opacity: 0.8;
-				width: 18px;
-				height: 18px;
+				width: 14px;
+				height: 14px;
 			}
 
 			.date {
@@ -92,7 +91,7 @@
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 							<div class="date">[[_getDueDateString(assessmentItem.dueDate)]]</div>
 						</template>
-						<template is="dom-if" if="[[_hasEndDate(assessmentItem)]]">
+						<template is="dom-if" if="[[_showEndDate(assessmentItem)]]">
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 							<div class="date">[[_getEndDateString(assessmentItem.endDate)]]</div>
 						</template>
@@ -128,6 +127,10 @@
 			return !!item.endDate;
 		},
 
+		_showEndDate: function(item) {
+			return !this._hasDueDate(item) && this._hasEndDate(item);
+		},
+
 		_isCompleted: function(item) {
 			return item.isCompleted;
 		},
@@ -148,6 +151,8 @@
 				dateString = this.localize('today');
 			} else if (calendarDateDiff === 1) {
 				dateString = this.localize('tomorrow');
+			} else if (calendarDateDiff > 1 && calendarDateDiff < 7) {
+				dateString = new Date(dateUTC).toLocaleDateString(this.locale, { weekday: 'long' });
 			} else {
 				dateString = new Intl.DateTimeFormat(this.locale, { month: 'long', day: 'numeric' }).format(new Date(dateUTC));
 			}

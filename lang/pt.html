@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangPtBehavior = {
 		pt: {
-			'closeSimpleOverlayText': 'Voltar ao Painel',
-			'closeSimpleOverlayTextMobile': 'Painel',
-			'dueDateShort': 'Vencimento em {dueDate}',
-			'dueDateLongImminent': '{prefix}: {dueDate}',
-			'errorMessage': 'Parece ter ocorrido um problema ao carregar este widget. Estamos trabalhando nisso e ele voltará a funcionar EM BREVE.',
-			'noAssessmentsInThisTimeFrame': '{userName} não tem nenhuma atribuição para entrega nesse intervalo de tempo.',
-			'noUpcomingAssessments': '{userName} não tem nenhuma atribuição futura.',
-			'today': 'Hoje',
-			'tomorrow': 'Amanhã',
-			'viewAllAssignments': 'Exibir todas as Atribuições'
+			"activityComplete": "Concluído",
+			"activityDueToday": "Expira hoje",
+			"activityEnded": "Closed",
+			"activityOverdue": "Atrasadas",
+			"assignment": "Atribuição",
+			"closeSimpleOverlayText": "Voltar ao Painel",
+			"closeSimpleOverlayTextMobile": "Painel",
+			"currentPeriod": "{startDate} - {endDate}",
+			"dueDateShort": "Vencimento em {dueDate}",
+			"dueDateLongImminent": "{prefix}: {dueDate}",
+			"endDateShort": "Termina em {endDate}",
+			"errorMessage": "Parece ter ocorrido um problema ao carregar este widget. Estamos trabalhando nisso e voltará a funcionar EM BREVE.",
+			"goNextText": "próximo",
+			"goPreviousText": "anterior",
+			"noAssessmentsInThisTimeFrame": "{userName} não tem nenhuma atribuição para entrega nesse intervalo de tempo.",
+			"noUpcomingAssessments": "{userName} não tem nenhuma atribuição que expira nas próximas 2 semanas.",
+			"quiz": "Questionário",
+			"today": "Hoje",
+			"tomorrow": "Amanhã",
+			"viewAllAssignments": "Exibir todos os trabalho"
 		}
 	};
 </script>

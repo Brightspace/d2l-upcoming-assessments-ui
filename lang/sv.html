@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangSvBehavior = {
 		sv: {
-			'closeSimpleOverlayText': 'Tillbaka till instrumentpanelen',
-			'closeSimpleOverlayTextMobile': 'Instrumentpanel',
-			'dueDateShort': 'Förfallodatum {dueDate}',
-			'dueDateLongImminent': '{prefix}: {dueDate}',
-			'errorMessage': 'Ett problem uppstod när widgeten skulle laddas. Vi jobbar på att lösa det så fort som möjligt.',
-			'noAssessmentsInThisTimeFrame': '{userName} har inga uppgifter för denna tidsram.',
-			'noUpcomingAssessments': '{userName} har inga kommande uppgifter.',
-			'today': 'Idag',
-			'tomorrow': 'Imorgon',
-			'viewAllAssignments': 'Visa alla uppgifter'
+			"activityComplete": "Klart",
+			"activityDueToday": "Förfaller idag",
+			"activityEnded": "Closed",
+			"activityOverdue": "Försenat",
+			"assignment": "Uppgift",
+			"closeSimpleOverlayText": "Tillbaka till instrumentpanelen",
+			"closeSimpleOverlayTextMobile": "Instrumentpanel",
+			"currentPeriod": "{startDate} - {endDate}",
+			"dueDateShort": "Förfallodatum {dueDate}",
+			"dueDateLongImminent": "{prefix}: {dueDate}",
+			"endDateShort": "Slutar {endDate}",
+			"errorMessage": "Den här widgeten kunde inte laddas. Vi jobbar på att lösa det så fort som möjligt.",
+			"goNextText": "nästa",
+			"goPreviousText": "föregående",
+			"noAssessmentsInThisTimeFrame": "{userName} har inga uppgifter för denna tidsram.",
+			"noUpcomingAssessments": "{userName} har inga uppgifter med förfallodatum de närmaste två veckorna.",
+			"quiz": "Förhör",
+			"today": "Idag",
+			"tomorrow": "Imorgon",
+			"viewAllAssignments": "Se allt"
 		}
 	};
 </script>

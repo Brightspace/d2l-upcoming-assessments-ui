@@ -60,12 +60,13 @@
 
 			.error-message,
 			.no-upcoming-assessments,
-			.view-all-assignments-link > h3,
 			.view-all-container {
 				@apply --d2l-body-compact-text;
 			}
 
 			.view-all-assignments-link > h3 {
+				font-size: 0.7rem;
+				font-weight: normal;
 				margin-bottom: 0;
 			}
 
@@ -155,7 +156,11 @@
 				 <d2l-date-dropdown current-period-text=[[_currentPeriodText]]></d2l-date-dropdown>
 			</div>
 			<template is="dom-if" if="[[_hasActivities(_allActivities)]]">
-				<d2l-all-assessments-list assessment-items=[[_allActivities]]></d2l-all-assessments-list>
+				<d2l-all-assessments-list
+					assessment-items="[[_allActivities]]"
+					period-start="[[_periodStart]]"
+					period-end="[[_periodEnd]]">
+				</d2l-all-assessments-list>
 			</template>
 			<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
 
@@ -219,7 +224,9 @@
 				getToken: {
 					type: Object,
 					value: null
-				}
+				},
+				_periodStart: String,
+				_periodEnd: String
 			},
 
 			behaviors: [
@@ -245,45 +252,31 @@
 
 			_getInfo: function() {
 				var self = this;
-				var userName;
 
 				return this._fetchEntity(this.userUrl, this.getToken)
 					.then(function(userEntity) {
-						userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
+						self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
+						var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
+						return self._getCustomRangeAction(myActivitiesLink)
+							.then(function(customActivitiesLink) {
+								return self._loadActivitiesForPeriod(customActivitiesLink);
+							})
+							.then(function(activities) {
+								activities = activities || [];
 
-						return self._getUserActivityUsages(userEntity, self.getToken, self.userUrl);
-					})
-					.then(function(activities) {
-						return self._getActivityInfo(activities, self.getToken, self.userUrl);
-					})
-					.catch(function() {
-						self._showError = true;
-					})
-					.then(function() {
-						if (!self._showError) {
-							self._userName = userName;
-						}
-						self._setLoaded(true);
-					});
-			},
+								var upcomingActivities = activities
+									.filter(function(activity) {
+										return self.isActivityUpcoming(activity);
+									});
+								self._setTotalCount(upcomingActivities.length);
 
-			_getActivityInfo: function(activities) {
-				var self = this;
-
-				self._previousPeriodUrl = (activities.getLinkByRel('https://activities.api.brightspace.com/rels/previous-period') || {}).href;
-				self._nextPeriodUrl = (activities.getLinkByRel('https://activities.api.brightspace.com/rels/next-period') || {}).href;
-				self._currentPeriodText = self._getFormattedPeriodText(activities.properties.start, activities.properties.end);
-
-				return self._getActivityUsagesInfo(activities, self.getToken, self.userUrl)
-					.then(function(activities) {
-						return self._getUserActivityUsageInfo(activities, self.getToken, self.userUrl);
-					})
-					.then(function(activities) {
-						self._updateActivitiesInfo(activities, self.getToken, self.userUrl);
-						self._showError = false;
-					})
-					.catch(function() {
-						self._showError = true;
+								var basicListActivities = upcomingActivities.slice(0, 4);
+								self.set('_assessments', basicListActivities);
+							})
+							.catch(function() {
+								self._showError = true;
+								self._userName = null;
+							});
 					});
 			},
 
@@ -304,25 +297,14 @@
 			},
 
 			_updateActivitiesInfo: function(activities) {
-				var self = this;
-
-				activities = activities
+				activities = activities || [];
+				return activities
 					.filter(function(activity) {
 						return activity.dueDate || activity.endDate;
 					})
 					.sort(function(a, b) {
 						return (a.dueDate || a.endDate) > (b.dueDate || b.endDate);
 					});
-
-				var upcomingActivities = activities
-					.filter(function(activity) {
-						return self.isActivityUpcoming(activity);
-					});
-				this._setTotalCount(upcomingActivities.length);
-
-				var basicListActivities = upcomingActivities.slice(0, 4);
-				this.set('_assessments', basicListActivities);
-				this.set('_allActivities', activities);
 			},
 
 			_keypressOpenAllAssignmentsView: function(e) {
@@ -336,7 +318,11 @@
 			},
 
 			_goPrev: function() {
-				return this._loadActivitiesForPeriod(this._previousPeriodUrl);
+				return this._loadActivitiesForPeriod(this._previousPeriodUrl)
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
+					});
 			},
 
 			_keypressGoPrev: function(e) {
@@ -346,7 +332,11 @@
 			},
 
 			_goNext: function() {
-				return this._loadActivitiesForPeriod(this._nextPeriodUrl);
+				return this._loadActivitiesForPeriod(this._nextPeriodUrl)
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
+					});
 			},
 
 			_keypressGoNext: function(e) {
@@ -355,22 +345,87 @@
 				}
 			},
 
-			_loadActivitiesForPeriod: function(periodUrl) {
-				if (!periodUrl) {
-					return Promise.resolve();
+			_getCustomRangeAction: function(activitiesUrl) {
+				if (!activitiesUrl) {
+					return Promise.reject();
 				}
 
 				var self = this;
+
+				return this._fetchEntity(activitiesUrl, this.getToken, this.userUrl)
+					.then(function(activities) {
+						var parameters = self._getCustomDateRangeParameters();
+
+						var action = (activities.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
+
+						return self._createActionUrl(action, parameters);
+					});
+			},
+
+			_getCustomDateRangeParameters: function() {
+				var currentTime = new Date();
+				var start = currentTime.toISOString();
+				var twoWeeksFromNow = new Date(currentTime.setDate(currentTime.getDate() + 14));
+				var end = twoWeeksFromNow.toISOString();
+
+				return {
+					start: start,
+					end: end
+				};
+			},
+
+			_createActionUrl: function(action, parameters) {
+				var query = {};
+				if (action.fields) {
+					action.fields.forEach(function(field) {
+						if (parameters.hasOwnProperty(field.name)) {
+							query[field.name] = parameters[field.name];
+						} else {
+							query[field.name] = field.value;
+						}
+					});
+				}
+
+				var queryString = Object.keys(query).map(function(key) {
+					return key + '=' + query[key];
+				}).join('&');
+
+				return queryString ? action.href + '?' + queryString : action.href;
+			},
+
+			_loadActivitiesForPeriod: function(periodUrl) {
+				if (!periodUrl) {
+					return Promise.reject();
+				}
+
+				var self = this;
+				var userActivityUsages;
 
 				var progress = this.$.allAssignmentsProgressBar;
 				progress.start();
 
 				return this._fetchEntity(periodUrl, this.getToken, this.userUrl)
-					.then(function(activities) {
-						return self._getActivityInfo(activities, self.getToken, self.userUrl);
+					.then(function(userUsages) {
+						userActivityUsages = userUsages;
+						self._previousPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.previousPeriod) || {}).href;
+						self._nextPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.nextPeriod) || {}).href;
+						self._currentPeriodText = self._getFormattedPeriodText(userActivityUsages.properties.start, userActivityUsages.properties.end);
+						self._periodStart = userActivityUsages.properties.start;
+						self._periodEnd = userActivityUsages.properties.end;
+
+						return self._getOverdueActivities(userActivityUsages, self.getToken, self.userUrl);
 					})
-					.then(function() {
+					.then(function(overdueUserActivityUsages) {
+						return self._getUserActivityUsagesInfos(userActivityUsages, overdueUserActivityUsages, self.getToken, self.userUrl);
+					})
+					.then(function(userActivityUsagesInfos) {
+						return self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
+					})
+					.then(function(activities) {
+						self.set('_allActivities', activities);
 						progress.finish();
+						self._setLoaded(true);
+						return activities;
 					});
 			},
 

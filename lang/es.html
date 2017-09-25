@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangEsBehavior = {
 		es: {
-			'closeSimpleOverlayText': 'Volver al panel',
-			'closeSimpleOverlayTextMobile': 'Panel',
-			'dueDateShort': 'Vencimiento {dueDate}',
-			'dueDateLongImminent': '{prefix}: {dueDate}',
-			'errorMessage': 'Al parecer, hay un problema para cargar este componente. Estamos trabajando en esto y lo solucionaremos lo más pronto posible.',
-			'noAssessmentsInThisTimeFrame': '{userName} no tiene ninguna asignación vencida para este plazo.',
-			'noUpcomingAssessments': '{userName} no tiene ninguna asignación próxima.',
-			'today': 'Hoy',
-			'tomorrow': 'Mañana',
-			'viewAllAssignments': 'Ver todas las asignaciones'
+			"activityComplete": "Completo",
+			"activityDueToday": "Entregar hoy",
+			"activityEnded": "Closed",
+			"activityOverdue": "Atrasadas",
+			"assignment": "Asignación",
+			"closeSimpleOverlayText": "Volver al panel",
+			"closeSimpleOverlayTextMobile": "Panel",
+			"currentPeriod": "{startDate} - {endDate}",
+			"dueDateShort": "Vencimiento {dueDate}",
+			"dueDateLongImminent": "{prefix}: {dueDate}",
+			"endDateShort": "Finaliza el {endDate}",
+			"errorMessage": "Al parecer, hay un problema para cargar este componente. Estamos trabajando para solucionarlo y lo haremos funcionar lo antes posible.",
+			"goNextText": "siguiente",
+			"goPreviousText": "anterior",
+			"noAssessmentsInThisTimeFrame": "{userName} no tiene ninguna asignación que entregar para este plazo.",
+			"noUpcomingAssessments": "{userName} no tiene ninguna asignación que entregar en las próximas 2 semanas.",
+			"quiz": "Cuestionario",
+			"today": "Hoy",
+			"tomorrow": "Mañana",
+			"viewAllAssignments": "Ver todos los trabajos"
 		}
 	};
 </script>

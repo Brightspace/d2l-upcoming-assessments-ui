@@ -58,10 +58,10 @@
 					type: Array,
 					value: function() {
 						return [];
-					},
-					observer: '_onAssessmentItemsChanged'
+					}
 				},
-
+				periodStart: String,
+				periodEnd: String,
 				_assessmentItemBuckets: {
 					type: Array,
 					value: function() {
@@ -75,21 +75,36 @@
 				window.D2L.UpcomingAssessments.LocalizeBehavior
 			],
 
+			observers: [
+				'_onAssessmentItemsChanged(assessmentItems, periodStart, periodEnd)'
+			],
+
 			_onAssessmentItemsChanged: function(assessmentItems) {
-				if (!this.assessmentItems) {
+				if (!this.assessmentItems || !this.periodStart || !this.periodEnd) {
 					return;
 				}
 
 				var dates = new Map();
+				var start = (new Date(this.periodStart)).setHours(0);
+				var end = (new Date(this.periodEnd)).setHours(0);
 
 				for (var i = 0; i < assessmentItems.length; i++) {
-					var dateString = new Date(assessmentItems[i].dueDate || assessmentItems[i].endDate).toDateString();
+					var item = assessmentItems[i];
+
+					var date = new Date(item.dueDate || item.endDate);
+					if (date < start || date > end) {
+						// Only show items that have their due date within the current period
+						// (or end date if assessment doesn't have a due date)
+						continue;
+					}
+
+					var dateString = date.toDateString();
 
 					if (!dates.get(dateString)) {
 						dates.set(dateString, []);
 					}
 
-					dates.get(dateString).push(assessmentItems[i]);
+					dates.get(dateString).push(item);
 				}
 
 				this._assessmentItemBuckets = Array.from(dates);

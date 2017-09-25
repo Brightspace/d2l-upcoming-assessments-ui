@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangZhBehavior = {
 		zh: {
-			'closeSimpleOverlayText': '返回仪表板',
-			'closeSimpleOverlayTextMobile': '仪表板',
-			'dueDateShort': '截止 {dueDate}',
-			'dueDateLongImminent': '{prefix}：{dueDate}',
-			'errorMessage': '加载本微件时出错了。我们正在努力解决，将尽快使其恢复正常。',
-			'noAssessmentsInThisTimeFrame': '{userName} 无任何在此时间段到期的作业。',
-			'noUpcomingAssessments': '{userName} 无任何即将分配的作业。',
-			'today': '今天',
-			'tomorrow': '明天',
-			'viewAllAssignments': '查看所有作业'
+			"activityComplete": "完成",
+			"activityDueToday": "今天过期",
+			"activityEnded": "Closed",
+			"activityOverdue": "过期",
+			"assignment": "作业",
+			"closeSimpleOverlayText": "返回仪表板",
+			"closeSimpleOverlayTextMobile": "仪表板",
+			"currentPeriod": "{startDate} - {endDate}",
+			"dueDateShort": "截止日期：{dueDate}",
+			"dueDateLongImminent": "{prefix}：{dueDate}",
+			"endDateShort": "结束日期：{endDate}",
+			"errorMessage": "加载此微件时似乎出现问题。我们正在解决，将会尽快使其恢复正常。",
+			"goNextText": "下一个",
+			"goPreviousText": "上一个",
+			"noAssessmentsInThisTimeFrame": "{userName} 无任何在此时间段到期的作业。",
+			"noUpcomingAssessments": "{userName} 无任何在未来 2 周内到期的作业。",
+			"quiz": "测验",
+			"today": "今天",
+			"tomorrow": "明天",
+			"viewAllAssignments": "查看所有作业"
 		}
 	};
 </script>

@@ -16,141 +16,118 @@
 	*/
 	var upcomingAssessmentsBehaviorImpl = {
 
-		_getActivityUsagesInfo: function(activities, getToken, userUrl) {
+		_getCompletionState: function(userActivityUsage) {
+			return {
+				isCompleted: !!userActivityUsage.getSubEntityByClass(this.HypermediaClasses.activities.complete)
+			};
+		},
+
+		_getDueDateState: function(userActivityUsage, overdueUserActivityUsages) {
+			var activityIsOverdue = false;
+			var activityIsDueToday = false;
+			var dueDate;
+			var dueDateEntity = userActivityUsage.getSubEntityByClass(this.HypermediaClasses.dates.dueDate);
+			if (dueDateEntity) {
+				dueDate = dueDateEntity.properties.date;
+				activityIsDueToday = this.getDateDiffInCalendarDays(dueDate) === 0;
+				activityIsOverdue = overdueUserActivityUsages.some(function(overdueUserUsage) {
+					return overdueUserUsage.getLinkByRel('self').href === userActivityUsage.getLinkByRel('self').href;
+				});
+			}
+
+			return {
+				dueDate: dueDate,
+				isOverdue: activityIsOverdue,
+				isDueToday: activityIsDueToday
+			};
+		},
+
+		_getEndDateState: function(userActivityUsage) {
+			var activityIsEnded = false;
+			var endDate;
+			var endDateEntity = userActivityUsage.getSubEntityByClass(this.HypermediaClasses.dates.endDate);
+			if (endDateEntity) {
+				endDate = endDateEntity.properties.date;
+				activityIsEnded = this.getDateDiffInCalendarDays(endDate) < 0;
+			}
+
+			return {
+				endDate: endDate,
+				isEnded: activityIsEnded
+			};
+		},
+
+		_getActivityType: function(activity) {
+			var type;
+			if (activity.hasClass(this.HypermediaClasses.assignments.assignment)) {
+				type = 'assignment';
+			} else if (activity.hasClass(this.HypermediaClasses.quizzes.quiz)) {
+				type = 'quiz';
+			}
+			return type;
+		},
+
+		_getOrganizationRequest: function(userActivityUsage, getToken, userUrl) {
+			var organizationLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.organization) || {} ).href;
+			return this._fetchEntity(organizationLink, getToken, userUrl);
+		},
+
+		_getActivityRequest: function(userActivityUsage, getToken, userUrl) {
+			var activityLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.assignment)
+					|| userActivityUsage.getLinkByRel(this.HypermediaRels.quiz) || {}).href;
+			return this._fetchEntity(activityLink, getToken, userUrl);
+		},
+
+		/*
+		* Returns an object that contains the information required to populate an assessment list item
+		*/
+		_getUserActivityUsagesInfos: function(userActivityUsages, overdueUserActivityUsages, getToken, userUrl) {
+			if (!userActivityUsages.entities) {
+				return;
+			}
+
 			var requests = [];
 			var self = this;
-			var overdueActivitiesRequest = self._getOverdueActivities(activities, getToken, userUrl);
 
-			var assignmentEntities = activities.getSubEntitiesByClass('user-assignment-activity');
-			var quizEntities = activities.getSubEntitiesByClass('user-quiz-activity');
-			[].concat(assignmentEntities).concat(quizEntities).forEach(function(assessment) {
-				if (!assessment.getSubEntityByClass(self.HypermediaClasses.dates.dueDate)
-					&& !assessment.getSubEntityByClass(self.HypermediaClasses.dates.endDate)
-				) {
-					return;
-				}
-				var orgUnitLink = (assessment.getLinkByRel(self.HypermediaRels.organization) || {}).href;
-				var activityUsageLink = assessment.getLinkByRel(self.HypermediaRels.Activities.activityUsage).href;
-				var activityIsComplete = !!assessment.getSubEntityByClass('complete');
+			var overdueAssignments = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userAssignmentActivity);
+			var overdueQuizzes = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userQuizActivity);
+			var overdueUserUsages = [];
+			overdueUserUsages = overdueUserUsages.concat(overdueAssignments);
+			overdueUserUsages = overdueUserUsages.concat(overdueQuizzes);
 
-				var activityUsageRequest = self._fetchEntity(activityUsageLink, getToken, userUrl);
-				var assessmentSelfHref = assessment.getLinkByRel('self').href;
+			userActivityUsages.entities.forEach(function(userActivityUsage) {
+				var organizationRequest = self._getOrganizationRequest.call(self, userActivityUsage, getToken, userUrl);
+				var activityRequest = self._getActivityRequest.call(self, userActivityUsage, getToken, userUrl);
 
-				var request = new Promise(function(resolve) {
-					Promise.all([activityUsageRequest, overdueActivitiesRequest])
-						.then(function(response) {
-							var activityUsageEntity = response[0];
-							var overdueActivitiesEntity = response[1];
-							var isOverdue = false;
-							if (overdueActivitiesEntity) {
-								var overdueActivities = [];
-								overdueActivities = overdueActivities.concat(overdueActivitiesEntity.getSubEntitiesByClass('user-quiz-activity'));
-								overdueActivities = overdueActivities.concat(overdueActivitiesEntity.getSubEntitiesByClass('user-assignment-activity'));
-								isOverdue = overdueActivities.some(function(usage) {
-									return usage.getLinkByRel('self').href === assessmentSelfHref;
-								});
-							}
-							resolve({
-								activityIsComplete: activityIsComplete,
-								activityIsOverdue: isOverdue,
-								activityUsage: activityUsageEntity,
-								orgUnitLink: orgUnitLink
-							});
-						});
-				});
+				var completionState = self._getCompletionState.call(self, userActivityUsage);
+				var dueDateState = self._getDueDateState.call(self, userActivityUsage, overdueUserUsages);
+				var endDateState = self._getEndDateState.call(self, userActivityUsage);
+
+				var request = Promise.all([activityRequest, organizationRequest])
+					.then(function(response) {
+						var activity = response[0];
+						var organization = response[1];
+
+						var type = self._getActivityType.call(self, activity);
+
+						return {
+							name: activity.properties.name,
+							courseName: organization.properties.name,
+							instructions: activity.properties.instructionsText || activity.properties.instructions,
+							dueDate: dueDateState.dueDate,
+							endDate: endDateState.endDate,
+							isCompleted: completionState.isCompleted,
+							isDueToday: dueDateState.isDueToday,
+							isOverdue: dueDateState.isOverdue,
+							isEnded: endDateState.isEnded,
+							type: type
+						};
+					});
 
 				requests.push(request);
 			});
 
 			return Promise.all(requests);
-		},
-
-		_getUserActivityUsageInfo: function(responses, getToken, userUrl) {
-			var requests = [];
-			var orgPromiseMap = {};
-			var self = this;
-
-			responses.forEach(function(response) {
-				if (!response.activityUsage.hasClass('published')) {
-					return;
-				}
-
-				var assessmentLink = (response.activityUsage.getLinkByRel(self.HypermediaRels.assignment)
-					|| response.activityUsage.getLinkByRel(self.HypermediaRels.quiz)).href;
-				var orgUnitRequest = orgPromiseMap[response.orgUnitLink];
-
-				var activityIsComplete = response.activityIsComplete;
-				var activityIsOverdue = response.activityIsOverdue;
-				var activityIsDueToday = false;
-
-				var dueDate;
-				var dueDateEntity = response.activityUsage.getSubEntityByClass(self.HypermediaClasses.dates.dueDate);
-				if (dueDateEntity) {
-					dueDate = dueDateEntity.properties.date;
-					// If there is no due date, the default value of false is correct
-					activityIsDueToday = !activityIsComplete
-						&& !activityIsOverdue
-						&& self.getDateDiffInCalendarDays(dueDate) === 0;
-				}
-
-				var endDate;
-				var endDateEntity = response.activityUsage.getSubEntityByClass(self.HypermediaClasses.dates.endDate);
-				if (endDateEntity) {
-					endDate = endDateEntity.properties.date;
-				}
-
-				if (!orgUnitRequest) {
-					orgUnitRequest = self._fetchEntity(response.orgUnitLink, getToken, userUrl);
-					orgPromiseMap[response.orgUnitLink] = orgUnitRequest;
-				}
-
-				var assessmentRequest = self._fetchEntity(assessmentLink, getToken, userUrl);
-
-				var request = new Promise(function(resolve) {
-					Promise.all([assessmentRequest, orgUnitRequest])
-						.then(function(response) {
-							var activity = response[0];
-							var organization = response[1];
-
-							var type;
-							if (activity.hasClass('assignment')) {
-								type = 'assignment';
-							} else if (activity.hasClass('quiz')) {
-								type = 'quiz';
-							}
-
-							resolve({
-								name: activity.properties.name,
-								courseName: organization.properties.name,
-								dueDate: dueDate,
-								endDate: endDate,
-								instructions: activity.properties.instructionsText || activity.properties.instructions,
-								isCompleted: activityIsComplete,
-								isDueToday: activityIsDueToday,
-								isOverdue: activityIsOverdue,
-								type: type
-							});
-						});
-				});
-
-				requests.push(request);
-			});
-
-			return Promise.all(requests);
-		},
-
-		_getOverdueActivitiesList: function(userUrl, getToken) {
-			var self = this;
-
-			return this._fetchEntity(userUrl)
-				.then(function(userEntity) {
-					return self._getUserActivityUsages(userEntity, getToken, userUrl);
-				})
-				.then(function(activities) {
-					self._setTotalCount(self._getTotalCount(activities, getToken, userUrl));
-
-					return self._getOverdueActivities(activities, getToken, userUrl);
-				});
 		},
 
 		_getUserActivityUsages: function(userEntity, getToken, userUrl) {
@@ -167,31 +144,9 @@
 			if (overdueActivitiesLink) {
 				return this._fetchEntity(overdueActivitiesLink, getToken, userUrl);
 			}
-		},
 
-		_getTotalCount: function(activities) {
-			var self = this;
-			var activityEntities = [];
-			activityEntities = activityEntities.concat(activities.getSubEntitiesByClass('user-assignment-activity'));
-			activityEntities = activityEntities.concat(activities.getSubEntitiesByClass('user-quiz-activity'));
-			return (activityEntities)
-				.map(function(assignment) {
-					return {
-						dueDate: ((assignment.getSubEntityByClass(self.HypermediaClasses.dates.dueDate) || {}).properties || {}).date,
-						endDate: ((assignment.getSubEntityByClass(self.HypermediaClasses.dates.endDate) || {}).properties || {}).date
-					};
-				})
-				.filter(function(item) {
-					return self.isActivityUpcoming(item);
-				})
-				.length;
-		},
-
-		_getOverdueCount: function(overdueActivities) {
-			var activityEntities = [];
-			activityEntities = activityEntities.concat(overdueActivities.getSubEntitiesByClass('user-assignment-activity'));
-			activityEntities = activityEntities.concat(overdueActivities.getSubEntitiesByClass('user-quiz-activity'));
-			return (activityEntities).length;
+			// API doesn't include the overdue link if user doesn't have any overdue activities
+			return window.D2L.Hypermedia.Siren.Parse({});
 		},
 
 		_fetchEntity: function(url, getToken, userUrl) {

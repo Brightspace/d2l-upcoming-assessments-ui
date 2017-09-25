@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangTrBehavior = {
 		tr: {
-			'closeSimpleOverlayText': 'Panoya Geri Dön',
-			'closeSimpleOverlayTextMobile': 'Pano',
-			'dueDateShort': 'Bitiş: {dueDate}',
-			'dueDateLongImminent': '{prefix}: {dueDate}',
-			'errorMessage': 'Bu pencere öğesi yüklenirken bir sorun oluştu. Bu sorunu çözmeye çalışıyoruz, en kısa zamanda sonuca ulaşacağız.',
-			'noAssessmentsInThisTimeFrame': '{userName} adlı kullanıcıya ait bu zaman çerçevesinde süresi dolan herhangi bir ödev bulunmuyor.',
-			'noUpcomingAssessments': '{userName} adlı kullanıcıya ait yaklaşan ödev bulunmuyor.',
-			'today': 'Bugün',
-			'tomorrow': 'Yarın',
-			'viewAllAssignments': 'Tüm Ödevleri Görüntüle'
+			"activityComplete": "Tamamla",
+			"activityDueToday": "Bugün Süresi Doluyor",
+			"activityEnded": "Closed",
+			"activityOverdue": "Gecikmiş",
+			"assignment": "Ödev",
+			"closeSimpleOverlayText": "Panoya Geri Dön",
+			"closeSimpleOverlayTextMobile": "Pano",
+			"currentPeriod": "{startDate} - {endDate}",
+			"dueDateShort": "Süresinin Dolma Tarihi: {dueDate}",
+			"dueDateLongImminent": "{prefix}: {dueDate}",
+			"endDateShort": "Şu Tarihte Sona Erer: {endDate}",
+			"errorMessage": "Bu pencere öğesi yüklenirken bir sorun oluştu. Bu sorunu çözmeye çalışıyoruz, en kısa zamanda sonuca ulaşacağız.",
+			"goNextText": "sonraki",
+			"goPreviousText": "önceki",
+			"noAssessmentsInThisTimeFrame": "Bu zaman çerçevesinde {userName} adlı kullanıcıya ait süresi dolan herhangi bir ödev bulunmuyor.",
+			"noUpcomingAssessments": "Önümüzdeki 2 hafta içinde {userName} adlı kullanıcıya ait süresi dolan herhangi bir ödev bulunmuyor.",
+			"quiz": "Sınav",
+			"today": "Bugün",
+			"tomorrow": "Yarın",
+			"viewAllAssignments": "Tüm İşleri Görüntüle"
 		}
 	};
 </script>

@@ -83,28 +83,6 @@ describe('<d2l-upcoming-assessments>', function() {
 		// 	}, 20);
 		// });
 
-		describe('_getActivityInfo', function() {
-
-			it('sets the nextPeriodUrl if the link exists on the provided activities object', function() {
-				activities.getLinkByRel = sandbox.stub().withArgs('https://activities.api.brightspace.com/rels/next-period').returns({ href: nextPeriodUrl });
-				activities.getSubEntitiesByClass = sandbox.stub().returns([]);
-				return element._getActivityInfo(activities)
-					.then(function() {
-						expect(element._nextPeriodUrl).to.equal(nextPeriodUrl);
-					});
-			});
-
-			it('sets the previousPeriodUrl if the link exists on the provided activities object', function() {
-				activities.getLinkByRel = sandbox.stub().withArgs('https://activities.api.brightspace.com/rels/previous-period').returns({ href: previousPeriodUrl });
-				activities.getSubEntitiesByClass = sandbox.stub().returns([]);
-				return element._getActivityInfo(activities)
-					.then(function() {
-						expect(element._previousPeriodUrl).to.equal(previousPeriodUrl);
-					});
-			});
-
-		});
-
 		describe('_goNext', function() {
 			it('invokes _loadActivitiesForPeriod with the nextPeriodUrl', function() {
 				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve());
@@ -133,27 +111,46 @@ describe('<d2l-upcoming-assessments>', function() {
 				element._fetchEntity = sandbox.stub();
 				return element._loadActivitiesForPeriod()
 					.then(function() {
+						return Promise.reject('Expected _loadActivitiesForPeriod to reject');
+					})
+					.catch(function() {
 						expect(element._fetchEntity).to.not.have.been.called;
 					});
 			});
 
 			it('calls _fetchEntity for the provided url', function() {
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(
+					window.D2L.Hypermedia.Siren.Parse(activities)
+				));
 				return element._loadActivitiesForPeriod(nextPeriodUrl)
 					.then(function() {
 						expect(element._fetchEntity).to.have.been.calledWith(nextPeriodUrl);
 					});
 			});
 
-			it('calls _getActivityInfo with the retrieved activities response', function() {
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(activities));
-				element._getActivityInfo = sandbox.spy();
-				return element._loadActivitiesForPeriod(nextPeriodUrl)
+		});
+
+		describe('_getCustomRangeAction', function() {
+			it('does nothing if the provided url was not set', function() {
+				element._fetchEntity = sandbox.stub();
+				return element._getCustomRangeAction()
 					.then(function() {
-						expect(element._getActivityInfo).to.have.been.calledWith(activities);
+						return Promise.reject('Expected _getCustomRangeAction to reject');
+					})
+					.catch(function() {
+						expect(element._fetchEntity).to.not.have.been.called;
 					});
 			});
 
+			it('calls _fetchEntity for the provided url', function() {
+				element._fetchEntity = sandbox.stub().returns(Promise.resolve(
+					window.D2L.Hypermedia.Siren.Parse(activities)
+				));
+				return element._getCustomRangeAction(nextPeriodUrl)
+					.then(function() {
+						expect(element._fetchEntity).to.have.been.calledWith(nextPeriodUrl);
+					});
+			});
 		});
 
 	});

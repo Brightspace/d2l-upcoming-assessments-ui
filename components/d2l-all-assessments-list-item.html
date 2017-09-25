@@ -30,7 +30,7 @@
 				align-items: center;
 			}
 
-			.course-meta-text {
+			.meta-text {
 				@apply --d2l-body-standard-text;
 				font-size: 0.7rem;
 				display: flex;
@@ -38,6 +38,11 @@
 				align-items: center;
 				word-wrap: break-word;
 				word-break: break-word;
+			}
+
+			.emphasis {
+				color: var(--d2l-color-cinnabar);
+				font-weight: bold;
 			}
 
 			.activity-icon, .spacer {
@@ -70,6 +75,10 @@
 
 			.overdue-info {
 				background-color: var(--d2l-color-cinnabar);
+			}
+
+			.ended-info {
+				background-color: var(--d2l-color-ferrite);
 			}
 
 			.activity-info {
@@ -117,6 +126,10 @@
 				}
 			}
 
+			[hidden] {
+				display: none;
+			}
+
 		</style>
 		<div role="listitem">
 			<div class="row">
@@ -125,18 +138,25 @@
 					<div class="info-container">
 						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
 						<div class="meta-info">
-							<div class="activity-status-badge completion-info" hidden$="[[!assessmentItem.isCompleted]]">
+							<div class="activity-status-badge completion-info" hidden$="[[!_showComplete]]">
 								[[localize('activityComplete')]]
 							</div>
-							<div class="activity-status-badge due-today-info" hidden$="[[!assessmentItem.isDueToday]]">
+							<div class="activity-status-badge due-today-info" hidden$="[[!_showDueToday]]">
 								[[localize('activityDueToday')]]
 							</div>
-							<div class="activity-status-badge overdue-info" hidden$="[[!assessmentItem.isOverdue]]">
-								[[localize('activityOverdue')]]
+							<div class="meta-info" hidden$="[[!_showOverdue]]">
+								<div class="activity-status-badge overdue-info">[[localize('activityOverdue')]]</div>
 							</div>
-							<div class="course-meta-text">[[assessmentItem.courseName]]</div>
+							<div class="meta-text" hidden$="[[!_showEndsText]]">
+								<div class="meta-text emphasis">[[_endsText]]</div>
+								<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+							</div>
+							<div class="activity-status-badge ended-info" hidden$="[[!_showEnded]]">
+								[[localize('activityEnded')]]
+							</div>
+							<div class="meta-text">[[assessmentItem.courseName]]</div>
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-							<div class="course-meta-text">[[assessmentType]]</div>
+							<div class="meta-text">[[assessmentType]]</div>
 						</div>
 					</div>
 				</div>
@@ -170,6 +190,27 @@
 			assessmentType: {
 				type: String,
 				value: ''
+			},
+			_endsText: String,
+			_showComplete: {
+				type: Boolean,
+				value: false
+			},
+			_showDueToday: {
+				type: Boolean,
+				value: false
+			},
+			_showOverdue: {
+				type: Boolean,
+				value: false
+			},
+			_showEnded: {
+				type: Boolean,
+				value: false
+			},
+			_showEndsText: {
+				type: Boolean,
+				value: false
 			}
 		},
 
@@ -181,6 +222,38 @@
 		_onAssessmentItemChanged: function(assessmentItem) {
 			this._updateAssessmentIcon(assessmentItem);
 			this._updateAssessmentType(assessmentItem);
+
+			this._showComplete = assessmentItem.isCompleted;
+			this._showDueToday = !assessmentItem.isCompleted && assessmentItem.isDueToday;
+			this._showOverdue = !assessmentItem.isCompleted && !assessmentItem.isEnded && assessmentItem.isOverdue;
+			this._showEnded = !assessmentItem.isCompleted && assessmentItem.isEnded;
+
+			if (assessmentItem.endDate) {
+				var relativeDateString = this._getRelativeDateString(assessmentItem.endDate);
+				this._endsText = this.localize('endDateShort', 'endDate', relativeDateString);
+				this._showEndsText = this._showOverdue;
+			}
+		},
+
+		_getRelativeDateString: function(dateUTC) {
+			if (!dateUTC) {
+				return;
+			}
+
+			var dateString;
+			var calendarDateDiff = this.getDateDiffInCalendarDays(dateUTC);
+
+			if (calendarDateDiff === 0) {
+				return this.localize('today');
+			} else if (calendarDateDiff === 1) {
+				return this.localize('tomorrow');
+			} else if (calendarDateDiff > 1 && calendarDateDiff < 7) {
+				dateString = new Date(dateUTC).toLocaleDateString(this.locale, { weekday: 'long' });
+			} else {
+				dateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(dateUTC));
+			}
+
+			return dateString;
 		},
 
 		_updateAssessmentIcon: function(assessmentItem) {

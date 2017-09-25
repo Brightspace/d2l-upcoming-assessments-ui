@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 
 <script>
-	'use strict';
+	/* eslint quotes: ["error", "double"] */
+	"use strict";
 
 	window.D2L = window.D2L || {};
 	window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
@@ -13,16 +14,26 @@
 	*/
 	window.D2L.UpcomingAssessments.LocalizeBehavior.LangJaBehavior = {
 		ja: {
-			'closeSimpleOverlayText': 'ダッシュボードに戻る',
-			'closeSimpleOverlayTextMobile': 'ダッシュボード',
-			'dueDateShort': '期限 {dueDate}',
-			'dueDateLongImminent': '{prefix}: {dueDate}',
-			'errorMessage': 'このウィジェットの読み込みに問題が発生しています。復旧に向けて現在対応中です。',
-			'noAssessmentsInThisTimeFrame': '{userName} には、この期間に期限を迎える課題がありません。',
-			'noUpcomingAssessments': '{userName} には、今後の課題がありません。',
-			'today': '今日',
-			'tomorrow': '明日',
-			'viewAllAssignments': '課題をすべて表示'
+			"activityComplete": "完了",
+			"activityDueToday": "本日期限",
+			"activityEnded": "Closed",
+			"activityOverdue": "期限切れ",
+			"assignment": "課題",
+			"closeSimpleOverlayText": "ダッシュボードに戻る",
+			"closeSimpleOverlayTextMobile": "ダッシュボード",
+			"currentPeriod": "{startDate}～{endDate}",
+			"dueDateShort": "期限 {dueDate}",
+			"dueDateLongImminent": "{prefix}: {dueDate}",
+			"endDateShort": "終了 {endDate}",
+			"errorMessage": "このウィジェットの読み込み中に問題が発生したようです。できるだけ早く機能するよう、解決に取り組んでおります。",
+			"goNextText": "次へ",
+			"goPreviousText": "前へ",
+			"noAssessmentsInThisTimeFrame": "{userName} には、この期間に期限を迎える課題がありません。",
+			"noUpcomingAssessments": "{userName} には、2 週間以内に期限を迎える課題がありません。",
+			"quiz": "クイズ",
+			"today": "今日",
+			"tomorrow": "明日",
+			"viewAllAssignments": "すべての学習の表示"
 		}
 	};
 </script>
