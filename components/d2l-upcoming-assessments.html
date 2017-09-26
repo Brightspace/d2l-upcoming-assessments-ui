@@ -153,7 +153,11 @@
 				</div>
 			</div>
 			 <div class="period-selection-container">
-				 <d2l-date-dropdown current-period-text=[[_currentPeriodText]]></d2l-date-dropdown>
+				 <d2l-date-dropdown
+				 	current-period-text=[[_currentPeriodText]]
+					locale=[[locale]]
+					>
+				</d2l-date-dropdown>
 			</div>
 			<template is="dom-if" if="[[_hasActivities(_allActivities)]]">
 				<d2l-all-assessments-list
@@ -322,16 +326,8 @@
 				this.$['view-all-assignments-overlay'].open();
 			},
 
-			_goPrev: function() {
-				return this._loadActivitiesForPeriod(this._previousPeriodUrl)
-					.catch(function() {
-						self._showError = true;
-						self._userName = null;
-					});
-			},
-
 			_onDateValueChanged: function(e) {
-				if (e.detail.date && e.detail.date !== null) {
+				if (e.detail.date) {
 					var parameters = this._getCustomDateRangeParameters(e.detail.date);
 					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
 					return this._loadActivitiesForPeriod(periodUrl)
@@ -340,14 +336,6 @@
 						self._userName = null;
 					});
 				}
-			},
-
-			_goNext: function() {
-				return this._loadActivitiesForPeriod(this._nextPeriodUrl)
-					.catch(function() {
-						self._showError = true;
-						self._userName = null;
-					});
 			},
 
 			_getCustomRangeAction: function(activitiesUrl) {

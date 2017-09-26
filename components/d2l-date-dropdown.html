@@ -3,11 +3,11 @@
 <link rel="import" href="../../d2l-colors/d2l-colors.html">
 <link rel="import" href="../../iron-input/iron-input.html">
 <link rel="import" href="../../iron-a11y-keys/iron-a11y-keys.html">
-<link rel="import" href="../../d2l-time-picker/d2l-time-picker.html">
-<link rel="import" href="../../d2l-intl/d2l-intl.html">
 <link rel="import" href="../../d2l-offscreen/d2l-offscreen-shared-styles.html">
 <link rel="import" href="../../d2l-polymer-behaviors/d2l-id.html">
-<link rel="import" href="../behaviors/localize-behavior.html">
+<link rel="import" href="../../d2l-icons/d2l-icon.html">
+<link rel="import" href="../../d2l-icons/tier1-icons.html">
+<link rel="import" href="../../d2l-date-picker/localize-behavior.html">
 
 <dom-module id="d2l-date-dropdown">
 	<template>
@@ -16,18 +16,7 @@
 				:host {
 					display: block;
 				}
-				:host([hide-label]) > label,
-				.d2l-date-picker-description {
-					@apply --d2l-offscreen;
-				}
-				:host(:dir(rtl)) :host([hide-label]) > label,
-				:host(:dir(rtl)) .d2l-date-picker-description {
-					@apply --d2l-offscreen-rtl;
-				}
-				:host-context([dir="rtl"]) :host([hide-label]) > label,
-				:host-context([dir="rtl"]) .d2l-date-picker-description {
-					@apply --d2l-offscreen-rtl;
-				}
+
 				vaadin-date-picker-light {
 					--primary-color: var(--d2l-color-celestine);
 					--light-primary-color: var(--d2l-color-celestine-plus-1);
@@ -58,12 +47,6 @@
 						font-family: inherit;
 					};
 				}
-				label {
-					@apply --d2l-date-picker-label;
-				}
-				input {
-					display: none;
-				}
 
 				span {
 					padding-right: 7px;
@@ -81,29 +64,17 @@
 				}
 
 				:host-context([dir="rtl"]) span {
-					padding-left: 0px;
-					padding-right: 7px;
+					padding-left: 7px;
+					padding-right: 0px;
 				}
 			</style>
 		</custom-style>
 
-		<label id="[[_labelId]]">{{label}}</label>
 		<vaadin-date-picker-light min="[[min]]" max="[[max]]" value="{{value}}" on-value-changed="handleValueChanged" attr-for-value="value">
 			<iron-a11y-keys target="[[_target]]" keys="enter" on-keys-pressed="_onEnter"></iron-a11y-keys>
 			<iron-a11y-keys target="[[_target]]" keys="up down" on-keys-pressed="_onUpDown"></iron-a11y-keys>
-			<iron-input>
-				<input
-					on-tap="_handleTap"
-					placeholder="{{placeholder}}"
-					class="d2l-input"
-					is="iron-input"
-					type="text"
-					on-focus="_handleFocus"
-					aria-describedby$="[[_descriptionId]]"
-					aria-labelledby$="[[_labelId]]"
-					style="display:none;"
-				>
-				</input>
+			<div>
+				<input is="iron-input" style="display:none;"></input>
 				<a
 					is="d2l-link"
 					on-focus="_handleFocus"
@@ -112,8 +83,7 @@
 					<span class="currentPeriod">[[currentPeriodText]]</span>
 					<d2l-icon icon="d2l-tier1:chevron-down" aria-hidden="true"></d2l-icon>
 				</a>
-				<!-- <div id="[[_descriptionId]]" class="d2l-date-picker-description" >{{description}}</div> -->
-			</iron-input>
+			</div>
 		</vaadin-date-picker-light>
 	</template>
 
@@ -125,19 +95,10 @@
 			_target: {
 				type: Object
 			},
-			_descriptionId: {
-				type: String
-			},
-			_labelId: {
-				type: String
-			},
 			behaviors: [
-				window.D2L.UpcomingAssessments.LocalizeBehavior
+				window.D2L.PolymerBehaviors.DatePicker.LocalizeBehavior
 			],
 			properties: {
-				placeholder: {
-					type: String
-				},
 				min: {
 					type: String
 				},
@@ -148,17 +109,6 @@
 					type: String,
 					reflectToAttribute: true,
 					notify: true
-				},
-				label: {
-					type: String
-				},
-				hideLabel: {
-					type: Boolean,
-					value: false,
-					reflectToAttribute: true
-				},
-				description:{
-					type: String
 				},
 				locale: {
 					type: String,
@@ -175,15 +125,14 @@
 				currentPeriodText: String
 			},
 			observers: [
-				'_localeChanged( locale )'
+				'_localeChanged( locale )',
+				'_updateDatePickeri18n( locale, localize, dateFormat, firstDayOfWeek )'
 			],
 			ready: function() {
 				this._target = this.$$('a');
 				this.addEventListener('iron-overlay-canceled', function(e) {
 					e.stopPropagation();
 				});
-				// this._labelId = D2L.Id.getUniqueId();
-				// this._descriptionId = D2L.Id.getUniqueId();
 			},
 			attached: function() {
 				var buttons = document.getElementsByClassName('vaadin-date-picker-overlay paper-button-0');
@@ -239,6 +188,44 @@
 			},
 			_localeChanged: function( locale ) {
 				this.language = locale;
+			},
+			_updateDatePickeri18n: function() {
+				var locale = window.d2lIntl.LocaleProvider(this.locale);
+				var dateFormatOverride = this.dateFormat ? {
+					locale: {
+						date: {
+							formats: {
+								dateFormats: {
+									short: this.dateFormat
+								}
+							}
+						}
+					}
+				} : {};
+				var formatter = new window.d2lIntl.DateTimeFormat( this.locale, dateFormatOverride );
+				var parser = new window.d2lIntl.DateTimeParse( this.locale, dateFormatOverride );
+				var datePicker = this.$$('vaadin-date-picker-light');
+				var localeOverrides = {
+					monthNames: locale.date.calendar.months.long,
+					weekdays: locale.date.calendar.days.long,
+					weekdaysShort: locale.date.calendar.days.short,
+					firstDayOfWeek: this.firstDayOfWeek ? this.firstDayOfWeek : locale.date.calendar.firstDayOfWeek,
+					today: this.localize('today'),
+					cancel: this.localize('cancel'),
+					formatDate: function( date ) {
+						return formatter.formatDate( date );
+					},
+					parseDate: function( dateString ) {
+						try {
+							return parser.parseDate( dateString );
+						} catch (exception) {
+							return null;
+						}
+					}
+				};
+				var datePickerLocale = this._merge(datePicker.i18n, localeOverrides);
+				datePicker.i18n = {}; // reassign to have Polymer refresh
+				datePicker.i18n = datePickerLocale;
 			},
 			_merge: function(obj1, obj2) {
 				if (obj2 === undefined || obj2 === null || typeof(obj2) !== 'object') {
