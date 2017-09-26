@@ -118,7 +118,7 @@
 	</template>
 
 	<script>
-	'use strict';
+		'use strict';
 
 		Polymer({
 			is: 'd2l-date-dropdown',
@@ -132,7 +132,7 @@
 				type: String
 			},
 			behaviors: [
-				window.D2L.UpcomingAssessments.LocalizeBehavior,
+				window.D2L.UpcomingAssessments.LocalizeBehavior
 			],
 			properties: {
 				placeholder: {
@@ -192,7 +192,14 @@
 				}
 			},
 			handleValueChanged: function(e, detail) {
-				this.fire('d2l-date-picker-value-changed', e, detail);
+				if (detail.value) {
+					var dateInfo = detail.value.split(/\s*\-\s*/g);
+					var year = dateInfo[0];
+					var month = dateInfo[1] - 1;
+					var date = dateInfo[2];
+					var changedDate = new Date(year, month, date);
+					this.fire('d2l-date-picker-value-changed', { date: changedDate });
+				}
 			},
 			_handleTap: function() {
 				var datepicker = this.$$('vaadin-date-picker-light');
@@ -218,7 +225,6 @@
 				}
 			},
 			focus: function() {
-				var thing = this.$$('a');
 				this.$$('a').focus();
 			},
 			_handleFocus: function() {

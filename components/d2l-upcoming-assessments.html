@@ -226,7 +226,8 @@
 					value: null
 				},
 				_periodStart: String,
-				_periodEnd: String
+				_periodEnd: String,
+				_selectCustomDateRangeAction: Object
 			},
 
 			behaviors: [
@@ -235,6 +236,10 @@
 				window.D2L.UpcomingAssessments.LocalizeBehavior,
 				window.D2L.Hypermedia.HMConstantsBehavior
 			],
+
+			listeners: {
+				'd2l-date-picker-value-changed': '_onDateValueChanged'
+			},
 
 			observers: [
 				'_onApiConfigChanged(userUrl, getToken)'
@@ -325,9 +330,15 @@
 					});
 			},
 
-			_keypressGoPrev: function(e) {
-				if ( e.code === 'Space' || e.code === 'Enter' ) {
-					return this._goPrev(e);
+			_onDateValueChanged: function(e) {
+				if (e.detail.date && e.detail.date !== null) {
+					var parameters = this._getCustomDateRangeParameters(e.detail.date);
+					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
+					return this._loadActivitiesForPeriod(periodUrl)
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
+					});
 				}
 			},
 
@@ -339,12 +350,6 @@
 					});
 			},
 
-			_keypressGoNext: function(e) {
-				if ( e.code === 'Space' || e.code === 'Enter' ) {
-					return this._goNext(e);
-				}
-			},
-
 			_getCustomRangeAction: function(activitiesUrl) {
 				if (!activitiesUrl) {
 					return Promise.reject();
@@ -354,19 +359,24 @@
 
 				return this._fetchEntity(activitiesUrl, this.getToken, this.userUrl)
 					.then(function(activities) {
-						var parameters = self._getCustomDateRangeParameters();
+						var currentTime = new Date();
+						currentTime.setHours(0, 0, 0, 0);
+						var parameters = self._getCustomDateRangeParameters(currentTime);
 
 						var action = (activities.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
+						self._selectCustomDateRangeAction = action;
 
 						return self._createActionUrl(action, parameters);
 					});
 			},
 
-			_getCustomDateRangeParameters: function() {
-				var currentTime = new Date();
-				var start = currentTime.toISOString();
-				var twoWeeksFromNow = new Date(currentTime.setDate(currentTime.getDate() + 14));
-				var end = twoWeeksFromNow.toISOString();
+			_getCustomDateRangeParameters: function(selectedDate) {
+				var day = selectedDate.getDay();
+				var startDate = new Date(selectedDate.setDate(selectedDate.getDate() - day));
+				var start = startDate.toISOString();
+				var twoWeeksFromStart = new Date(startDate.setDate(startDate.getDate() + 14));
+				twoWeeksFromStart.setHours(23, 59, 59, 999);
+				var end = twoWeeksFromStart.toISOString();
 
 				return {
 					start: start,
