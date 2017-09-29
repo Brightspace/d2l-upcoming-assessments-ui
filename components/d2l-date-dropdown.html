@@ -18,6 +18,7 @@
 				}
 
 				vaadin-date-picker-light {
+					height: 28px;
 					--primary-color: var(--d2l-color-celestine);
 					--light-primary-color: var(--d2l-color-celestine-plus-1);
 					--dark-theme-background-color: var(--d2l-color-ferrite);
@@ -27,6 +28,9 @@
 					--vaadin-date-picker-overlay: {
 						font-family: inherit;
 						max-height: 355px;
+						margin-top: 10px;
+						border-radius: 5px;
+						border: 1px solid var(--d2l-color-mica);
 					};
 					--vaadin-date-picker-yearscroller: {
 						font-family: inherit;
@@ -67,20 +71,46 @@
 					padding-left: 7px;
 					padding-right: 0px;
 				}
+
+				.d2l-dropdown-content-pointer {
+					position: relative;
+					clip: rect(-5px, 21px, 8px, -3px);
+					left: calc(50% - 7px);
+					z-index: 10000;
+					display: none;
+				}
+
+				.d2l-dropdown-content-pointer > div {
+					background-color: #ffffff;
+					border: 1px solid var(--d2l-color-mica);
+					border-radius: 0.1rem;
+					border-right: hidden;
+					border-bottom: hidden;
+					box-shadow: -4px -4px 12px -5px rgba(86, 90, 92, .2);
+					height: 16px;
+					width: 16px;
+					transform: rotate(45deg);
+					-webkit-transform: rotate(45deg);
+				}
 			</style>
 		</custom-style>
 
 		<vaadin-date-picker-light value="{{value}}" on-value-changed="handleValueChanged" attr-for-value="value">
 			<iron-a11y-keys target="[[_target]]" keys="enter" on-keys-pressed="_onEnter"></iron-a11y-keys>
 			<iron-a11y-keys target="[[_target]]" keys="up down" on-keys-pressed="_onUpDown"></iron-a11y-keys>
-			<a
-				is="d2l-link"
-				on-focus="_handleFocus"
-				on-tap="_handleTap"
-				class="input">
-				<span class="currentPeriod">[[currentPeriodText]]</span>
-				<d2l-icon icon="d2l-tier1:chevron-down" aria-hidden="true"></d2l-icon>
-			</a>
+			<div class="input">
+				<a
+					is="d2l-link"
+					on-focus="_handleFocus"
+					on-tap="_handleTap">
+					<span class="currentPeriod">[[currentPeriodText]]</span>
+					<d2l-icon icon="d2l-tier1:chevron-down" aria-hidden="true"></d2l-icon>
+				</a>
+				<div class="d2l-dropdown-content-pointer">
+					<div></div>
+				</div>
+			</div>
+
 		</vaadin-date-picker-light>
 	</template>
 
@@ -113,17 +143,47 @@
 					type: Number,
 					value: 0
 				},
+				_opened: {
+					type: Boolean,
+					value: false
+				},
+				_smallScreen: {
+					type: Boolean,
+					value: false
+				},
 				currentPeriodText: String
 			},
 			observers: [
 				'_localeChanged( locale )',
-				'_updateDatePickeri18n( locale, localize, dateFormat, firstDayOfWeek )'
+				'_updateDatePickeri18n( locale, localize, dateFormat, firstDayOfWeek )',
+				'_showPointer( _smallScreen, _opened )'
 			],
 			ready: function() {
 				this._target = this.$$('a');
+				var mql = window.matchMedia('(max-width: 420px)');
+				mql.addListener(this._mobileBreakpointListener.bind(this));
+
+				var self = this;
+				this.addEventListener('iron-overlay-opened', function() {
+					self._opened = true;
+				});
+
 				this.addEventListener('iron-overlay-canceled', function(e) {
 					e.stopPropagation();
 				});
+
+				this.addEventListener('iron-overlay-closed', function() {
+					self._opened = false;
+				});
+			},
+			_showPointer: function(smallScreen, opened) {
+				var pointer = this.$$('.d2l-dropdown-content-pointer');
+
+				if (opened && !smallScreen) {
+					pointer.style.display = 'inline-block';
+				} else {
+					pointer.style.display = 'none';
+				}
 			},
 			handleValueChanged: function(e, detail) {
 				if (detail.value) {
@@ -226,6 +286,13 @@
 					}
 				}.bind(this));
 				return obj1;
+			},
+			_mobileBreakpointListener: function(mqlevent) {
+				if (mqlevent.matches) {
+					this._smallScreen = true;
+				} else {
+					this._smallScreen = false;
+				}
 			}
 		});
 	</script>
