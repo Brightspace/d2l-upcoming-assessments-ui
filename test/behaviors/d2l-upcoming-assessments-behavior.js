@@ -7,6 +7,7 @@ describe('d2l upcoming assessments behavior', function() {
 	var activityHref = '/path/to/activity';
 	var activityName = 'Activity Name';
 	var activityInstructions = 'Some instructions yo';
+	var quizDescription = 'Some description yo';
 	var organizationHref = '/path/to/org';
 	var organizationName = 'this is the organization name';
 	var organization = {
@@ -73,12 +74,18 @@ describe('d2l upcoming assessments behavior', function() {
 	}
 
 	function getActivity(type) {
+		var subEntities = [];
+		if (type === 'quiz') {
+			subEntities.push(getDescription());
+		} else {
+			subEntities.push(getInstructions());
+		}
 		var entity = {
 			class: [type],
 			properties: {
-				name: activityName,
-				instructionsText: activityInstructions
+				name: activityName
 			},
+			entities: subEntities,
 			links: [{
 				rel: ['self'],
 				href: activityHref
@@ -87,6 +94,28 @@ describe('d2l upcoming assessments behavior', function() {
 		};
 
 		return parse(entity);
+	}
+
+	function getInstructions() {
+		return {
+			class: ['richtext', 'instructions'],
+			properties: {
+				text: activityInstructions,
+				html: '<p>' + activityInstructions + '</p>'
+			},
+			rel: ['https://assignments.api.brightspace.com/rels/instructions']
+		};
+	}
+
+	function getDescription() {
+		return {
+			class: ['richtext', 'description'],
+			properties: {
+				text: quizDescription,
+				html: '<p>' + quizDescription + '</p>'
+			},
+			rel: ['https://quizzes.api.brightspace.com/rels/description']
+		};
 	}
 
 	beforeEach(function() {
@@ -162,6 +191,22 @@ describe('d2l upcoming assessments behavior', function() {
 		});
 	});
 
+	describe('_getAssignmentInstructions', function() {
+		it('should return the text value from the richtext instructions entity', function() {
+			var assignment = getActivity('assignment');
+			var instructions = component._getAssignmentInstructions(assignment);
+			expect(instructions).to.equal(activityInstructions);
+		});
+	});
+
+	describe('_getQuizDescription', function() {
+		it('should return the text value from the richtext description entity', function() {
+			var quiz = getActivity('quiz');
+			var description = component._getQuizDescription(quiz);
+			expect(description).to.equal(quizDescription);
+		});
+	});
+
 	describe('_getOrganizationRequest', function() {
 		it('should make a request for the organization', function() {
 			var usage = getUserActivityUsage('assignment');
@@ -211,17 +256,29 @@ describe('d2l upcoming assessments behavior', function() {
 				});
 		});
 
-		it('should fall back to the activity instructions property if instructionsText is null', function() {
-			var activityWithInstructions = JSON.parse(JSON.stringify(activity));
-			activityWithInstructions.properties.instructionsText = null;
-			activityWithInstructions.properties.instructions = 'some other text';
-
-			component._getActivityRequest.returns(Promise.resolve(parse(activityWithInstructions)));
+		it('should set the instructions to the value returned from _getAssignmentInstructions if the activity is an assignment', function() {
+			component._getAssignmentInstructions = sandbox.stub().returns('bonita bonita bonita');
+			component._getQuizDescription = sandbox.stub().returns('time for new flava in ya ear');
 
 			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
-				.then(function(response) {
-					expect(response[0].instructions).to.equal('some other text');
-				});
+			.then(function(response) {
+				expect(component._getAssignmentInstructions).to.be.called;
+				expect(component._getQuizDescription).not.to.be.called;
+				expect(response[0].instructions).to.equal('bonita bonita bonita');
+			});
+		});
+
+		it('should set the instructions to the value returned from _getQuizDescription if the activity is a quiz', function() {
+			component._getActivityRequest = sandbox.stub().returns(Promise.resolve(getActivity('quiz')));
+			component._getAssignmentInstructions = sandbox.stub().returns('bonita bonita bonita');
+			component._getQuizDescription = sandbox.stub().returns('time for new flava in ya ear');
+
+			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			.then(function(response) {
+				expect(component._getAssignmentInstructions).not.to.be.called;
+				expect(component._getQuizDescription).to.be.called;
+				expect(response[0].instructions).to.equal('time for new flava in ya ear');
+			});
 		});
 
 		it('should return the correct values for all properties', function() {
