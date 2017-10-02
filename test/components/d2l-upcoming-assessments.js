@@ -110,6 +110,8 @@ describe('<d2l-upcoming-assessments>', function() {
 					'end':'2017-09-03T03:59:59.999Z'
 				};
 				var range = element._getCustomDateRangeParameters(date);
+				expect(range.start).to.equal(expected.start);
+				expect(range.end).to.equal(expected.end);
 				expect(range).to.deep.equal(expected);
 			});
 		});
