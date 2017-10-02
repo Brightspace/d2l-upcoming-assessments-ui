@@ -87,7 +87,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				var date = new Date('Tue Sep 12 2017 00:00:00 GMT-0400 (EDT)');
 				var expected = {
 					start: '2017-09-10T04:00:00.000Z',
-					end: '2017-09-25T03:59:59.999Z'
+					end: '2017-09-24T03:59:59.999Z'
 				};
 				var range = element._getCustomDateRangeParameters(date);
 				expect(range).to.deep.equal(expected);
@@ -97,7 +97,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				var date = new Date('Sun Sep 03 2017 00:00:00 GMT-0400 (EDT)');
 				var expected = {
 					'start':'2017-09-03T04:00:00.000Z',
-					'end':'2017-09-18T03:59:59.999Z'
+					'end':'2017-09-17T03:59:59.999Z'
 				};
 				var range = element._getCustomDateRangeParameters(date);
 				expect(range).to.deep.equal(expected);
@@ -107,7 +107,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				var date = new Date('Sat Aug 26 2017 00:00:00 GMT-0400 (EDT)');
 				var expected = {
 					'start':'2017-08-20T04:00:00.000Z',
-					'end':'2017-09-04T03:59:59.999Z'
+					'end':'2017-09-03T03:59:59.999Z'
 				};
 				var range = element._getCustomDateRangeParameters(date);
 				expect(range).to.deep.equal(expected);
@@ -136,7 +136,7 @@ describe('<d2l-upcoming-assessments>', function() {
 					}
 				};
 
-				var expectedUrl = 'http://www.foo.com?start=2017-09-03T04:00:00.000Z&end=2017-09-18T03:59:59.999Z';
+				var expectedUrl = 'http://www.foo.com?start=2017-09-03T04:00:00.000Z&end=2017-09-17T03:59:59.999Z';
 				return element._onDateValueChanged(dateObj)
 					.then(function() {
 						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(expectedUrl);

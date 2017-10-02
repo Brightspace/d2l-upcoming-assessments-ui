@@ -19,10 +19,11 @@
 
 				vaadin-date-picker-light {
 					height: 28px;
+
 					--primary-color: var(--d2l-color-celestine);
 					--light-primary-color: var(--d2l-color-celestine-plus-1);
 					--dark-theme-background-color: var(--d2l-color-ferrite);
-					--dark-theme-secondary-color: #ffffff;
+					--dark-theme-secondary-color: var(--d2l-color-white);
 					--primary-text-color: var(--d2l-color-ferrite);
 					--secondary-text-color: var(--d2l-color-tungsten);
 					--vaadin-date-picker-overlay: {
@@ -31,6 +32,7 @@
 						margin-top: 10px;
 						border-radius: 5px;
 						border: 1px solid var(--d2l-color-mica);
+						opacity: 0;
 					};
 					--vaadin-date-picker-yearscroller: {
 						font-family: inherit;
@@ -62,8 +64,7 @@
 					align-items: center;
 				}
 
-				a:hover,
-				a:focus {
+				a:hover {
 					text-decoration: none;
 				}
 
@@ -77,11 +78,12 @@
 					clip: rect(-5px, 21px, 8px, -3px);
 					left: calc(50% - 7px);
 					z-index: 10000;
-					display: none;
+					display: inline-block;
+					opacity: 0;
 				}
 
 				.d2l-dropdown-content-pointer > div {
-					background-color: #ffffff;
+					background-color: var(--d2l-color-white);
 					border: 1px solid var(--d2l-color-mica);
 					border-radius: 0.1rem;
 					border-right: hidden;
@@ -100,6 +102,7 @@
 			<iron-a11y-keys target="[[_target]]" keys="up down" on-keys-pressed="_onUpDown"></iron-a11y-keys>
 			<div class="input">
 				<a
+					href="javascript:void(0);"
 					is="d2l-link"
 					on-focus="_handleFocus"
 					on-tap="_handleTap">
@@ -166,6 +169,8 @@
 				var self = this;
 				this.addEventListener('iron-overlay-opened', function() {
 					self._opened = true;
+					self.$$('vaadin-date-picker-light').customStyle['--vaadin-date-picker-overlay'] = 'font-family: inherit; max-height: 355px; margin-top: 10px; border-radius: 5px; border: 1px solid var(--d2l-color-mica); transition: all 200ms cubic-bezier(.75, 0, 1, 1); opacity:1;';
+					self.$$('vaadin-date-picker-light').updateStyles();
 				});
 
 				this.addEventListener('iron-overlay-canceled', function(e) {
@@ -174,15 +179,19 @@
 
 				this.addEventListener('iron-overlay-closed', function() {
 					self._opened = false;
+					self.$$('vaadin-date-picker-light').customStyle['--vaadin-date-picker-overlay'] = 'font-family: inherit; max-height: 355px; margin-top: 10px; border-radius: 5px; border: 1px solid var(--d2l-color-mica); opacity:0;';
+					self.$$('vaadin-date-picker-light').updateStyles();
 				});
 			},
 			_showPointer: function(smallScreen, opened) {
 				var pointer = this.$$('.d2l-dropdown-content-pointer');
 
 				if (opened && !smallScreen) {
-					pointer.style.display = 'inline-block';
+					pointer.style.transition = 'all 200ms cubic-bezier(.75, 0, 1, 1)';
+					pointer.style.opacity = 1;
 				} else {
-					pointer.style.display = 'none';
+					pointer.style.transition = '';
+					pointer.style.opacity = 0;
 				}
 			},
 			handleValueChanged: function(e, detail) {

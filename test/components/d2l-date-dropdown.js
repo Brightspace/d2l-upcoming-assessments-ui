@@ -60,25 +60,25 @@ describe('<d2l-date-dropdown>', function() {
 		it('should show the pointer when screen not small and iron-overlay-opened', function() {
 			elem._smallScreen = false;
 			elem._opened = true;
-			expect(elem.$$('.d2l-dropdown-content-pointer').style.display).to.equal('inline-block');
+			expect(elem.$$('.d2l-dropdown-content-pointer').style.opacity).to.equal('1');
 		});
 
 		it('should not show the pointer when screen not small and iron-overlay-closed', function() {
 			elem._smallScreen = false;
 			elem._opened = false;
-			expect(elem.$$('.d2l-dropdown-content-pointer').style.display).to.equal('none');
+			expect(elem.$$('.d2l-dropdown-content-pointer').style.opacity).to.equal('0');
 		});
 
 		it('should not show the pointer when screen small and iron-overlay-opened', function() {
 			elem._smallScreen = true;
 			elem._opened = true;
-			expect(elem.$$('.d2l-dropdown-content-pointer').style.display).to.equal('none');
+			expect(elem.$$('.d2l-dropdown-content-pointer').style.opacity).to.equal('0');
 		});
 
 		it('should not show the pointer when screen small and iron-overlay-closed', function() {
 			elem._smallScreen = false;
 			elem._opened = false;
-			expect(elem.$$('.d2l-dropdown-content-pointer').style.display).to.equal('none');
+			expect(elem.$$('.d2l-dropdown-content-pointer').style.opacity).to.equal('0');
 		});
 	});
 });

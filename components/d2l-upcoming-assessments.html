@@ -360,7 +360,7 @@
 				var day = selectedDate.getDay();
 				var startDate = new Date(selectedDate.setDate(selectedDate.getDate() - day));
 				var start = startDate.toISOString();
-				var twoWeeksFromStart = new Date(startDate.setDate(startDate.getDate() + 14));
+				var twoWeeksFromStart = new Date(startDate.setDate(startDate.getDate() + 13));
 				twoWeeksFromStart.setHours(23, 59, 59, 999);
 				var end = twoWeeksFromStart.toISOString();
 
