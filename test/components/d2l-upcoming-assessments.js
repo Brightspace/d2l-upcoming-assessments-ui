@@ -84,35 +84,55 @@ describe('<d2l-upcoming-assessments>', function() {
 
 		describe('_getCustomDateRangeParameters', function() {
 			it('gets the correct range when selected date is a Tuesday', function() {
-				var date = new Date('Tue Sep 12 2017 00:00:00 GMT-0400 (EDT)');
+				var date = new Date('Tue Sep 12 2017 00:00:00');
 				var expected = {
-					start: '2017-09-10T04:00:00.000Z',
-					end: '2017-09-24T03:59:59.999Z'
+					start: 'Sept 10 2017 00:00:00',
+					end: 'Sept 23 2017 23:59:59'
 				};
 				var range = element._getCustomDateRangeParameters(date);
-				expect(range).to.deep.equal(expected);
+
+				var start = new Date(expected.start).toISOString();
+				var endDate = new Date(expected.end);
+				endDate.setMilliseconds(999);
+				var end = endDate.toISOString();
+
+				expect(range.start).to.equal(start);
+				expect(range.end).to.equal(end);
 			});
 
 			it('gets the correct range when selected date is a Sunday', function() {
-				var date = new Date('Sun Sep 03 2017 00:00:00 GMT-0400 (EDT)');
+				var date = new Date('Sun Sep 03 2017 00:00:00');
 				var expected = {
-					'start':'2017-09-03T04:00:00.000Z',
-					'end':'2017-09-17T03:59:59.999Z'
+					'start':'Sept 3 2017 00:00:00',
+					'end':'Sept 16 2017 23:59:59'
 				};
 				var range = element._getCustomDateRangeParameters(date);
-				expect(range).to.deep.equal(expected);
+
+				var start = new Date(expected.start).toISOString();
+				var endDate = new Date(expected.end);
+				endDate.setMilliseconds(999);
+				var end = endDate.toISOString();
+
+				expect(range.start).to.equal(start);
+				expect(range.end).to.equal(end);
 			});
 
 			it('gets the correct range when selected date is a Saturday', function() {
-				var date = new Date('Sat Aug 26 2017 00:00:00 GMT-0400 (EDT)');
+				var date = new Date('Sat Aug 26 2017 00:00:00');
 				var expected = {
-					'start':'2017-08-20T04:00:00.000Z',
-					'end':'2017-09-03T03:59:59.999Z'
+					'start':'Aug 20 2017 00:00:00',
+					'end':'Sept 2 2017 23:59:59'
 				};
+
 				var range = element._getCustomDateRangeParameters(date);
-				expect(range.start).to.equal(expected.start);
-				expect(range.end).to.equal(expected.end);
-				expect(range).to.deep.equal(expected);
+
+				var start = new Date(expected.start).toISOString();
+				var endDate = new Date(expected.end);
+				endDate.setMilliseconds(999);
+				var end = endDate.toISOString();
+
+				expect(range.start).to.equal(start);
+				expect(range.end).to.equal(end);
 			});
 		});
 
@@ -131,14 +151,24 @@ describe('<d2l-upcoming-assessments>', function() {
 						value:'2017-10-03T19:14:21.889Z'
 					}]
 				};
-				var date = new Date('Tue Sep 05 2017 00:00:00 GMT-0400 (EDT)');
+				var date = new Date('Tue Sep 05 2017 00:00:00');
 				var dateObj = {
 					detail: {
 						date: date
 					}
 				};
 
-				var expectedUrl = 'http://www.foo.com?start=2017-09-03T04:00:00.000Z&end=2017-09-17T03:59:59.999Z';
+				var expected = {
+					'start': 'Sept 3 2017 00:00:00',
+					'end': 'Sept 16 2017 23:59:59'
+				};
+
+				var start = new Date(expected.start).toISOString();
+				var endDate = new Date(expected.end);
+				endDate.setMilliseconds(999);
+				var end = endDate.toISOString();
+
+				var expectedUrl = 'http://www.foo.com?start=' + start + '&end=' + end;
 				return element._onDateValueChanged(dateObj)
 					.then(function() {
 						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(expectedUrl);
