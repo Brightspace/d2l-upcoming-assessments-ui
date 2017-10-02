@@ -79,13 +79,13 @@
 		},
 
 		_getAssignmentInstructions: function(activity) {
-			var instructions = activity.getSubEntityByRel('https://assignments.api.brightspace.com/rels/instructions');
-			return instructions && instructions.hasClass('richtext') ? instructions.properties.text : '';
+			var instructions = activity.getSubEntityByRel(this.HypermediaRels.Assignments.instructions);
+			return instructions && instructions.hasClass(this.HypermediaClasses.text.richtext) ? instructions.properties.text : '';
 		},
 
 		_getQuizDescription: function(activity) {
-			var description = activity.getSubEntityByRel('https://quizzes.api.brightspace.com/rels/description');
-			return description && description.hasClass('richtext') ? description.properties.text : '';
+			var description = activity.getSubEntityByRel(this.HypermediaRels.Quizzes.description);
+			return description && description.hasClass(this.HypermediaClasses.text.richtext) ? description.properties.text : '';
 		},
 
 		/*
