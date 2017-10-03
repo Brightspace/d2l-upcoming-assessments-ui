@@ -31,10 +31,11 @@
 			.assessment-info {
 				@apply --d2l-body-standard-text;
 				font-size: 12px;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
+				/* display: flex; */
+				/* flex-direction: row; */
+				/* align-items: center; */
 				line-height: 1;
+				display: block;
 			}
 
 			.info-container {
@@ -76,6 +77,18 @@
 				align-items: center;
 			}
 
+			.course-name {
+				display: inline;
+				word-wrap: break-word;
+			}
+
+			.assessment-type {
+				display: inline;
+			}
+
+			.date {
+				display: inline;
+			}
 		</style>
 			<div class="activity-info">
 				<div class="activity-icon-container">
@@ -84,7 +97,7 @@
 				<div class="info-container">
 					<h3 class="assessment-title">{{assessmentItem.name}}</h3>
 					<div class="assessment-info">
-						<div class="course-name">{{assessmentItem.courseName}}</div>
+						<div class="course-name">Grade 4 math with an extremely long name that causes everything to break and it's so looooooooooooonnnnnnnnnnnnnngggggggg {{assessmentItem.courseName}}</div>
 						<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 						<div class="assessment-type">[[_getAssessmentType(assessmentItem)]]</div>
 						<template is="dom-if" if="[[_hasDueDate(assessmentItem)]]">
