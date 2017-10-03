@@ -1,4 +1,5 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../d2l-colors/d2l-colors.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../d2l-intl/d2l-intl.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
@@ -9,7 +10,6 @@
 <link rel="import" href="../behaviors/d2l-upcoming-assessments-behavior.html">
 <link rel="import" href="../behaviors/date-behavior.html">
 <link rel="import" href="../behaviors/localize-behavior.html">
-<link rel="import" href="../../d2l-colors/d2l-colors.html">
 <link rel="import" href="d2l-all-assessments-list.html">
 <link rel="import" href="d2l-assessments-list.html">
 <link rel="import" href="d2l-date-dropdown.html">
@@ -258,6 +258,7 @@
 			_debounceTime: 20,
 
 			_getInfo: function() {
+				this._showError = false;
 				var self = this;
 
 				return this._fetchEntity(this.userUrl, this.getToken)
