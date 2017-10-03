@@ -193,17 +193,60 @@ describe('d2l upcoming assessments behavior', function() {
 
 	describe('_getAssignmentInstructions', function() {
 		it('should return the text value from the richtext instructions entity', function() {
+			sandbox.spy(component, '_getRichTextValuePreferPlainText');
 			var assignment = getActivity('assignment');
 			var instructions = component._getAssignmentInstructions(assignment);
+
+			expect(component._getRichTextValuePreferPlainText).to.be.calledOnce;
 			expect(instructions).to.equal(activityInstructions);
 		});
+
 	});
 
 	describe('_getQuizDescription', function() {
 		it('should return the text value from the richtext description entity', function() {
+			sandbox.spy(component, '_getRichTextValuePreferPlainText');
 			var quiz = getActivity('quiz');
 			var description = component._getQuizDescription(quiz);
+
+			expect(component._getRichTextValuePreferPlainText).to.be.calledOnce;
 			expect(description).to.equal(quizDescription);
+		});
+	});
+
+	describe('_getRichTextValuePreferPlainText', function() {
+		it('should return empty string if no object is provided', function() {
+			var retval = component._getRichTextValuePreferPlainText();
+			expect(retval).to.equal('');
+		});
+
+		it('should return empty string if the entity provided does not have the richtext class', function() {
+			var retval = component._getRichTextValuePreferPlainText(getActivity('quiz'));
+			expect(retval).to.equal('');
+		});
+
+		it('should return empty string if both the html and text properties are empty', function() {
+			var richtext = getInstructions();
+			richtext.properties.text = null;
+			richtext.properties.html = null;
+
+			var retval = component._getRichTextValuePreferPlainText(parse(richtext));
+			expect(retval).to.equal('');
+		});
+
+		it('should prefer the text value from the richtext entity if both text and html are supplied', function() {
+			var richtext = getInstructions();
+
+			var retval = component._getRichTextValuePreferPlainText(parse(richtext));
+			expect(retval).to.equal(activityInstructions);
+		});
+
+		it('should return the html value from the richtext entity if the text value is empty', function() {
+			var richtext = getInstructions();
+			richtext.properties.text = null;
+
+			var retval = component._getRichTextValuePreferPlainText(parse(richtext));
+			expect(retval).to.equal('<p>' + activityInstructions + '</p>');
 		});
 	});
 
@@ -256,7 +299,7 @@ describe('d2l upcoming assessments behavior', function() {
 				});
 		});
 
-		it('should set the instructions to the value returned from _getAssignmentInstructions if the activity is an assignment', function() {
+		it('should set the info property to the value returned from _getAssignmentInstructions if the activity is an assignment', function() {
 			component._getAssignmentInstructions = sandbox.stub().returns('bonita bonita bonita');
 			component._getQuizDescription = sandbox.stub().returns('time for new flava in ya ear');
 
@@ -264,11 +307,11 @@ describe('d2l upcoming assessments behavior', function() {
 			.then(function(response) {
 				expect(component._getAssignmentInstructions).to.be.called;
 				expect(component._getQuizDescription).not.to.be.called;
-				expect(response[0].instructions).to.equal('bonita bonita bonita');
+				expect(response[0].info).to.equal('bonita bonita bonita');
 			});
 		});
 
-		it('should set the instructions to the value returned from _getQuizDescription if the activity is a quiz', function() {
+		it('should set the info property to the value returned from _getQuizDescription if the activity is a quiz', function() {
 			component._getActivityRequest = sandbox.stub().returns(Promise.resolve(getActivity('quiz')));
 			component._getAssignmentInstructions = sandbox.stub().returns('bonita bonita bonita');
 			component._getQuizDescription = sandbox.stub().returns('time for new flava in ya ear');
@@ -277,7 +320,7 @@ describe('d2l upcoming assessments behavior', function() {
 			.then(function(response) {
 				expect(component._getAssignmentInstructions).not.to.be.called;
 				expect(component._getQuizDescription).to.be.called;
-				expect(response[0].instructions).to.equal('time for new flava in ya ear');
+				expect(response[0].info).to.equal('time for new flava in ya ear');
 			});
 		});
 
@@ -302,7 +345,7 @@ describe('d2l upcoming assessments behavior', function() {
 				.then(function(response) {
 					expect(response[0].name).to.equal(activityName);
 					expect(response[0].courseName).to.equal(organizationName);
-					expect(response[0].instructions).to.equal(activityInstructions);
+					expect(response[0].info).to.equal(activityInstructions);
 					expect(response[0].dueDate).to.equal(dueDate);
 					expect(response[0].endDate).to.equal(endDate);
 					expect(response[0].isCompleted).to.equal(true);

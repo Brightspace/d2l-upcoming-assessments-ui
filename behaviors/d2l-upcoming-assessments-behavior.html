@@ -79,13 +79,20 @@
 		},
 
 		_getAssignmentInstructions: function(activity) {
-			var instructions = activity.getSubEntityByRel(this.HypermediaRels.Assignments.instructions);
-			return instructions && instructions.hasClass(this.HypermediaClasses.text.richtext) ? instructions.properties.text : '';
+			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Assignments.instructions));
 		},
 
 		_getQuizDescription: function(activity) {
-			var description = activity.getSubEntityByRel(this.HypermediaRels.Quizzes.description);
-			return description && description.hasClass(this.HypermediaClasses.text.richtext) ? description.properties.text : '';
+			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Quizzes.description));
+		},
+
+		_getRichTextValuePreferPlainText: function(richtextEntity) {
+			if (!richtextEntity || !richtextEntity.hasClass(this.HypermediaClasses.text.richtext) ||
+		    	(!richtextEntity.properties.text && !richtextEntity.properties.html)) {
+				return '';
+			}
+
+			return richtextEntity.properties.text || richtextEntity.properties.html;
 		},
 
 		/*
@@ -119,17 +126,17 @@
 						var organization = response[1];
 
 						var type = self._getActivityType.call(self, activity);
-						var instructions;
+						var info;
 						if (type === 'quiz') {
-							instructions = self._getQuizDescription.call(self, activity);
+							info = self._getQuizDescription.call(self, activity);
 						} else if (type === 'assignment') {
-							instructions = self._getAssignmentInstructions.call(self, activity);
+							info = self._getAssignmentInstructions.call(self, activity);
 						}
 
 						return {
 							name: activity.properties.name,
 							courseName: organization.properties.name,
-							instructions: instructions,
+							info: info,
 							dueDate: dueDateState.dueDate,
 							endDate: endDateState.endDate,
 							isCompleted: completionState.isCompleted,
