@@ -29,7 +29,7 @@
 					--vaadin-date-picker-overlay: {
 						font-family: inherit;
 						max-height: 355px;
-						margin-top: -10px;
+						margin-top: 0;
 						border-radius: 5px;
 						border: 1px solid var(--d2l-color-mica);
 						opacity: 0;
@@ -80,7 +80,7 @@
 					z-index: 10000;
 					display: inline-block;
 					opacity: 0;
-					top: -20px;
+					top: -10px;
 				}
 
 				:host-context([dir="rtl"]) .d2l-dropdown-content-pointer {
@@ -176,7 +176,7 @@
 				var self = this;
 				this.addEventListener('iron-overlay-opened', function() {
 					self._opened = true;
-					self.$$('vaadin-date-picker-light').customStyle['--vaadin-date-picker-overlay'] = 'font-family: inherit; max-height: 355px; margin-top: -10px; border-radius: 5px; border: 1px solid var(--d2l-color-mica); transition: all 200ms cubic-bezier(.75, 0, 1, 1); opacity:1; transform: translateY(20px);';
+					self.$$('vaadin-date-picker-light').customStyle['--vaadin-date-picker-overlay'] = 'font-family: inherit; max-height: 355px; margin-top: 0px; border-radius: 5px; border: 1px solid var(--d2l-color-mica); transition: all 300ms ease; opacity:1; transform: translateY(10px);';
 					self.$$('vaadin-date-picker-light').updateStyles();
 				});
 
@@ -186,7 +186,7 @@
 
 				this.addEventListener('iron-overlay-closed', function() {
 					self._opened = false;
-					self.$$('vaadin-date-picker-light').customStyle['--vaadin-date-picker-overlay'] = 'font-family: inherit; max-height: 355px; margin-top: -10px; border-radius: 5px; border: 1px solid var(--d2l-color-mica); opacity:0;';
+					self.$$('vaadin-date-picker-light').customStyle['--vaadin-date-picker-overlay'] = 'font-family: inherit; max-height: 355px; margin-top: 0px; border-radius: 5px; border: 1px solid var(--d2l-color-mica); opacity:0;';
 					self.$$('vaadin-date-picker-light').updateStyles();
 				});
 			},
@@ -194,8 +194,8 @@
 				var pointer = this.$$('.d2l-dropdown-content-pointer');
 
 				if (opened && !smallScreen) {
-					pointer.style.transition = 'all 200ms cubic-bezier(.75, 0, 1, 1)';
-					pointer.style.transform = 'translateY(20px)';
+					pointer.style.transition = 'all 300ms ease';
+					pointer.style.transform = 'translateY(10px)';
 					pointer.style.opacity = 1;
 				} else {
 					pointer.style.transition = '';

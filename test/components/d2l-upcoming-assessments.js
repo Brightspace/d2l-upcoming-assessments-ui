@@ -250,7 +250,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				element._getOverdueActivities = sandbox.stub().returns(activities);
 				element._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
 				element._updateActivitiesInfo = sandbox.stub().returns(activities);
-				return element._loadActivitiesForPeriod(nextPeriodUrl)
+				return element._loadActivitiesForPeriod(periodUrl)
 					.then(function() {
 						expect(element._allActivities).to.equal(activities);
 					});
@@ -270,7 +270,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				element._getOverdueActivities = sandbox.stub().returns(activities);
 				element._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
 				element._updateActivitiesInfo = sandbox.stub().returns(activities);
-				return element._loadActivitiesForPeriod(nextPeriodUrl)
+				return element._loadActivitiesForPeriod(periodUrl)
 					.then(function() {
 						expect(element._assessments).to.not.equal(activities);
 					});
