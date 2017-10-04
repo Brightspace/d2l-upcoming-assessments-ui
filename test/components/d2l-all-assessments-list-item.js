@@ -29,7 +29,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 		var item = {
 			name: 'Name',
 			courseName: 'Course',
-			instructionsText: 'Instructions',
+			info: 'Instructions',
 			dueDate: nowish(dueDateModifier),
 			endDate: nowish(endDateModifier),
 			isCompleted: isCompleted,

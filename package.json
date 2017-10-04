@@ -1,6 +1,6 @@
 {
   "name": "d2l-upcoming-assessments",
-  "version": "1.28.0",
+  "version": "1.29.0",
   "description": "A widget to display upcoming assessments for a given user",
   "main": "index.js",
   "directories": {

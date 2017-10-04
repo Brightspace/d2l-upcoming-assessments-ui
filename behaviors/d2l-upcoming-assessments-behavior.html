@@ -78,6 +78,23 @@
 			return this._fetchEntity(activityLink, getToken, userUrl);
 		},
 
+		_getAssignmentInstructions: function(activity) {
+			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Assignments.instructions));
+		},
+
+		_getQuizDescription: function(activity) {
+			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Quizzes.description));
+		},
+
+		_getRichTextValuePreferPlainText: function(richtextEntity) {
+			if (!richtextEntity || !richtextEntity.hasClass(this.HypermediaClasses.text.richtext) ||
+				(!richtextEntity.properties.text && !richtextEntity.properties.html)) {
+				return '';
+			}
+
+			return richtextEntity.properties.text || richtextEntity.properties.html;
+		},
+
 		/*
 		* Returns an object that contains the information required to populate an assessment list item
 		*/
@@ -109,11 +126,17 @@
 						var organization = response[1];
 
 						var type = self._getActivityType.call(self, activity);
+						var info;
+						if (type === 'quiz') {
+							info = self._getQuizDescription.call(self, activity);
+						} else if (type === 'assignment') {
+							info = self._getAssignmentInstructions.call(self, activity);
+						}
 
 						return {
 							name: activity.properties.name,
 							courseName: organization.properties.name,
-							instructions: activity.properties.instructionsText || activity.properties.instructions,
+							info: info,
 							dueDate: dueDateState.dueDate,
 							endDate: endDateState.endDate,
 							isCompleted: completionState.isCompleted,
