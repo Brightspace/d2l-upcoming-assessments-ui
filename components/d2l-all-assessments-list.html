@@ -85,8 +85,8 @@
 				}
 
 				var dates = new Map();
-				var start = (new Date(this.periodStart)).setHours(0);
-				var end = (new Date(this.periodEnd)).setHours(0);
+				var start = this.periodStart;
+				var end = this.periodEnd;
 
 				for (var i = 0; i < assessmentItems.length; i++) {
 					var item = assessmentItems[i];
