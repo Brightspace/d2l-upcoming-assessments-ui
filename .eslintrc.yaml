@@ -1,17 +1,7 @@
 extends:
-  - brightspace
-env:
-  browser: true
-  node: true
-plugins:
-  - html
+  brightspace/polymer-config
 rules:
-  no-var: off
+  object-shorthand: [2, "never"]
 globals:
-  a11ySuite: true
-  expect: true
-  Map: true
-  Polymer: true
-  Promise: true
-  WCT: true
-
+  Promise: false
+  Map: false

@@ -93,7 +93,7 @@
 				align-items: center;
 			}
 
-			.instructions {
+			.info {
 				@apply --d2l-body-compact-text;
 				font-size: 0.8rem;
 				font-weight: 300;
@@ -109,7 +109,7 @@
 				height: 18px;
 			}
 
-			:host-context([dir="rtl"]) .instructions {
+			:host-context([dir="rtl"]) .info {
 				padding-right: 0px;
 				padding-left: 30px;
 			}
@@ -121,7 +121,7 @@
 					border-right: 0px;
 				}
 
-				.instructions-row {
+				.info-row {
 					display: none;
 				}
 			}
@@ -161,9 +161,9 @@
 					</div>
 				</div>
 			</div>
-			<div class="row instructions-row">
+			<div class="row info-row">
 				<div class="spacer"></div>
-				<div class="instructions">[[assessmentItem.instructions]]</div>
+				<div class="info">[[assessmentItem.info]]</div>
 			</div>
 		</div>
 	</template>
