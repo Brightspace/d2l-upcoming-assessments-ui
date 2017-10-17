@@ -18,6 +18,10 @@
 	<template>
 		<style>
 			:host {
+				/* display: flex;
+				flex-direction: column;
+				flex-grow: 1;
+				min-width: 0; */
 				display: block;
 			}
 
@@ -68,11 +72,6 @@
 				margin-bottom: 0;
 			}
 
-			.view-all-assignments-link {
-				bottom: 0;
-				display: inline-block;
-			}
-
 			.no-assessments-in-time-frame {
 				text-align: center;
 			}
@@ -108,6 +107,12 @@
 				color: var(--d2l-color-celestuba);
 			}
 
+			@media (min-width: 992px) {
+				.view-all-assignments-link {
+					position: absolute;
+					bottom: 0;
+				}
+			}
 		</style>
 
 
