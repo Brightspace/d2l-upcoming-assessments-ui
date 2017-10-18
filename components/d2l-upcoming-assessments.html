@@ -261,7 +261,7 @@
 				this._showError = false;
 				var self = this;
 
-				return this._fetchEntity(this.userUrl, this.getToken)
+				return this._fetchEntityWithToken(this.userUrl, this.getToken)
 					.then(function(userEntity) {
 						self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
 						var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
@@ -344,7 +344,7 @@
 
 				var self = this;
 
-				return this._fetchEntity(activitiesUrl, this.getToken, this.userUrl)
+				return this._fetchEntityWithToken(activitiesUrl, this.getToken, this.userUrl)
 					.then(function(activities) {
 						var currentTime = new Date();
 						currentTime.setHours(0, 0, 0, 0);
@@ -401,7 +401,7 @@
 				var progress = this.$.allAssignmentsProgressBar;
 				progress.start();
 
-				return this._fetchEntity(periodUrl, this.getToken, this.userUrl)
+				return this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl)
 					.then(function(userUsages) {
 						userActivityUsages = userUsages;
 						self._previousPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.previousPeriod) || {}).href;

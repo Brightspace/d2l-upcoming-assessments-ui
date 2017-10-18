@@ -65,7 +65,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				});
 
 				element.isActivityUpcoming = sinon.stub().returns(true);
-				element._fetchEntity = sinon.stub().returns(Promise.resolve(userEntity));
+				element._fetchEntityWithToken = sinon.stub().returns(Promise.resolve(userEntity));
 				element._getCustomRangeAction = sinon.stub().returns(Promise.resolve(customRangeUrl));
 				element._loadActivitiesForPeriod = sinon.stub().returns(Promise.resolve(myActivities));
 			});
@@ -82,7 +82,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				element.userUrl = 'http://example.com';
 
 				return element._getInfo().then(function() {
-					expect(element._fetchEntity).to.have.been.calledWith('http://example.com');
+					expect(element._fetchEntityWithToken).to.have.been.calledWith('http://example.com');
 				});
 			});
 
@@ -216,23 +216,23 @@ describe('<d2l-upcoming-assessments>', function() {
 		describe('_loadActivitiesForPeriod', function() {
 
 			it('does nothing if the provided url was not set', function() {
-				element._fetchEntity = sandbox.stub();
+				element._fetchEntityWithToken = sandbox.stub();
 				return element._loadActivitiesForPeriod()
 					.then(function() {
 						return Promise.reject('Expected _loadActivitiesForPeriod to reject');
 					})
 					.catch(function() {
-						expect(element._fetchEntity).to.not.have.been.called;
+						expect(element._fetchEntityWithToken).to.not.have.been.called;
 					});
 			});
 
-			it('calls _fetchEntity for the provided url', function() {
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(
+			it('calls _fetchEntityWithToken for the provided url', function() {
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(
 					window.D2L.Hypermedia.Siren.Parse(activities)
 				));
 				return element._loadActivitiesForPeriod(periodUrl)
 					.then(function() {
-						expect(element._fetchEntity).to.have.been.calledWith(periodUrl);
+						expect(element._fetchEntityWithToken).to.have.been.calledWith(periodUrl);
 					});
 			});
 
@@ -246,7 +246,7 @@ describe('<d2l-upcoming-assessments>', function() {
 
 				element._getFormattedPeriodText = sandbox.stub().returns('dateText');
 
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(userUsage));
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
 				element._getOverdueActivities = sandbox.stub().returns(activities);
 				element._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
 				element._updateActivitiesInfo = sandbox.stub().returns(activities);
@@ -266,7 +266,7 @@ describe('<d2l-upcoming-assessments>', function() {
 
 				element._getFormattedPeriodText = sandbox.stub().returns('dateText');
 
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(userUsage));
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
 				element._getOverdueActivities = sandbox.stub().returns(activities);
 				element._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
 				element._updateActivitiesInfo = sandbox.stub().returns(activities);
@@ -284,7 +284,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				userUsage.getSubEntityByRel = sandbox.stub().returns();
 				userUsage.getLinkByRel = sandbox.stub().returns();
 
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(userUsage));
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
 				element._getCustomRangeAction = sandbox.stub().returns(Promise.resolve(userUsage));
 
 				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve([1, 2, 3]));
@@ -302,7 +302,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				userUsage.getSubEntityByRel = sandbox.stub().returns();
 				userUsage.getLinkByRel = sandbox.stub().returns();
 
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(userUsage));
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
 				element._getCustomRangeAction = sandbox.stub().returns(Promise.resolve(userUsage));
 
 				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve([1, 2, 3]));
@@ -320,7 +320,7 @@ describe('<d2l-upcoming-assessments>', function() {
 				userUsage.getSubEntityByRel = sandbox.stub().returns();
 				userUsage.getLinkByRel = sandbox.stub().returns();
 
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(userUsage));
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
 				element._getCustomRangeAction = sandbox.stub().returns(Promise.resolve(userUsage));
 
 				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve([1, 2, 3, 4, 5, 6]));
@@ -336,23 +336,23 @@ describe('<d2l-upcoming-assessments>', function() {
 
 		describe('_getCustomRangeAction', function() {
 			it('does nothing if the provided url was not set', function() {
-				element._fetchEntity = sandbox.stub();
+				element._fetchEntityWithToken = sandbox.stub();
 				return element._getCustomRangeAction()
 					.then(function() {
 						return Promise.reject('Expected _getCustomRangeAction to reject');
 					})
 					.catch(function() {
-						expect(element._fetchEntity).to.not.have.been.called;
+						expect(element._fetchEntityWithToken).to.not.have.been.called;
 					});
 			});
 
-			it('calls _fetchEntity for the provided url', function() {
-				element._fetchEntity = sandbox.stub().returns(Promise.resolve(
+			it('calls _fetchEntityWithToken for the provided url', function() {
+				element._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(
 					window.D2L.Hypermedia.Siren.Parse(activities)
 				));
 				return element._getCustomRangeAction(periodUrl)
 					.then(function() {
-						expect(element._fetchEntity).to.have.been.calledWith(periodUrl);
+						expect(element._fetchEntityWithToken).to.have.been.calledWith(periodUrl);
 					});
 			});
 		});

@@ -68,13 +68,13 @@
 
 		_getOrganizationRequest: function(userActivityUsage, getToken, userUrl) {
 			var organizationLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.organization) || {} ).href;
-			return this._fetchEntity(organizationLink, getToken, userUrl);
+			return this._fetchEntityWithToken(organizationLink, getToken, userUrl);
 		},
 
 		_getActivityRequest: function(userActivityUsage, getToken, userUrl) {
 			var activityLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.assignment)
 					|| userActivityUsage.getLinkByRel(this.HypermediaRels.quiz) || {}).href;
-			return this._fetchEntity(activityLink, getToken, userUrl);
+			return this._fetchEntityWithToken(activityLink, getToken, userUrl);
 		},
 
 		_getAssignmentInstructions: function(activity) {
@@ -156,7 +156,7 @@
 			var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
 
 			if (myActivitiesLink) {
-				return this._fetchEntity(myActivitiesLink, getToken, userUrl);
+				return this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl);
 			}
 		},
 
@@ -164,7 +164,7 @@
 			var overdueActivitiesLink = (activities.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;
 
 			if (overdueActivitiesLink) {
-				return this._fetchEntity(overdueActivitiesLink, getToken, userUrl);
+				return this._fetchEntityWithToken(overdueActivitiesLink, getToken, userUrl);
 			}
 
 			// API doesn't include the overdue link if user doesn't have any overdue activities

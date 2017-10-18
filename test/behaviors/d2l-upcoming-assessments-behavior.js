@@ -253,22 +253,22 @@ describe('d2l upcoming assessments behavior', function() {
 	describe('_getOrganizationRequest', function() {
 		it('should make a request for the organization', function() {
 			var usage = getUserActivityUsage('assignment');
-			component._fetchEntity = sandbox.stub();
+			component._fetchEntityWithToken = sandbox.stub();
 
 			component._getOrganizationRequest(usage, getToken, userUrl);
 
-			expect(component._fetchEntity).to.have.been.called;
+			expect(component._fetchEntityWithToken).to.have.been.called;
 		});
 	});
 
 	describe('_getActivityRequest', function() {
 		it('should make a request for the activity', function() {
 			var usage = getUserActivityUsage('assignment');
-			component._fetchEntity = sandbox.stub();
+			component._fetchEntityWithToken = sandbox.stub();
 
 			component._getActivityRequest(usage, getToken, userUrl);
 
-			expect(component._fetchEntity).to.have.been.called;
+			expect(component._fetchEntityWithToken).to.have.been.called;
 		});
 	});
 
@@ -353,70 +353,6 @@ describe('d2l upcoming assessments behavior', function() {
 					expect(response[0].isOverdue).to.equal(true);
 					expect(response[0].isEnded).to.equal(false);
 					expect(response[0].type).to.equal('assignment');
-				});
-		});
-	});
-
-	describe('_fetchEntity', function() {
-		var getRejected, getNoken;
-
-		beforeEach(function() {
-			component._makeRequest = sandbox.stub().returns(Promise.resolve());
-			getRejected = function() {
-				return Promise.reject(new Error('Rejected rejected denied'));
-			};
-			getNoken = function() {
-				return Promise.resolve(null);
-			};
-		});
-
-		[
-			{ parm1: 'url', parm2: null, parm3: null },
-			{ parm1: null, parm2: getToken, parm3: null },
-			{ parm1: null, parm2: null, parm3: 'url'}
-		].forEach(function(testcase) {
-			it('should not make request if getToken or url is not provided', function() {
-				component._fetchEntity(testcase.parm1, testcase.parm2, testcase.parm3);
-				expect(component._makeRequest.called).to.be.false;
-			});
-		});
-
-		it('should make request when getToken and url are provided', function() {
-			return component._fetchEntity('url', getToken, null)
-				.then(function() {
-					expect(component._makeRequest.called).to.be.true;
-				});
-		});
-
-		it('should make request when getToken, url and userUrl are provided', function() {
-			return component._fetchEntity('url', getToken, 'userUrl')
-				.then(function() {
-					expect(component._makeRequest.called).to.be.true;
-				});
-		});
-
-		it('should make request when getToken is previous set and url is provided', function() {
-			return component._fetchEntity('url', getToken, null)
-				.then(function() {
-					expect(component._makeRequest.called).to.be.true;
-				});
-		});
-
-		it('should not make request when getToken rejects', function() {
-			return component._fetchEntity('url', getRejected, null)
-				.then(function() {
-					expect(component._makeRequest.called).to.be.false;
-				}, function() {
-					expect(component._makeRequest.called).to.be.false;
-				});
-		});
-
-		it('should not make request when token is not a string', function() {
-			return component._fetchEntity('url', getNoken, null)
-				.then(function() {
-					expect(component._makeRequest.called).to.be.false;
-				}, function() {
-					expect(component._makeRequest.called).to.be.false;
 				});
 		});
 	});
