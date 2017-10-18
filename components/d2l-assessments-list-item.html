@@ -97,7 +97,7 @@
 				<div class="info-container">
 					<h3 class="assessment-title">{{assessmentItem.name}}</h3>
 					<div class="assessment-info">
-						<div class="course-name">Grade 4 math with an extremely long name that causes everything to break and it's so looooooooooooonnnnnnnnnnnnnngggggggg {{assessmentItem.courseName}}</div>
+						<div class="course-name">{{assessmentItem.courseName}}</div>
 						<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 						<div class="assessment-type">[[_getAssessmentType(assessmentItem)]]</div>
 						<template is="dom-if" if="[[_hasDueDate(assessmentItem)]]">
