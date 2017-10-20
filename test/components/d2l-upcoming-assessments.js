@@ -236,7 +236,7 @@ describe('<d2l-upcoming-assessments>', function() {
 					});
 			});
 
-			it('should update the allActivies with the activities in the period', function() {
+			it('should update allActivies with the activities in the period', function() {
 				var userUsage = {};
 				userUsage.getLinkByRel = sandbox.stub().returns();
 				userUsage.properties = {
