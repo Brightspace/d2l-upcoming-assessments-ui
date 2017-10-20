@@ -1,6 +1,6 @@
 # \<d2l-upcoming-assessments\>
 
-Widget to display upcoming assessments
+Polymer widget to display upcoming assessments
 
 ## Install the Polymer-CLI
 
