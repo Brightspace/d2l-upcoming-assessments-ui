@@ -326,6 +326,10 @@
 				this.$['view-all-assignments-overlay'].open();
 			},
 
+			_closeAllAssignmentsView: function() {
+				this.$['view-all-assignments-overlay'].close();
+			},
+
 			_onDateValueChanged: function(e) {
 				if (e.detail.date) {
 					var parameters = this._getCustomDateRangeParameters(e.detail.date);
