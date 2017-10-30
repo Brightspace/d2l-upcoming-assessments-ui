@@ -126,7 +126,7 @@
 		<a class="view-all-assignments-link"
 			is="d2l-link"
 			href="javascript:void(0);"
-			on-tap="_openAllAssignmentsView"
+			on-tap="openAllAssignmentsView"
 			on-keypress="_keypressOpenAllAssignmentsView"
 			hidden$=[[_showError]]
 			tabindex="0">
@@ -318,15 +318,15 @@
 
 			_keypressOpenAllAssignmentsView: function(e) {
 				if ( e.code === 'Space' || e.code === 'Enter' ) {
-					return this._openAllAssignmentsView(e);
+					return this.openAllAssignmentsView(e);
 				}
 			},
 
-			_openAllAssignmentsView: function() {
+			openAllAssignmentsView: function() {
 				this.$['view-all-assignments-overlay'].open();
 			},
 
-			_closeAllAssignmentsView: function() {
+			closeAllAssignmentsView: function() {
 				this.$['view-all-assignments-overlay'].close();
 			},
 
