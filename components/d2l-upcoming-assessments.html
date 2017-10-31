@@ -280,11 +280,11 @@
 
 								var basicListActivities = upcomingActivities.slice(0, 4);
 								self.set('_assessments', basicListActivities);
-							})
-							.catch(function() {
-								self._showError = true;
-								self._userName = null;
 							});
+					})
+					.catch(function() {
+						self._showError = true;
+						self._userName = null;
 					});
 			},
 
