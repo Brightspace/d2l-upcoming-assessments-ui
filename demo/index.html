@@ -52,6 +52,12 @@
 					token="foozleberries">
 				</d2l-upcoming-assessments>
 			</div>
+
+			<script>
+				document.querySelectorAll('d2l-upcoming-assessments').forEach(function(assessment) {
+					assessment.getToken = function() { return Promise.resolve('foozleberries'); };
+				});
+			</script>
 		</d2l-demo-template>
 	</body>
 </html>

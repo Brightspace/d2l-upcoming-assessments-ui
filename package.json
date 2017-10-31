@@ -1,6 +1,6 @@
 {
   "name": "d2l-upcoming-assessments",
-  "version": "1.25.0",
+  "version": "1.25.1",
   "description": "A widget to display upcoming assessments for a given user",
   "main": "index.js",
   "directories": {
@@ -13,7 +13,7 @@
     "test:lint:js": "eslint --ext .js,.html . behaviors/ components/ demo/ lang/ test/",
     "test:lint:wc": "polymer lint",
     "test:wct": "polymer test -p",
-    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=firefox polymer test -p --skip-plugin sauce"
+    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test -p --skip-plugin sauce"
   },
   "repository": {
     "type": "git",

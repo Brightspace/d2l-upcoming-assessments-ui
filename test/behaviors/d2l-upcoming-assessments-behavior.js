@@ -182,6 +182,39 @@ describe('d2l upcoming assessments behavior', function() {
 
 			expect(component._fetchEntity).to.have.been.called;
 		});
+
+		it('should resolve null when the request fails with 4xx', function() {
+			var usage = getUserActivityUsage('assignment');
+			component._fetchEntity = sandbox.stub().returns(Promise.reject(404));
+
+			return component._getActivityRequest(usage, getToken, userUrl)
+				.then(function(result) {
+					expect(result).to.be.null;
+				});
+		});
+
+		it('should resolve null when the request fails with 4xx', function() {
+			var usage = getUserActivityUsage('assignment');
+			component._fetchEntity = sandbox.stub().returns(Promise.reject({ status: 400 }));
+
+			return component._getActivityRequest(usage, getToken, userUrl)
+				.then(function(result) {
+					expect(result).to.be.null;
+				});
+		});
+
+		it('should reject when the request fails with server error', function() {
+			var usage = getUserActivityUsage('assignment');
+			component._fetchEntity = sandbox.stub().returns(Promise.reject(500));
+
+			return component._getActivityRequest(usage, getToken, userUrl)
+				.then(function() {
+					return Promise.reject();
+				})
+				.catch(function(err) {
+					expect(err).to.equal(500);
+				});
+		});
 	});
 
 	describe('_getUserActivityUsagesInfos', function() {
@@ -222,6 +255,29 @@ describe('d2l upcoming assessments behavior', function() {
 				.then(function(response) {
 					expect(response[0].instructions).to.equal('some other text');
 				});
+		});
+
+		it('should fail when all the activity requests fail', function() {
+			component._getActivityRequest = sandbox.stub().returns(Promise.resolve(null));
+
+			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			.then(function() {
+				return Promise.reject('Expect failure');
+			})
+			.catch(function() {
+				return;
+			});
+		});
+
+		it('should not fail when some of the activity requests fail', function() {
+			component._getActivityRequest.onSecondCall().returns(Promise.resolve(null));
+
+			userUsages = parse({ entities: [userUsage, userUsage] });
+
+			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			.then(function(response) {
+				expect(response[0].instructions).to.equal(activityInstructions);
+			});
 		});
 
 		it('should return the correct values for all properties', function() {
