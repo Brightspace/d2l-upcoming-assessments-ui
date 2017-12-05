@@ -1,0 +1,102 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../d2l-colors/d2l-colors.html">
+<link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
+<link rel="import" href="../../d2l-intl/d2l-intl.html">
+<link rel="import" href="../../d2l-link/d2l-link.html">
+<link rel="import" href="../../d2l-page-load-progress/d2l-page-load-progress.html">
+<link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
+<link rel="import" href="../behaviors/d2l-upcoming-assessments-behavior.html">
+<link rel="import" href="../behaviors/date-behavior.html">
+<link rel="import" href="../behaviors/localize-behavior.html">
+<link rel="import" href="d2l-all-assessments-list.html">
+<link rel="import" href="d2l-assessments-list.html">
+<link rel="import" href="d2l-date-dropdown.html">
+<script src="../../fetch/fetch.js"></script>
+<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
+
+<dom-module id="d2l-all-assessments">
+	<template>
+		<style>
+			.no-assessments-in-time-frame {
+				margin: 0;
+				text-align: center;
+			}
+
+			d2l-all-assessments-list, .no-assessments-in-time-frame, .period-selection-container {
+				padding-top: 40px;
+			}
+
+			.period-selection-container {
+				display: flex;
+				justify-content: center;
+				margin-bottom: 10px;
+			}
+		</style>
+
+		<div class="period-selection-container">
+			<d2l-date-dropdown
+				current-period-text=[[_currentPeriodText]]
+				locale=[[locale]]>
+			</d2l-date-dropdown>
+		</div>
+		<template is="dom-if" if="[[_hasActivities(_allActivities)]]">
+			<d2l-all-assessments-list
+				assessment-items="[[_allActivities]]"
+				period-start="[[_periodStart]]"
+				period-end="[[_periodEnd]]">
+			</d2l-all-assessments-list>
+		</template>
+		<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'd2l-all-assessments',
+
+			properties: {
+				_noAssessmentsInThisTimeFrame: {
+					type: String,
+					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _firstName)'
+				}
+			},
+
+			behaviors: [
+				window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior,
+				window.D2L.UpcomingAssessments.DateBehavior,
+				window.D2L.UpcomingAssessments.LocalizeBehavior,
+				window.D2L.Hypermedia.HMConstantsBehavior
+			],
+
+			listeners: {
+				'd2l-date-dropdown-value-changed': '_onDateValueChanged'
+			},
+
+			observers: [
+				'_onApiConfigChanged(userUrl, getToken)'
+			],
+
+			_debounceTime: 20,
+
+			_onApiConfigChanged: function() {
+				this.debounce('getInfo', this._getInfo, this._debounceTime);
+			},
+
+			_hasActivities: function(activities) {
+				return activities && activities.length > 0;
+			},
+
+			_onDateValueChanged: function(e) {
+				if (e.detail.date) {
+					var parameters = this._getCustomDateRangeParameters(e.detail.date);
+					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
+					return this._loadActivitiesForPeriod(periodUrl)
+					.catch(function() {
+						self._showError = true;
+						self._firstName = null;
+					});
+				}
+			}
+		});
+	</script>
+</dom-module>

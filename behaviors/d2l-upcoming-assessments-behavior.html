@@ -15,6 +15,32 @@
 	*/
 	var upcomingAssessmentsBehaviorImpl = {
 
+		properties: {
+			userUrl: String,
+			getToken: {
+				type: Object,
+				value: function() {
+					return null;
+				}
+			},
+			_showError: {
+				type: Boolean,
+				value: false
+			},
+			_firstName: String,
+			_allActivities: {
+				type: Array,
+				value: function() {
+					return [];
+				}
+			},
+			_previousPeriodUrl: String,
+			_nextPeriodUrl: String,
+			_currentPeriodText: String,
+			_periodStart: String,
+			_periodEnd: String
+		},
+
 		_getCompletionState: function(userActivityUsage) {
 			return {
 				isCompleted: !!userActivityUsage.getSubEntityByClass(this.HypermediaClasses.activities.complete)
@@ -225,6 +251,99 @@
 				start: start,
 				end: end
 			};
+		},
+
+		_getUser: function(userUrl, getToken) {
+			return this._fetchEntityWithToken(userUrl, getToken);
+		},
+
+		_storeUserInformation: function(userEntity) {
+			this._firstName = this.__getFirstName(userEntity);
+			return userEntity;
+		},
+
+		__getFirstName: function(userEntity) {
+			var firstNameEntity = userEntity.getSubEntityByRel(this.HypermediaRels.firstName);
+			if (firstNameEntity) {
+				return firstNameEntity.properties.name;
+			}
+			return null;
+		},
+
+		_getInfo: function() {
+			this._showError = false;
+			var self = this;
+
+			return this._fetchEntityWithToken(this.userUrl, this.getToken)
+				.then(function(userEntity) {
+					self._firstName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
+					var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
+					return self._getCustomRangeAction(myActivitiesLink, self.userUrl)
+						.then(function(customActivitiesLink) {
+							return self._loadActivitiesForPeriod(customActivitiesLink);
+						});
+				})
+				.catch(function() {
+					self._showError = true;
+					self._firstName = null;
+				});
+		},
+
+		_loadActivitiesForPeriod: function(periodUrl) {
+			if (!periodUrl) {
+				return Promise.reject();
+			}
+
+			var self = this;
+			var userActivityUsages;
+
+			return this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl)
+				.then(function(userUsages) {
+					userActivityUsages = userUsages;
+					self._previousPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.previousPeriod) || {}).href;
+					self._nextPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.nextPeriod) || {}).href;
+					self._currentPeriodText = self._getFormattedPeriodText(userActivityUsages.properties.start, userActivityUsages.properties.end);
+					self._periodStart = userActivityUsages.properties.start;
+					self._periodEnd = userActivityUsages.properties.end;
+
+					return self._getOverdueActivities(userActivityUsages, self.getToken, self.userUrl);
+				})
+				.then(function(overdueUserActivityUsages) {
+					return self._getUserActivityUsagesInfos(userActivityUsages, overdueUserActivityUsages, self.getToken, self.userUrl);
+				})
+				.then(function(userActivityUsagesInfos) {
+					return self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
+				})
+				.then(function(activities) {
+					self.set('_allActivities', activities);
+					return activities;
+				});
+		},
+
+		_getFormattedPeriodText: function(startDate, endDate) {
+			var startDateDate = new Date(startDate);
+			var endDateDate = new Date(endDate);
+
+			var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
+			var endDateString;
+			if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
+				endDateString = endDateDate.getDate();
+			} else {
+				endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
+			}
+
+			return this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
+		},
+
+		_updateActivitiesInfo: function(activities) {
+			activities = activities || [];
+			return activities
+				.filter(function(activity) {
+					return activity.dueDate || activity.endDate;
+				})
+				.sort(function(a, b) {
+					return (a.dueDate || a.endDate) > (b.dueDate || b.endDate);
+				});
 		},
 
 		_createActionUrl: function(action, parameters) {

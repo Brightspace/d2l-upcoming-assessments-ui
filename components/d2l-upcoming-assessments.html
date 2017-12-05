@@ -4,8 +4,6 @@
 <link rel="import" href="../../d2l-intl/d2l-intl.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-page-load-progress/d2l-page-load-progress.html">
-<link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay.html">
-<link rel="import" href="../../d2l-simple-overlay/d2l-simple-overlay-close-button.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../behaviors/d2l-upcoming-assessments-behavior.html">
 <link rel="import" href="../behaviors/date-behavior.html">
@@ -134,42 +132,6 @@
 			tabindex="0">
 			<h3>[[localize('viewAllAssignments')]]</h3>
 		</a>
-
-		<d2l-simple-overlay
-			id="view-all-assignments-overlay"
-			title-name="[[localize('viewAllAssignments')]]"
-			close-simple-overlay-alt-text="[[localize('closeSimpleOverlayText')]]"
-			no-cancel-on-outside-click
-			with-backdrop
-			restore-focus-on-close>
-			<div slot="header">
-				<d2l-page-load-progress id="allAssignmentsProgressBar" autostart color="#003b71"></d2l-page-load-progress>
-				<div class="view-all-container">
-					<d2l-simple-overlay-close-button>
-						<div class="overlay-close-button-content-wrapper">
-							<d2l-icon icon="d2l-tier1:chevron-left"></d2l-icon>
-							<span>[[_closeSimpleOverlayText]]</span>
-						</div>
-					</d2l-simple-overlay-close-button>
-				</div>
-			</div>
-			 <div class="period-selection-container">
-				 <d2l-date-dropdown
-				 	current-period-text=[[_currentPeriodText]]
-					locale=[[locale]]
-					>
-				</d2l-date-dropdown>
-			</div>
-			<template is="dom-if" if="[[_hasActivities(_allActivities)]]">
-				<d2l-all-assessments-list
-					assessment-items="[[_allActivities]]"
-					period-start="[[_periodStart]]"
-					period-end="[[_periodEnd]]">
-				</d2l-all-assessments-list>
-			</template>
-			<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
-
-		</d2l-simple-overlay>
 	</template>
 
 	<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
@@ -180,7 +142,6 @@
 			is: 'd2l-upcoming-assessments',
 
 			properties: {
-				userUrl: String,
 				loaded: {
 					type: Boolean,
 					notify: true,
@@ -201,37 +162,13 @@
 						return [];
 					}
 				},
-				_allActivities: {
-					type: Array,
-					value: function() {
-						return [];
-					}
-				},
-				_userName: String,
-				_showError: {
-					type: Boolean,
-					value: false
-				},
 				_noUpcomingAssessments: {
 					type: String,
-					computed: 'localize("noUpcomingAssessments", "userName", _userName)'
-				},
-				_noAssessmentsInThisTimeFrame: {
-					type: String,
-					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _userName)'
+					computed: 'localize("noUpcomingAssessments", "userName", _firstName)'
 				},
 				_closeSimpleOverlayText: {
 					type: String
 				},
-				_previousPeriodUrl: String,
-				_nextPeriodUrl: String,
-				_currentPeriodText: String,
-				getToken: {
-					type: Object,
-					value: null
-				},
-				_periodStart: String,
-				_periodEnd: String,
 				_selectCustomDateRangeAction: Object
 			},
 
@@ -254,45 +191,21 @@
 				var mql = window.matchMedia('(max-width: 767px)');
 				this._updateCloseSimpleOverlayText(mql.matches);
 				mql.addListener(this._mobileBreakpointListener.bind(this));
-
-				this.$.allAssignmentsProgressBar.finish();
 			},
 
 			_debounceTime: 20,
 
-			_getInfo: function() {
-				this._showError = false;
-				var self = this;
-
-				return this._fetchEntityWithToken(this.userUrl, this.getToken)
-					.then(function(userEntity) {
-						self._userName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
-						var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
-						return self._getCustomRangeAction(myActivitiesLink, self.userUrl)
-							.then(function(customActivitiesLink) {
-								return self._loadActivitiesForPeriod(customActivitiesLink);
-							})
-							.then(function(activities) {
-								activities = activities || [];
-
-								var upcomingActivities = activities
-									.filter(function(activity) {
-										return self.isActivityUpcoming(activity);
-									});
-								self._setTotalCount(upcomingActivities.length);
-
-								var basicListActivities = upcomingActivities.slice(0, 3);
-								self.set('_assessments', basicListActivities);
-							});
-					})
+			_getUpcomingAssessmentsInfo: function() {
+				return this._getInfo()
+					.then(this._getUpcomingAssessments.bind(this))
 					.catch(function() {
 						self._showError = true;
-						self._userName = null;
+						self._firstName = null;
 					});
 			},
 
 			_onApiConfigChanged: function() {
-				this.debounce('getInfo', this._getInfo, this._debounceTime);
+				this.debounce('getUpcomingAssessmentsInfo', this._getUpcomingAssessmentsInfo, this._debounceTime);
 			},
 
 			_showUpcomingAssessments: function(assessments, showError) {
@@ -325,11 +238,7 @@
 			},
 
 			openAllAssignmentsView: function() {
-				this.$['view-all-assignments-overlay'].open();
-			},
-
-			closeAllAssignmentsView: function() {
-				this.$['view-all-assignments-overlay'].close();
+				this.dispatchEvent(new CustomEvent('openAllWorkView', { bubbles: true }));
 			},
 
 			_onDateValueChanged: function(e) {
@@ -339,60 +248,23 @@
 					return this._loadActivitiesForPeriod(periodUrl)
 					.catch(function() {
 						self._showError = true;
-						self._userName = null;
+						self._firstName = null;
 					});
 				}
 			},
 
-			_loadActivitiesForPeriod: function(periodUrl) {
-				if (!periodUrl) {
-					return Promise.reject();
-				}
+			_getUpcomingAssessments: function(activities) {
+				activities = activities || [];
 
-				var self = this;
-				var userActivityUsages;
+				var upcomingActivities = activities
+					.filter(function(activity) {
+						return this.isActivityUpcoming(activity);
+					}.bind(this));
+				this._setTotalCount(upcomingActivities.length);
 
-				var progress = this.$.allAssignmentsProgressBar;
-				progress.start();
-
-				return this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl)
-					.then(function(userUsages) {
-						userActivityUsages = userUsages;
-						self._previousPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.previousPeriod) || {}).href;
-						self._nextPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.nextPeriod) || {}).href;
-						self._currentPeriodText = self._getFormattedPeriodText(userActivityUsages.properties.start, userActivityUsages.properties.end);
-						self._periodStart = userActivityUsages.properties.start;
-						self._periodEnd = userActivityUsages.properties.end;
-
-						return self._getOverdueActivities(userActivityUsages, self.getToken, self.userUrl);
-					})
-					.then(function(overdueUserActivityUsages) {
-						return self._getUserActivityUsagesInfos(userActivityUsages, overdueUserActivityUsages, self.getToken, self.userUrl);
-					})
-					.then(function(userActivityUsagesInfos) {
-						return self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
-					})
-					.then(function(activities) {
-						self.set('_allActivities', activities);
-						progress.finish();
-						self._setLoaded(true);
-						return activities;
-					});
-			},
-
-			_getFormattedPeriodText: function(startDate, endDate) {
-				var startDateDate = new Date(startDate);
-				var endDateDate = new Date(endDate);
-
-				var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
-				var endDateString;
-				if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
-					endDateString = endDateDate.getDate();
-				} else {
-					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
-				}
-
-				return this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
+				var basicListActivities = upcomingActivities.slice(0, 3);
+				this.set('_assessments', basicListActivities);
+				this._setLoaded(true);
 			},
 
 			_mobileBreakpointListener: function(mqlevent) {

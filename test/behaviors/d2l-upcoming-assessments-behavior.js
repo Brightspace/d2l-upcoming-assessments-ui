@@ -501,4 +501,79 @@ describe('d2l upcoming assessments behavior', function() {
 				});
 		});
 	});
+
+	describe('_getInfo', function() {
+		var customRangeUrl, myActivities, userEntity;
+
+		beforeEach(function() {
+			customRangeUrl = 'http://example.com?start=2017-09-20T12:00:00.000Z&end=2017-09-27T12:00:00.000Z';
+			myActivities = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
+			userEntity = window.D2L.Hypermedia.Siren.Parse({
+				entities: [{
+					rel: ['https://api.brightspace.com/rels/first-name'],
+					properties: {
+						name: 'foo'
+					}
+				}],
+				links: [{
+					rel: ['https://activities.api.brightspace.com/rels/my-activities'],
+					href: 'http://example.com/my-activities'
+				}]
+			});
+
+			component.isActivityUpcoming = sinon.stub().returns(true);
+			component._fetchEntityWithToken = sinon.stub().returns(Promise.resolve(userEntity));
+			component._getCustomRangeAction = sinon.stub().returns(Promise.resolve(customRangeUrl));
+			component._loadActivitiesForPeriod = sinon.stub().returns(Promise.resolve(myActivities));
+		});
+
+		it('should reset the error state', function() {
+			component._showError = true;
+
+			return component._getInfo().then(function() {
+				expect(component._showError).to.be.false;
+			});
+		});
+
+		it('should fetch the user entity', function() {
+			component.userUrl = 'http://example.com';
+
+			return component._getInfo().then(function() {
+				expect(component._fetchEntityWithToken).to.have.been.calledWith('http://example.com');
+			});
+		});
+
+		it('should set the user\'s name', function() {
+			return component._getInfo().then(function() {
+				expect(component._firstName).to.equal('foo');
+			});
+		});
+
+		it('should fetch activities with a custom date range', function() {
+			return component._getInfo().then(function() {
+				expect(component._getCustomRangeAction).to.have.been.calledWith('http://example.com/my-activities');
+			});
+		});
+
+		// it('should set the total number of activities', function() {
+		// 	return component._getInfo().then(function() {
+		// 		expect(component.totalCount).to.equal(5);
+		// 	});
+		// });
+
+		it('should set the stored assessments', function() {
+			return component._getInfo().then(function() {
+				expect(component._allActivities.length).to.equal(5);
+			});
+		});
+
+		it('should set the error state if things go wrong', function() {
+			component._loadActivitiesForPeriod = sinon.stub().returns(Promise.reject());
+
+			return component._getInfo().then(function() {
+				expect(component._showError).to.be.true;
+			});
+		});
+	});
+
 });
