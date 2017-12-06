@@ -2,7 +2,7 @@
 
 'use strict';
 
-describe('<d2l-upcoming-assessments>', function() {
+describe('<d2l-all-assessments>', function() {
 
 	var element;
 
