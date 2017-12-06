@@ -259,11 +259,6 @@
 			return this._fetchEntityWithToken(userUrl, getToken);
 		},
 
-		_storeUserInformation: function(userEntity) {
-			this._firstName = this.__getFirstName(userEntity);
-			return userEntity;
-		},
-
 		__getFirstName: function(userEntity) {
 			var firstNameEntity = userEntity.getSubEntityByRel(this.HypermediaRels.firstName);
 			if (firstNameEntity) {
