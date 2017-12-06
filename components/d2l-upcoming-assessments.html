@@ -1,7 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../d2l-colors/d2l-colors.html">
 <link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
-<link rel="import" href="../../d2l-intl/d2l-intl.html">
 <link rel="import" href="../../d2l-link/d2l-link.html">
 <link rel="import" href="../../d2l-page-load-progress/d2l-page-load-progress.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
@@ -175,7 +174,6 @@
 			behaviors: [
 				window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior,
 				window.D2L.UpcomingAssessments.DateBehavior,
-				window.D2L.UpcomingAssessments.LocalizeBehavior,
 				window.D2L.Hypermedia.HMConstantsBehavior
 			],
 
@@ -239,18 +237,6 @@
 
 			openAllAssignmentsView: function() {
 				this.dispatchEvent(new CustomEvent('openAllWorkView', { bubbles: true }));
-			},
-
-			_onDateValueChanged: function(e) {
-				if (e.detail.date) {
-					var parameters = this._getCustomDateRangeParameters(e.detail.date);
-					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
-					return this._loadActivitiesForPeriod(periodUrl)
-					.catch(function() {
-						self._showError = true;
-						self._firstName = null;
-					});
-				}
 			},
 
 			_getUpcomingAssessments: function(activities) {

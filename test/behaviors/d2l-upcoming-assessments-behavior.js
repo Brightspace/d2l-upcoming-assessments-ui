@@ -4,6 +4,13 @@
 
 describe('d2l upcoming assessments behavior', function() {
 	var component, sandbox, getToken, userUrl, completionDate, dueDate, endDate;
+	var periodUrl = '/some/period/now/';
+	var activities = {
+		properties: {
+			start: '2017-07-19T16:20:07.567Z',
+			end: '2017-08-02T16:20:07.567Z'
+		}
+	};
 	var activityHref = '/path/to/activity';
 	var activityName = 'Activity Name';
 	var activityInstructions = 'Some instructions yo';
@@ -555,18 +562,6 @@ describe('d2l upcoming assessments behavior', function() {
 			});
 		});
 
-		// it('should set the total number of activities', function() {
-		// 	return component._getInfo().then(function() {
-		// 		expect(component.totalCount).to.equal(5);
-		// 	});
-		// });
-
-		it('should set the stored assessments', function() {
-			return component._getInfo().then(function() {
-				expect(component._allActivities.length).to.equal(5);
-			});
-		});
-
 		it('should set the error state if things go wrong', function() {
 			component._loadActivitiesForPeriod = sinon.stub().returns(Promise.reject());
 
@@ -574,6 +569,71 @@ describe('d2l upcoming assessments behavior', function() {
 				expect(component._showError).to.be.true;
 			});
 		});
+	});
+
+	describe('_loadActivitiesForPeriod', function() {
+
+		it('does nothing if the provided url was not set', function() {
+			component._fetchEntityWithToken = sandbox.stub();
+			return component._loadActivitiesForPeriod()
+				.then(function() {
+					return Promise.reject('Expected _loadActivitiesForPeriod to reject');
+				})
+				.catch(function() {
+					expect(component._fetchEntityWithToken).to.not.have.been.called;
+				});
+		});
+
+		it('calls _fetchEntityWithToken for the provided url', function() {
+			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(
+				window.D2L.Hypermedia.Siren.Parse(activities)
+			));
+			return component._loadActivitiesForPeriod(periodUrl)
+				.then(function() {
+					expect(component._fetchEntityWithToken).to.have.been.calledWith(periodUrl);
+				});
+		});
+
+		it('should update allActivies with the activities in the period', function() {
+			var userUsage = {};
+			userUsage.getLinkByRel = sandbox.stub().returns();
+			userUsage.properties = {
+				start: 'start',
+				end: 'end'
+			};
+
+			component._getFormattedPeriodText = sandbox.stub().returns('dateText');
+
+			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
+			component._getOverdueActivities = sandbox.stub().returns(activities);
+			component._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
+			component._updateActivitiesInfo = sandbox.stub().returns(activities);
+			return component._loadActivitiesForPeriod(periodUrl)
+				.then(function() {
+					expect(component._allActivities).to.equal(activities);
+				});
+		});
+
+		it('should not update the assessments with the activities in the period', function() {
+			var userUsage = {};
+			userUsage.getLinkByRel = sandbox.stub().returns();
+			userUsage.properties = {
+				start: 'start',
+				end: 'end'
+			};
+
+			component._getFormattedPeriodText = sandbox.stub().returns('dateText');
+
+			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
+			component._getOverdueActivities = sandbox.stub().returns(activities);
+			component._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
+			component._updateActivitiesInfo = sandbox.stub().returns(activities);
+			return component._loadActivitiesForPeriod(periodUrl)
+				.then(function() {
+					expect(component._assessments).to.not.equal(activities);
+				});
+		});
+
 	});
 
 });

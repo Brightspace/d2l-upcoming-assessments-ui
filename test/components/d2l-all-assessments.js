@@ -1,4 +1,39 @@
-/*
+/* global describe, it, fixture, expect, beforeEach, afterEach, sinon */
+
+'use strict';
+
+describe('<d2l-upcoming-assessments>', function() {
+
+	var element;
+
+	beforeEach(function() {
+		element = fixture('basic');
+	});
+
+	describe('smoke test', function() {
+
+		it('can be instantiated', function() {
+			expect(element.is).to.equal('d2l-all-assessments');
+		});
+
+	});
+
+	describe('fetching data', function() {
+
+		var element;
+		var sandbox;
+
+		beforeEach(function() {
+			sandbox = sinon.sandbox.create();
+
+			element = fixture('basic');
+			element._debounceTime = 10;
+		});
+
+		afterEach(function() {
+			sandbox.restore();
+		});
+
 		describe('_onDateValueChanged', function() {
 			it('invokes _loadActivitiesForPeriod with the correct url', function() {
 				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve());
@@ -38,4 +73,7 @@
 					});
 			});
 		});
-*/
+
+	});
+
+});
