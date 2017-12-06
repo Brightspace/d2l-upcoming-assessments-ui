@@ -259,14 +259,6 @@
 			return this._fetchEntityWithToken(userUrl, getToken);
 		},
 
-		__getFirstName: function(userEntity) {
-			var firstNameEntity = userEntity.getSubEntityByRel(this.HypermediaRels.firstName);
-			if (firstNameEntity) {
-				return firstNameEntity.properties.name;
-			}
-			return null;
-		},
-
 		_getInfo: function() {
 			this._showError = false;
 			var self = this;
