@@ -79,7 +79,7 @@
 			_debounceTime: 20,
 
 			_onApiConfigChanged: function() {
-				this.debounce('getAllAssessmentsInfo', _getAllAssessmentsInfo, this._debounceTime);
+				this.debounce('getAllAssessmentsInfo', this._getAllAssessmentsInfo, this._debounceTime);
 			},
 
 			_getAllAssessmentsInfo: function() {
@@ -117,7 +117,7 @@
 				}
 
 				this._currentPeriodText = this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
-			},
+			}
 		});
 	</script>
 </dom-module>
