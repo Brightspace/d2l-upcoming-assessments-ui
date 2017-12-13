@@ -57,7 +57,8 @@
 				_noAssessmentsInThisTimeFrame: {
 					type: String,
 					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _firstName)'
-				}
+				},
+				_currentPeriodText: String
 			},
 
 			behaviors: [
@@ -78,7 +79,12 @@
 			_debounceTime: 20,
 
 			_onApiConfigChanged: function() {
-				this.debounce('getInfo', this._getInfo, this._debounceTime);
+				this.debounce('getAllAssessmentsInfo', _getAllAssessmentsInfo, this._debounceTime);
+			},
+
+			_getAllAssessmentsInfo: function() {
+				this._getInfo()
+					.then(this._formatPeriodText.bind(this));
 			},
 
 			_hasActivities: function(activities) {
@@ -90,12 +96,28 @@
 					var parameters = this._getCustomDateRangeParameters(e.detail.date);
 					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
 					return this._loadActivitiesForPeriod(periodUrl)
+					.then(this._formatPeriodText.bind(this))
 					.catch(function() {
 						self._showError = true;
 						self._firstName = null;
 					});
 				}
-			}
+			},
+
+			_formatPeriodText: function() {
+				var startDateDate = new Date(this._periodStart);
+				var endDateDate = new Date(this._periodEnd);
+
+				var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
+				var endDateString;
+				if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
+					endDateString = endDateDate.getDate();
+				} else {
+					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
+				}
+
+				this._currentPeriodText = this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
+			},
 		});
 	</script>
 </dom-module>
