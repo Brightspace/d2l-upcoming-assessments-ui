@@ -344,11 +344,11 @@ describe('d2l upcoming assessments behavior', function() {
 			component._getQuizDescription = sandbox.stub().returns('time for new flava in ya ear');
 
 			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
-			.then(function(response) {
-				expect(component._getAssignmentInstructions).to.be.called;
-				expect(component._getQuizDescription).not.to.be.called;
-				expect(response[0].info).to.equal('bonita bonita bonita');
-			});
+				.then(function(response) {
+					expect(component._getAssignmentInstructions).to.be.called;
+					expect(component._getQuizDescription).not.to.be.called;
+					expect(response[0].info).to.equal('bonita bonita bonita');
+				});
 		});
 
 		it('should set the info property to the value returned from _getQuizDescription if the activity is a quiz', function() {
@@ -357,23 +357,23 @@ describe('d2l upcoming assessments behavior', function() {
 			component._getQuizDescription = sandbox.stub().returns('time for new flava in ya ear');
 
 			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
-			.then(function(response) {
-				expect(component._getAssignmentInstructions).not.to.be.called;
-				expect(component._getQuizDescription).to.be.called;
-				expect(response[0].info).to.equal('time for new flava in ya ear');
-			});
+				.then(function(response) {
+					expect(component._getAssignmentInstructions).not.to.be.called;
+					expect(component._getQuizDescription).to.be.called;
+					expect(response[0].info).to.equal('time for new flava in ya ear');
+				});
 		});
 
 		it('should fail when all the activity requests fail', function() {
 			component._getActivityRequest = sandbox.stub().returns(Promise.resolve(null));
 
 			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
-			.then(function() {
-				return Promise.reject('Expect failure');
-			})
-			.catch(function() {
-				return;
-			});
+				.then(function() {
+					return Promise.reject('Expect failure');
+				})
+				.catch(function() {
+					return;
+				});
 		});
 
 		it('should not fail when some of the activity requests fail', function() {
@@ -384,11 +384,11 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsages = parse({ entities: [userUsage, userUsage] });
 
 			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
-			.then(function(response) {
-				expect(component._getAssignmentInstructions).to.be.called;
-				expect(component._getQuizDescription).not.to.be.called;
-				expect(response[0].info).to.equal('bonita bonita bonita');
-			});
+				.then(function(response) {
+					expect(component._getAssignmentInstructions).to.be.called;
+					expect(component._getQuizDescription).not.to.be.called;
+					expect(response[0].info).to.equal('bonita bonita bonita');
+				});
 		});
 
 		it('should return the correct values for all properties', function() {

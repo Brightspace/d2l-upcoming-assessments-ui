@@ -207,7 +207,7 @@
 			},
 			handleValueChanged: function(e, detail) {
 				if (detail.value) {
-					var dateInfo = detail.value.split(/\s*\-\s*/g);
+					var dateInfo = detail.value.split(/\s*-\s*/g);
 					var year = dateInfo[0];
 					var month = dateInfo[1] - 1;
 					var date = dateInfo[2];
@@ -217,13 +217,13 @@
 			},
 			_handleTap: function() {
 				var datepicker = this.$$('vaadin-date-picker-light');
-				if ( !datepicker.opened ) {
+				if (!datepicker.opened) {
 					datepicker._focusOverlayOnOpen = true;
 				}
 			},
 			_onEnter: function(e) {
 				var datepicker = this.$$('vaadin-date-picker-light');
-				if ( !datepicker.opened ) {
+				if (!datepicker.opened) {
 					// A better solution is to add a boolean to the 3rd party open function
 					datepicker._focusOverlayOnOpen = true;
 					datepicker.open();
@@ -233,7 +233,7 @@
 			},
 			_onUpDown: function(e) {
 				var datepicker = this.$$('vaadin-date-picker-light');
-				if ( !datepicker.opened ) {
+				if (!datepicker.opened) {
 					e.detail.keyboardEvent.preventDefault();
 					e.detail.keyboardEvent.stopPropagation();
 				}
@@ -245,13 +245,13 @@
 				// in shady DOM the input's "focus" event does not bubble,
 				// so no need to fire it
 				if (!Polymer.Settings.useShadow) {
-					this.dispatchEvent( new CustomEvent(
-							'focus',
-							{bubbles: true, composed: false}
-						) );
+					this.dispatchEvent(new CustomEvent(
+						'focus',
+						{bubbles: true, composed: false}
+					));
 				}
 			},
-			_localeChanged: function( locale ) {
+			_localeChanged: function(locale) {
 				this.language = locale;
 			},
 			_updateDatePickeri18n: function() {
@@ -267,8 +267,8 @@
 						}
 					}
 				} : {};
-				var formatter = new window.d2lIntl.DateTimeFormat( this.locale, dateFormatOverride );
-				var parser = new window.d2lIntl.DateTimeParse( this.locale, dateFormatOverride );
+				var formatter = new window.d2lIntl.DateTimeFormat(this.locale, dateFormatOverride);
+				var parser = new window.d2lIntl.DateTimeParse(this.locale, dateFormatOverride);
 				var datePicker = this.$$('vaadin-date-picker-light');
 				var localeOverrides = {
 					monthNames: locale.date.calendar.months.long,
@@ -277,12 +277,12 @@
 					firstDayOfWeek: this.firstDayOfWeek ? this.firstDayOfWeek : locale.date.calendar.firstDayOfWeek,
 					today: this.localize('today'),
 					cancel: this.localize('cancel'),
-					formatDate: function( date ) {
-						return formatter.formatDate( date );
+					formatDate: function(date) {
+						return formatter.formatDate(date);
 					},
-					parseDate: function( dateString ) {
+					parseDate: function(dateString) {
 						try {
-							return parser.parseDate( dateString );
+							return parser.parseDate(dateString);
 						} catch (exception) {
 							return null;
 						}
@@ -296,9 +296,9 @@
 				if (obj2 === undefined || obj2 === null || typeof(obj2) !== 'object') {
 					return obj1;
 				}
-				Object.keys(obj2).forEach( function(i) {
+				Object.keys(obj2).forEach(function(i) {
 					if (obj1.hasOwnProperty(i)) {
-						if (typeof(obj2[i]) === 'object' && typeof(obj1[i]) === 'object' ) {
+						if (typeof(obj2[i]) === 'object' && typeof(obj1[i]) === 'object') {
 							this._merge(obj1[i], obj2[i]);
 						} else {
 							obj1[i] = obj2[i];

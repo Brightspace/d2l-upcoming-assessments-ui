@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "d2l-demo-template": "~0.0.11",
+    "d2l-demo-template": "^1.0.2",
     "web-component-tester": "^6.1.3"
   },
   "resolutions": {

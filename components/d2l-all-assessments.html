@@ -96,11 +96,11 @@
 					var parameters = this._getCustomDateRangeParameters(e.detail.date);
 					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
 					return this._loadActivitiesForPeriod(periodUrl)
-					.then(this._formatPeriodText.bind(this))
-					.catch(function() {
-						self._showError = true;
-						self._firstName = null;
-					});
+						.then(this._formatPeriodText.bind(this))
+						.catch(function() {
+							self._showError = true;
+							self._firstName = null;
+						});
 				}
 			},
 

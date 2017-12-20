@@ -92,7 +92,7 @@
 		},
 
 		_getOrganizationRequest: function(userActivityUsage, getToken, userUrl) {
-			var organizationLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.organization) || {} ).href;
+			var organizationLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.organization) || {}).href;
 			return this._fetchEntityWithToken(organizationLink, getToken, userUrl);
 		},
 
