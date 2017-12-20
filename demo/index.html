@@ -55,6 +55,7 @@
 				<script>
 					document.querySelectorAll('d2l-upcoming-assessments').forEach(function(assessment) {
 						assessment.getToken = function() { return Promise.resolve('foozleberries'); };
+						assessment.isActivityUpcoming = function(activity) { return true; };
 					});
 				</script>
 			</div>

@@ -1,5 +1,28 @@
 {
-    "entities": [ ],
+  "properties": {
+    "start": "2017-12-12T23:00:00.000Z",
+    "end": "2017-12-25T23:00:00.000Z"
+  },
+  "entities": [ ],
+  "actions": [
+      {
+          "name": "select-custom-date-range",
+          "method": "GET",
+          "href": "/demo/data/activities/user/170.json",
+          "fields": [
+              {
+                  "name": "start",
+                  "type": "text",
+                  "value": "Sept 3 2017 00:00:00"
+              },
+              {
+                "name": "end",
+                "type": "text",
+                "value": "Sept 16 2017 23:59:59"
+              }
+          ]
+      }
+  ],
     "links": [
         {
             "rel": [
