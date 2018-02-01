@@ -8,6 +8,7 @@
 <link rel="import" href="../../d2l-icons/tier1-icons.html">
 <link rel="import" href="../../d2l-date-picker/localize-behavior.html">
 <link rel="import" href="../../d2l-intl/d2l-intl.html">
+<link rel="import" href="../../d2l-link/d2l-link.html">
 
 <dom-module id="d2l-date-dropdown">
 	<template>
@@ -118,14 +119,13 @@
 			<iron-a11y-keys target="[[_target]]" keys="enter" on-keys-pressed="_onEnter"></iron-a11y-keys>
 			<iron-a11y-keys target="[[_target]]" keys="up down" on-keys-pressed="_onUpDown"></iron-a11y-keys>
 			<div class="input">
-				<a
+				<d2l-link
 					href="javascript:void(0);"
-					is="d2l-link"
 					on-focus="_handleFocus"
 					on-tap="_handleTap">
 					<span class="currentPeriod">[[currentPeriodText]]</span>
 					<d2l-icon icon="d2l-tier1:chevron-down" aria-hidden="true"></d2l-icon>
-				</a>
+				</d2l-link>
 				<div class="d2l-dropdown-content-pointer">
 					<div></div>
 				</div>
