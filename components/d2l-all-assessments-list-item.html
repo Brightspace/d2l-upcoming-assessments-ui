@@ -4,6 +4,7 @@
 <link rel="import" href="../../d2l-icons/tier3-icons.html">
 <link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="../../iron-icon/iron-icon.html">
+<link rel="import" href="../../d2l-status-indicator/d2l-status-indicator.html">
 <link rel="import" href="../behaviors/date-behavior.html">
 <link rel="import" href="../behaviors/localize-behavior.html">
 
@@ -53,36 +54,13 @@
 				flex: 0 0 100px;
 			}
 
-			.activity-status-badge {
-				color: white;
-				font-size: 0.6rem;
-				font-weight: bold;
-				line-height: 1;
-				margin-right: 10px;
-				padding: 4px 10px 3px 10px;
-				text-transform: uppercase;
-				border-radius: 12px;
+			d2l-status-indicator:not([hidden]) {
+				margin-right: 5px;
 			}
 
-			:host-context([dir="rtl"]) .activity-status-badge {
-				margin-left: 10px;
+			:host-context([dir="rtl"]) d2l-status-indicator:not([hidden]) {
+				margin-left: 5px;
 				margin-right: 0px;
-			}
-
-			.completion-info {
-				background-color: var(--d2l-color-olivine-minus-1);
-			}
-
-			.due-today-info {
-				background-color: var(--d2l-color-celestine);
-			}
-
-			.overdue-info {
-				background-color: var(--d2l-color-cinnabar);
-			}
-
-			.ended-info {
-				background-color: var(--d2l-color-ferrite);
 			}
 
 			.activity-info {
@@ -159,22 +137,16 @@
 					<div class="info-container">
 						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
 						<div class="meta-info">
-							<div class="activity-status-badge completion-info" hidden$="[[!_showComplete]]">
-								[[localize('activityComplete')]]
-							</div>
-							<div class="activity-status-badge due-today-info" hidden$="[[!_showDueToday]]">
-								[[localize('activityDueToday')]]
-							</div>
+							<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
+							<d2l-status-indicator text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
 							<div class="meta-info" hidden$="[[!_showOverdue]]">
-								<div class="activity-status-badge overdue-info">[[localize('activityOverdue')]]</div>
+								<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]"></d2l-status-indicator>
 							</div>
 							<div class="meta-text" hidden$="[[!_showEndsText]]">
 								<div class="meta-text emphasis">[[_endsText]]</div>
 								<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 							</div>
-							<div class="activity-status-badge ended-info" hidden$="[[!_showEnded]]">
-								[[localize('activityEnded')]]
-							</div>
+							<d2l-status-indicator state="null" text="[[localize('activityEnded')]]" hidden$="[[!_showEnded]]"></d2l-status-indicator>
 							<div class="meta-text course-name">[[assessmentItem.courseName]]</div>
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 							<div class="meta-text">[[assessmentType]]</div>
