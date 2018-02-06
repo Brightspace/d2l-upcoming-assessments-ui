@@ -74,7 +74,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 							var dueTodayInfo = element.$$('d2l-status-indicator[state="default"]');
 							expect(dueTodayInfo).to.exist;
 
-							!isCompleted && isDueToday
+							!isCompleted && isDueToday && !isOverdue
 								? expect(dueTodayInfo.getAttribute('hidden')).to.be.null
 								: expect(dueTodayInfo.getAttribute('hidden')).to.not.be.null;
 						});
