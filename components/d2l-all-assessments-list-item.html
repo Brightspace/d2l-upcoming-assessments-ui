@@ -225,7 +225,7 @@
 			this._updateAssessmentType(assessmentItem);
 
 			this._showComplete = assessmentItem.isCompleted;
-			this._showDueToday = !assessmentItem.isCompleted && assessmentItem.isDueToday;
+			this._showDueToday = !assessmentItem.isCompleted && assessmentItem.isDueToday && !assessmentItem.isOverdue;
 			this._showOverdue = !assessmentItem.isCompleted && !assessmentItem.isEnded && assessmentItem.isOverdue;
 			this._showEnded = !assessmentItem.isCompleted && assessmentItem.isEnded;
 
