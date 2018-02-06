@@ -138,7 +138,7 @@
 						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
 						<div class="meta-info">
 							<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
-							<d2l-status-indicator text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
+							<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
 							<div class="meta-info" hidden$="[[!_showOverdue]]">
 								<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]"></d2l-status-indicator>
 							</div>
