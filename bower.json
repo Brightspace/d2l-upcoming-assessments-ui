@@ -6,7 +6,7 @@
     "app-localize-behavior": "PolymerElements/app-localize-behavior#^1.0.2",
     "d2l-colors": "^2.2.3",
     "d2l-date-picker": "~0.0.12",
-    "d2l-fetch-siren-entity-behavior": "Brightspace/d2l-fetch-siren-entity-behavior#^3.0.0",
+    "d2l-fetch-siren-entity-behavior": "Brightspace/d2l-fetch-siren-entity-behavior#^4.0.0",
     "d2l-hm-constants-behavior": "Brightspace/d2l-hm-constants-behavior#^3.0.0",
     "d2l-icons": "^3.1.2",
     "d2l-intl": "^0.4.1",
