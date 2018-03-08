@@ -13,11 +13,33 @@
 		<style>
 			:host {
 				display: block;
+			}
+
+			.assessment-info {
+				display: flex;
 				margin: 10px auto;
 				background-color: var(--d2l-color-white);
 				border: 1px var(--d2l-color-titanius) solid;
 				border-radius: 4px;
-				padding: 20px 0;
+				padding: 30px;
+			}
+
+			.assessment-info.has-activity-details:hover {
+				border-color: var(--d2l-color-celestine);
+				cursor: pointer;
+			}
+
+			.assessment-info.has-activity-details:hover .assessment-title,
+			.assessment-info.has-activity-details:hover .activity-icon {
+				color: var(--d2l-color-celestine);
+			}
+
+			.assessment-info.has-activity-details:hover .assessment-title {
+				text-decoration: underline var(--d2l-color-celestine);
+			}
+
+			.activity-info-container {
+				width: 100%;
 			}
 
 			.assessment-title {
@@ -51,7 +73,14 @@
 			}
 
 			.activity-icon, .spacer {
-				flex: 0 0 100px;
+				flex: 0 0 30px;
+				margin-right: 30px;
+			}
+
+			:host-context([dir="rtl"]) .activity-icon,
+			:host-context([dir="rtl"]) .spacer {
+				margin-right: 0;
+				margin-left: 30px;
 			}
 
 			d2l-status-indicator:not([hidden]) {
@@ -117,12 +146,33 @@
 				}
 			}
 
-			[hidden] {
-				display: none;
+			.indicator-container {
+				display: flex;
+				align-items: center;
+				margin-left: 30px;
+				width: 20px;
 			}
 
-			.clickable:hover {
-				cursor: pointer;
+			:host-context([dir="rtl"]) .indicator-container {
+				margin-left: 0;
+				margin-right: 30px;
+			}
+
+			d2l-icon.indicator-icon {
+				--d2l-icon-height: 20px;
+				--d2l-icon-width: 20px;
+			}
+
+			:host-context([dir="rtl"]) d2l-icon.indicator-icon {
+				margin-right: -20px;
+			}
+
+			.assessment-info.has-activity-details:hover d2l-icon.indicator-icon {
+				color: var(--d2l-color-celestine);
+			}
+
+			[hidden] {
+				display: none;
 			}
 
 		</style>
@@ -131,32 +181,37 @@
 			role$="[[_getAssessmentInfoRole(_canOpenActivityDetails)]]"
 			on-tap="_openActivityDetails"
 			on-keydown="_onKeydownOpenActivityDetails">
-			<div class="row">
-				<div class="activity-info">
-					<d2l-icon class="activity-icon" icon="[[assessmentIcon]]"></d2l-icon>
-					<div class="info-container">
-						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
-						<div class="meta-info">
-							<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
-							<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
-							<div class="meta-info" hidden$="[[!_showOverdue]]">
-								<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]"></d2l-status-indicator>
-							</div>
-							<div class="meta-text" hidden$="[[!_showEndsText]]">
-								<div class="meta-text emphasis">[[_endsText]]</div>
+			<div class="activity-info-container">
+				<div class="row">
+					<div class="activity-info">
+						<d2l-icon class="activity-icon" icon="[[assessmentIcon]]"></d2l-icon>
+						<div class="info-container">
+							<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+							<div class="meta-info">
+								<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
+								<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
+								<div class="meta-info" hidden$="[[!_showOverdue]]">
+									<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]"></d2l-status-indicator>
+								</div>
+								<div class="meta-text" hidden$="[[!_showEndsText]]">
+									<div class="meta-text emphasis">[[_endsText]]</div>
+									<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+								</div>
+								<d2l-status-indicator state="null" text="[[localize('activityEnded')]]" hidden$="[[!_showEnded]]"></d2l-status-indicator>
+								<div class="meta-text course-name">[[assessmentItem.courseName]]</div>
 								<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+								<div class="meta-text">[[assessmentType]]</div>
 							</div>
-							<d2l-status-indicator state="null" text="[[localize('activityEnded')]]" hidden$="[[!_showEnded]]"></d2l-status-indicator>
-							<div class="meta-text course-name">[[assessmentItem.courseName]]</div>
-							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-							<div class="meta-text">[[assessmentType]]</div>
 						</div>
 					</div>
 				</div>
+				<div class="row info-row">
+					<div class="spacer"></div>
+					<div class="info">[[assessmentItem.info]]</div>
+				</div>
 			</div>
-			<div class="row info-row">
-				<div class="spacer"></div>
-				<div class="info">[[assessmentItem.info]]</div>
+			<div class="indicator-container" hidden$="[[!_canOpenActivityDetails]]">
+				<d2l-icon class="indicator-icon" icon="d2l-tier3:chevron-right" aria-hidden="true"></d2l-icon>
 			</div>
 		</div>
 	</template>
@@ -293,9 +348,11 @@
 		},
 
 		_getAssessmentInfoCssClassNames: function(canOpenActivityDetails) {
+			var classNames = 'assessment-info';
 			if (canOpenActivityDetails) {
-				return 'clickable';
+				classNames = classNames + ' has-activity-details';
 			}
+			return classNames
 		},
 
 		_getAssessmentInfoTabIndex: function(canOpenActivityDetails) {
