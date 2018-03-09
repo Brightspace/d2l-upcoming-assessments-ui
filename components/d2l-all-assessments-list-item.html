@@ -45,7 +45,6 @@
 			.assessment-title {
 				@apply --d2l-heading-3;
 				margin: 0;
-				margin-bottom: -5px;
 			}
 
 			.row {
@@ -149,13 +148,16 @@
 			.indicator-container {
 				display: flex;
 				align-items: center;
-				margin-left: 30px;
+				padding-left: 30px;
+				margin-left: auto;
 				width: 20px;
 			}
 
 			:host-context([dir="rtl"]) .indicator-container {
+				padding-left: 0;
 				margin-left: 0;
-				margin-right: 30px;
+				padding-right: 30px;
+				margin-right: auto;
 			}
 
 			d2l-icon.indicator-icon {
@@ -185,8 +187,16 @@
 				<div class="row">
 					<div class="activity-info">
 						<d2l-icon class="activity-icon" icon="[[assessmentIcon]]"></d2l-icon>
+						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
+						<div class="indicator-container" hidden$="[[!_canOpenActivityDetails]]">
+							<d2l-icon class="indicator-icon" icon="d2l-tier3:chevron-right" aria-hidden="true"></d2l-icon>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="spacer"></div>
+					<div class="activity-info">
 						<div class="info-container">
-							<h3 class="assessment-title">[[assessmentItem.name]]</h3>
 							<div class="meta-info">
 								<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
 								<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
@@ -209,9 +219,6 @@
 					<div class="spacer"></div>
 					<div class="info">[[assessmentItem.info]]</div>
 				</div>
-			</div>
-			<div class="indicator-container" hidden$="[[!_canOpenActivityDetails]]">
-				<d2l-icon class="indicator-icon" icon="d2l-tier3:chevron-right" aria-hidden="true"></d2l-icon>
 			</div>
 		</div>
 	</template>
