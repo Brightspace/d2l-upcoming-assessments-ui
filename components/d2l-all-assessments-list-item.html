@@ -52,6 +52,15 @@
 				align-items: center;
 			}
 
+			.row.meta-row {
+				flex-direction: row;
+				margin-top: 5px;
+			}
+
+			.row.meta-row .meta-info .spacer {
+				display: none;
+			}
+
 			.meta-text {
 				@apply --d2l-body-standard-text;
 				font-size: 0.7rem;
@@ -108,7 +117,6 @@
 
 			.meta-info {
 				display: inline-flex;
-				flex: 1;
 				align-items: center;
 			}
 
@@ -133,6 +141,12 @@
 				padding-left: 30px;
 			}
 
+			@media (min-width: 768px) {
+				.row.meta-row > .spacer {
+					display: block;
+				}
+			}
+
 			@media (max-width: 767px) {
 				:host {
 					border-radius: 0px;
@@ -141,6 +155,22 @@
 				}
 
 				.info-row {
+					display: none;
+				}
+
+				.row.meta-row {
+					flex-direction: column;
+				}
+
+				.row.meta-row .meta-info {
+					width: 100%;
+				}
+
+				.row.meta-row .meta-info .spacer {
+					display: block;
+				}
+
+				.row.meta-row .meta-text .separator-icon {
 					display: none;
 				}
 			}
@@ -193,26 +223,24 @@
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="spacer"></div>
-					<div class="activity-info">
-						<div class="info-container">
-							<div class="meta-info">
-								<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
-								<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
-								<div class="meta-info" hidden$="[[!_showOverdue]]">
-									<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]"></d2l-status-indicator>
-								</div>
-								<div class="meta-text" hidden$="[[!_showEndsText]]">
-									<div class="meta-text emphasis">[[_endsText]]</div>
-									<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-								</div>
-								<d2l-status-indicator state="null" text="[[localize('activityEnded')]]" hidden$="[[!_showEnded]]"></d2l-status-indicator>
-								<div class="meta-text course-name">[[assessmentItem.courseName]]</div>
-								<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-								<div class="meta-text">[[assessmentType]]</div>
-							</div>
+				<div class="row meta-row">
+					<div class="spacer" hidden></div>
+					<div class="meta-info">
+						<div class="spacer"></div>
+						<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
+						<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
+						<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]" hidden$="[[!_showOverdue]]"></d2l-status-indicator>
+						<div class="meta-text" hidden$="[[!_showEndsText]]">
+							<div class="meta-text emphasis">[[_endsText]]</div>
+							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 						</div>
+						<d2l-status-indicator state="null" text="[[localize('activityEnded')]]" hidden$="[[!_showEnded]]"></d2l-status-indicator>
+					</div>
+					<div class="meta-info">
+						<div class="spacer"></div>
+						<div class="meta-text course-name">[[assessmentItem.courseName]]</div>
+						<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+						<div class="meta-text">[[assessmentType]]</div>
 					</div>
 				</div>
 				<div class="row info-row">
