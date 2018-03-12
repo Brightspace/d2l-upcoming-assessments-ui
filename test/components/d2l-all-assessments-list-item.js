@@ -81,11 +81,11 @@ describe('<d2l-all-assessments-list-item>', function() {
 
 						it('should show Overdue badge correctly', function() {
 							var overdueInfo = element.$$('d2l-status-indicator[state="alert"]');
-							expect(overdueInfo.parentElement).to.exist;
+							expect(overdueInfo).to.exist;
 
 							!isCompleted && isOverdue && !isEnded
-								? expect(overdueInfo.parentElement.getAttribute('hidden')).to.be.null
-								: expect(overdueInfo.parentElement.getAttribute('hidden')).to.not.be.null;
+								? expect(overdueInfo.getAttribute('hidden')).to.be.null
+								: expect(overdueInfo.getAttribute('hidden')).to.not.be.null;
 						});
 
 						it('should show Closed badge correctly', function() {
