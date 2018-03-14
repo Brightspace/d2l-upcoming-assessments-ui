@@ -52,12 +52,12 @@
 				align-items: center;
 			}
 
-			.row.meta-row {
+			.meta-container {
 				flex-direction: row;
 				margin-top: 5px;
 			}
 
-			.row.meta-row .meta-info .spacer {
+			.meta-container .meta-info .spacer {
 				display: none;
 			}
 
@@ -106,15 +106,6 @@
 				align-items: center;
 			}
 
-			.info-container {
-				padding-right: 10px;
-			}
-
-			:host-context([dir="rtl"]) .info-container  {
-				padding-right: 0;
-				padding-left: 10px;
-			}
-
 			.meta-info {
 				display: inline-flex;
 				align-items: center;
@@ -142,7 +133,7 @@
 			}
 
 			@media (min-width: 768px) {
-				.row.meta-row > .spacer {
+				.meta-container > .spacer {
 					display: block;
 				}
 			}
@@ -158,19 +149,19 @@
 					display: none;
 				}
 
-				.row.meta-row {
+				.meta-container {
 					flex-direction: column;
 				}
 
-				.row.meta-row .meta-info {
+				.meta-container .meta-info {
 					width: 100%;
 				}
 
-				.row.meta-row .meta-info .spacer {
+				.meta-container .meta-info .spacer {
 					display: block;
 				}
 
-				.row.meta-row .meta-text .separator-icon {
+				.meta-container .meta-text .separator-icon {
 					display: none;
 				}
 			}
@@ -223,7 +214,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="row meta-row">
+				<div class="row meta-container">
 					<div class="spacer" hidden></div>
 					<div class="meta-info">
 						<div class="spacer"></div>
