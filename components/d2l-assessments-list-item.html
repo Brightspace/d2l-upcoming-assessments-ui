@@ -20,6 +20,11 @@
 				background-color: var(--d2l-color-white);
 			}
 
+			.activity-container {
+				display: flex;
+				width: 100%;
+			}
+
 			.assessment-title {
 				@apply --d2l-heading-3;
 				margin: 0;
@@ -94,32 +99,52 @@
 			.assessment-details {
 				margin-top: 0.2rem;
 			}
+
+			.has-activity-details:hover,
+			.has-activity-details:focus {
+				cursor: pointer;
+			}
+
+			.has-activity-details:hover .assessment-title,
+			.has-activity-details:focus .assessment-title {
+				color: var(--d2l-color-celestine);
+				outline-width: 0;
+				text-decoration: underline;
+			}
+
+			.has-activity-details:hover .activity-icon,
+			.has-activity-details:focus .activity-icon {
+				color: var(--d2l-color-celestine);
+			}
+
 		</style>
-			<div class="activity-info">
-				<div class="activity-icon-container">
-					<d2l-icon class="activity-icon" icon="[[_getAssessmentIcon(assessmentItem)]]"></d2l-icon>
-				</div>
-				<div class="info-container">
-					<h3 class="assessment-title">{{assessmentItem.name}}</h3>
-					<div class="assessment-info">
-						<div class="course-name">{{assessmentItem.courseName}}</div>
-						<div class="assessment-details">
-							<div class="assessment-type">[[_getAssessmentType(assessmentItem)]]</div>
-							<template is="dom-if" if="[[_hasDueDate(assessmentItem)]]">
-								<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-								<div class="date">[[_getDueDateString(assessmentItem.dueDate)]]</div>
-							</template>
-							<template is="dom-if" if="[[_showEndDate(assessmentItem)]]">
-								<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
-								<div class="date">[[_getEndDateString(assessmentItem.endDate)]]</div>
-							</template>
+			<div class="activity-container">
+				<div class="activity-info">
+					<div class="activity-icon-container">
+						<d2l-icon class="activity-icon" icon="[[_getAssessmentIcon(assessmentItem)]]"></d2l-icon>
+					</div>
+					<div class="info-container">
+						<h3 class="assessment-title">{{assessmentItem.name}}</h3>
+						<div class="assessment-info">
+							<div class="course-name">{{assessmentItem.courseName}}</div>
+							<div class="assessment-details">
+								<div class="assessment-type">[[_getAssessmentType(assessmentItem)]]</div>
+								<template is="dom-if" if="[[_hasDueDate(assessmentItem)]]">
+									<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+									<div class="date">[[_getDueDateString(assessmentItem.dueDate)]]</div>
+								</template>
+								<template is="dom-if" if="[[_showEndDate(assessmentItem)]]">
+									<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
+									<div class="date">[[_getEndDateString(assessmentItem.endDate)]]</div>
+								</template>
+							</div>
 						</div>
 					</div>
 				</div>
+				<template is="dom-if" if="[[_isCompleted(assessmentItem)]]">
+					<iron-icon class="completion-icon" icon="d2l-tier1:check"></iron-icon>
+				</template>
 			</div>
-			<template is="dom-if" if="[[_isCompleted(assessmentItem)]]">
-				<iron-icon class="completion-icon" icon="d2l-tier1:check"></iron-icon>
-			</template>
 	</template>
 
 	<script>
@@ -130,7 +155,16 @@
 		is: 'd2l-assessments-list-item',
 
 		properties: {
-			assessmentItem: Object
+			assessmentItem: Object,
+			activityDetailsEnabled: {
+				type: Boolean,
+				value: false
+			},
+			_canOpenActivityDetails: {
+				type: Boolean,
+				computed: '_computeCanOpenActivityDetails(assessmentItem, activityDetailsEnabled)',
+				observer: '_canOpenActivityDetailsUpdated'
+			}
 		},
 
 		behaviors: [
@@ -190,6 +224,43 @@
 			if (assessmentItem.type === 'assignment') return this.localize('assignment');
 			if (assessmentItem.type === 'quiz') return this.localize('quiz');
 			return '';
+		},
+
+		_computeCanOpenActivityDetails: function(assessmentItem, activityDetailsEnabled) {
+			return activityDetailsEnabled && assessmentItem.type === 'assignment' && !!assessmentItem.userActivityUsageHref;
+		},
+
+		_canOpenActivityDetailsUpdated: function() {
+			var activityContainer = this.$$('.activity-container');
+			var self = this;
+			var event = new CustomEvent('open-immersive-page', {
+				bubbles: true,
+				detail: {
+					pageName: 'activity-details',
+					userActivityUsageHref: this.assessmentItem.userActivityUsageHref
+				}
+			});
+
+			var onTap = function() { self.dispatchEvent(event); };
+			var onKeydown = function(e) {
+				if (e.keyCode === 13 || e.keyCode === 32) {
+					self.dispatchEvent(event);
+				}
+			};
+
+			if (this._canOpenActivityDetails) {
+				activityContainer.classList.add('has-activity-details');
+				activityContainer.setAttribute('role', 'link');
+				activityContainer.setAttribute('tabIndex', 0);
+				activityContainer.addEventListener('tap', onTap);
+				activityContainer.addEventListener('keydown', onKeydown);
+			} else {
+				activityContainer.classList.remove('has-activity-details');
+				activityContainer.removeAttribute('role', 'link');
+				activityContainer.removeAttribute('tabIndex', 0);
+				activityContainer.removeEventListener('tap', onTap);
+				activityContainer.removeEventListener('keydown', onKeydown);
+			}
 		}
 
 	});

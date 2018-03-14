@@ -14,7 +14,10 @@
 			}
 		</style>
 		<template is="dom-repeat" items="[[assessmentItems]]">
-			<d2l-assessments-list-item assessment-item="[[item]]"></d2l-assessments-list-item>
+			<d2l-assessments-list-item
+				assessment-item="[[item]]"
+				activity-details-enabled="[[activityDetailsEnabled]]">
+			</d2l-assessments-list-item>
 		</template>
 	</template>
 	<script>
@@ -30,6 +33,10 @@
 					value: function() {
 						return [];
 					}
+				},
+				activityDetailsEnabled: {
+					type: Boolean,
+					value: false
 				}
 			}
 

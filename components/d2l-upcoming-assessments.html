@@ -116,7 +116,10 @@
 			</div>
 
 			<template is="dom-if" if="[[_showUpcomingAssessments(_assessments, _showError)]]">
-				<d2l-assessments-list assessment-items=[[_assessments]]></d2l-assessments-list>
+				<d2l-assessments-list
+					assessment-items=[[_assessments]]
+					activity-details-enabled=[[activityDetailsEnabled]]>
+				</d2l-assessments-list>
 			</template>
 
 			<div hidden$="[[!_showError]]" class="error-message">[[localize('errorMessage')]]</div>
@@ -153,6 +156,10 @@
 					readOnly: true,
 					reflectToAttribute: true,
 					value: 0
+				},
+				activityDetailsEnabled: {
+					type: Boolean,
+					value: false
 				},
 				_assessments: {
 					type: Array,

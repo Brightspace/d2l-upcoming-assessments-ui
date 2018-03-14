@@ -4,39 +4,65 @@
 
 describe('<d2l-assessments-list-item>', function() {
 
+	var element, sandbox;
+
 	function nowish(modifierDays) {
 		var date = new Date();
 		date.setDate(date.getDate() + modifierDays);
 		return date;
 	}
 
-	var quizItem = {
-		'name': 'Math Quiz',
-		'courseName': 'Math',
-		'instructionsText': 'Do the math quiz pls, k thx.',
-		'itemType': 'Quiz',
-		'type': 'quiz',
-		'dueDate': '2017-04-06'
-	};
+	// sets and return activity item
+	function setActivityItem(type, completed, userActivityUsageHref) {
+		var capitalizedType = type && type[0].toUpperCase() + type.slice(1);
+		var activityItem = {
+			name: 'Math ' + capitalizedType,
+			courseName: 'Math',
+			instructionsText: 'Do the math ' + type + ' pls. k thx.',
+			itemType: capitalizedType,
+			type: type,
+			dueDate: '2017-04-06',
+			isCompleted: completed,
+			userActivityUsageHref: userActivityUsageHref
+		};
 
-	var assignmentItem = {
-		'name': 'Math Assignment',
-		'courseName': 'Math',
-		'instructionsText': 'Do the math assignment pls, k thx.',
-		'itemType': 'Assignment',
-		'type': 'assignment',
-		'dueDate': '2017-04-06'
-	};
+		element.assessmentItem = activityItem;
+		Polymer.dom.flush();
 
-	var completedAssessmentItem = {
-		'name': 'Math Quiz',
-		'courseName': 'Math',
-		'instructionsText': 'Do the math quiz pls, k thx.',
-		'itemType': 'Quiz',
-		'type': 'quiz',
-		'dueDate': '2017-04-06',
-		'isCompleted': true
-	};
+		return activityItem;
+	}
+
+	function getEvent(type) {
+		var event;
+		switch (type) {
+			case 'click':
+				event = document.createEvent('MouseEvents');
+				event.initEvent('tap', true, true);
+				return event;
+			case 'enter':
+				event = document.createEvent('Event');
+				event.keyCode = 13;
+				event.initEvent('keydown');
+				return event;
+			case 'space':
+				event = document.createEvent('Event');
+				event.keyCode = 32;
+				event.initEvent('keydown');
+				return event;
+			case 'tab':
+				event = document.createEvent('Event');
+				event.keyCode = 9;
+				event.initEvent('keydown');
+				return event;
+			default:
+				return;
+		}
+	}
+
+	beforeEach(function() {
+		element = fixture('basic');
+		sandbox = sinon.sandbox.create();
+	});
 
 	describe('smoke test', function() {
 
@@ -50,9 +76,7 @@ describe('<d2l-assessments-list-item>', function() {
 	describe('item rendering', function() {
 
 		it('renders the correct data for a quiz', function() {
-			var element = fixture('basic');
-
-			element.set('assessmentItem', quizItem);
+			var quizItem = setActivityItem('quiz');
 
 			expect(element.$$('.assessment-title').textContent).to.equal(quizItem.name);
 			expect(element.$$('.course-name').textContent).to.equal(quizItem.courseName);
@@ -61,9 +85,7 @@ describe('<d2l-assessments-list-item>', function() {
 		});
 
 		it('renders the correct data for an assignment', function() {
-			var element = fixture('basic');
-
-			element.set('assessmentItem', assignmentItem);
+			var assignmentItem = setActivityItem('assignment');
 
 			expect(element.$$('.assessment-title').textContent).to.equal(assignmentItem.name);
 			expect(element.$$('.course-name').textContent).to.equal(assignmentItem.courseName);
@@ -72,18 +94,14 @@ describe('<d2l-assessments-list-item>', function() {
 		});
 
 		it('has a completion checkmark when completed', function() {
-			var element = fixture('basic');
-
-			element.set('assessmentItem', completedAssessmentItem);
+			setActivityItem('assignment', true);
 			element.$$('template').render();
 
 			expect(element.$$('.completion-icon')).to.exist;
 		});
 
 		it('doesn\'t have a completion checkmark when not completed', function() {
-			var element = fixture('basic');
-
-			element.set('assessmentItem', quizItem);
+			setActivityItem('quiz');
 			element.$$('template').render();
 
 			expect(element.$$('.completion-icon')).to.not.exist;
@@ -98,9 +116,68 @@ describe('<d2l-assessments-list-item>', function() {
 			{ date: nowish(5), dateStr: 'date within the week', result: /^Due.*(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day.*$/ }
 		].forEach(function(testCase) {
 			it('returns correct string for ' + testCase.dateStr, function() {
-				var element = fixture('basic');
 				var relativeDateString = element._getDateString(testCase.date, 'dueDateShort', 'dueDate');
 				expect(relativeDateString).to.match(testCase.result);
+			});
+		});
+	});
+
+	describe('opening activity details', function() {
+		var container;
+
+		beforeEach(function() {
+			element.dispatchEvent = sandbox.stub();
+			container = element.$$('.activity-container');
+		});
+
+		[
+			{ assignmentLocation: '/path/to/userActivityUsageAssignment', activityDetailsEnabled: false, event: 'click' },
+			{ assignmentLocation: '/path/to/userActivityUsageAssignment', activityDetailsEnabled: false, event: 'enter' },
+			{ assignmentLocation: '/path/to/userActivityUsageAssignment', activityDetailsEnabled: false, event: 'space' },
+			{ assignmentLocation: null, activityDetailsEnabled: true, event: 'click' },
+			{ assignmentLocation: null, activityDetailsEnabled: true, event: 'enter' },
+			{ assignmentLocation: null, activityDetailsEnabled: true, event: 'space' },
+			{ assignmentLocation: '/path/to/userActivityUsageAssignment', activityDetailsEnabled: true, event: 'tab' }
+		].forEach(testCase => {
+			it(`should not dispatch event if assignment details enabled is ${testCase.activityDetailsEnabled}, userActivityUsageHref is ${testCase.assignmentLocation}, and event is ${testCase.event}`, function() {
+				setActivityItem('assignment', false, testCase.assignmentLocation);
+				element.activityDetailsEnabled = testCase.activityDetailsEnabled;
+				var processedEvent = getEvent(testCase.event);
+				container.dispatchEvent(processedEvent, true);
+				expect(element.dispatchEvent).to.not.be.called;
+			});
+		});
+
+		[
+			{ event: 'click' },
+			{ event: 'enter' },
+			{ event: 'space' }
+		].forEach(testCase => {
+			it(`should not dispatch event for non-assignment grade items and event is ${testCase.event}`, function() {
+				element.activityDetailsEnabled = true;
+				var processedEvent = getEvent(testCase.event);
+
+				setActivityItem('quiz', false, '/path/to/userActivityUsageQuiz');
+				container.dispatchEvent(processedEvent);
+				expect(element.dispatchEvent).to.not.be.called;
+
+				setActivityItem(null, false, null);
+				container.dispatchEvent(processedEvent);
+				expect(element.dispatchEvent).to.not.be.called;
+			});
+		});
+
+		[
+			{ event: 'click' },
+			{ event: 'enter' },
+			{ event: 'space' }
+		].forEach(testCase => {
+			it(`should dispatch event when all conditions are met and event is ${testCase.event}`, function() {
+				element.activityDetailsEnabled = true;
+				setActivityItem('assignment', false, '/path/to/userActivityUsageAssignment');
+				var processedEvent = getEvent(testCase.event);
+				container.dispatchEvent(processedEvent);
+				expect(element.dispatchEvent).to.have.been.calledOnce;
 			});
 		});
 	});
