@@ -256,7 +256,7 @@
 
 				var upcomingActivities = activities
 					.filter(function(activity) {
-						return this.isActivityUpcoming(activity);
+						return this.isActivityUpcoming(activity) && !activity.isExempt;
 					}.bind(this));
 				this._setTotalCount(upcomingActivities.length);
 

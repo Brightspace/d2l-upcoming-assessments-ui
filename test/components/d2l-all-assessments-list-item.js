@@ -21,7 +21,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 		return date;
 	}
 
-	function setAssessmentItem(isCompleted, isDueToday, isOverdue, isEnded, type, userActivityUsageHref) {
+	function setAssessmentItem(isCompleted, isDueToday, isOverdue, isEnded, isExempt, type, userActivityUsageHref) {
 		// If due today, 0; if overdue, negative; otherwise, positive
 		var dueDateModifier = isDueToday ? 0 : isOverdue ? -3 : 3;
 		var endDateModifier = isEnded ? -1 : 5;
@@ -36,6 +36,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 			isDueToday: isDueToday,
 			isOverdue: isOverdue,
 			isEnded: isEnded,
+			isExempt: isExempt,
 			type: type || 'assignment',
 			userActivityUsageHref: userActivityUsageHref || null
 		};
@@ -54,47 +55,71 @@ describe('<d2l-all-assessments-list-item>', function() {
 				var overdueString = dueTodayString + ' and is ' + (isOverdue ? '' : 'not') + ' overdue';
 
 				[true, false].forEach(function(isEnded) {
-					var testName = overdueString + ' and is ' + (isEnded ? '' : 'not') + ' ended';
 
-					describe('when activity' + testName, function() {
-						beforeEach(function() {
-							setAssessmentItem(isCompleted, isDueToday, isOverdue, isEnded);
-						});
+					var endedString = overdueString + ' and is ' + (isEnded ? '' : 'not') + ' ended';
 
-						it('should show Complete activity badge correctly', function() {
-							var completionInfo = element.$$('d2l-status-indicator[state="success"]');
-							expect(completionInfo).to.exist;
+					[true, false].forEach(function(isExempt) {
+						var testName = endedString + ' and is ' + (isExempt ? '' : 'not') + ' exempt';
 
-							isCompleted
-								? expect(completionInfo.getAttribute('hidden')).to.be.null
-								: expect(completionInfo.getAttribute('hidden')).to.not.be.null;
-						});
+						describe('when activity' + testName, function() {
+							beforeEach(function() {
+								setAssessmentItem(isCompleted, isDueToday, isOverdue, isEnded, isExempt);
+							});
 
-						it('should show Due Today badge correctly', function() {
-							var dueTodayInfo = element.$$('d2l-status-indicator[state="default"]');
-							expect(dueTodayInfo).to.exist;
+							it('should show Complete activity badge correctly', function() {
+								var completionAndExempt = element.querySelectorAll('d2l-status-indicator[state="success"]');
 
-							!isCompleted && isDueToday && !isOverdue
-								? expect(dueTodayInfo.getAttribute('hidden')).to.be.null
-								: expect(dueTodayInfo.getAttribute('hidden')).to.not.be.null;
-						});
+								var completionInfo = Array.prototype.slice.call(completionAndExempt)
+									.find(function(statusIndicator) {
+										return statusIndicator.firstElementChild.textContent.includes('Complete');
+									});
+								expect(completionInfo).to.exist;
 
-						it('should show Overdue badge correctly', function() {
-							var overdueInfo = element.$$('d2l-status-indicator[state="alert"]');
-							expect(overdueInfo).to.exist;
+								isCompleted && !isExempt
+									? expect(completionInfo.getAttribute('hidden')).to.be.null
+									: expect(completionInfo.getAttribute('hidden')).to.not.be.null;
+							});
 
-							!isCompleted && isOverdue && !isEnded
-								? expect(overdueInfo.getAttribute('hidden')).to.be.null
-								: expect(overdueInfo.getAttribute('hidden')).to.not.be.null;
-						});
+							it('should show Due Today badge correctly', function() {
+								var dueTodayInfo = element.$$('d2l-status-indicator[state="default"]');
+								expect(dueTodayInfo).to.exist;
 
-						it('should show Closed badge correctly', function() {
-							var endedInfo = element.$$('d2l-status-indicator[state="null"]');
-							expect(endedInfo).to.exist;
+								!isCompleted && isDueToday && !isOverdue && !isExempt
+									? expect(dueTodayInfo.getAttribute('hidden')).to.be.null
+									: expect(dueTodayInfo.getAttribute('hidden')).to.not.be.null;
+							});
 
-							!isCompleted && isEnded
-								? expect(endedInfo.getAttribute('hidden')).to.be.null
-								: expect(endedInfo.getAttribute('hidden')).to.not.be.null;
+							it('should show Overdue badge correctly', function() {
+								var overdueInfo = element.$$('d2l-status-indicator[state="alert"]');
+								expect(overdueInfo).to.exist;
+
+								!isCompleted && isOverdue && !isEnded && !isExempt
+									? expect(overdueInfo.getAttribute('hidden')).to.be.null
+									: expect(overdueInfo.getAttribute('hidden')).to.not.be.null;
+							});
+
+							it('should show Closed badge correctly', function() {
+								var endedInfo = element.$$('d2l-status-indicator[state="null"]');
+								expect(endedInfo).to.exist;
+
+								!isCompleted && isEnded && !isExempt
+									? expect(endedInfo.getAttribute('hidden')).to.be.null
+									: expect(endedInfo.getAttribute('hidden')).to.not.be.null;
+							});
+
+							it('should show Exempted badge correctly', function() {
+								var completionAndExempt = element.querySelectorAll('d2l-status-indicator[state="success"]');
+
+								var exemptInfo = Array.prototype.slice.call(completionAndExempt)
+									.find(function(statusIndicator) {
+										return statusIndicator.firstElementChild.textContent.includes('Exempted');
+									});
+								expect(exemptInfo).to.exist;
+
+								isExempt
+									? expect(exemptInfo.getAttribute('hidden')).to.be.null
+									: expect(exemptInfo.getAttribute('hidden')).to.not.be.null;
+							});
 						});
 					});
 				});
@@ -131,28 +156,28 @@ describe('<d2l-all-assessments-list-item>', function() {
 		});
 
 		it('should not dispatch event if activity details is not enabled', function() {
-			setAssessmentItem(false, false, false, false, 'assignment', '/user/activity/url');
+			setAssessmentItem(false, false, false, false, false, 'assignment', '/user/activity/url');
 			element.assignmentDetailsEnabled = false;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
 		it('should not dispatch event for non-assignment assessment items', function() {
-			setAssessmentItem(false, false, false, false, 'quiz');
+			setAssessmentItem(false, false, false, false, false, 'quiz');
 			element.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
 		it('should not dispatch event if userActivityUsageHref is null', function() {
-			setAssessmentItem(false, false, false, false, 'assignment');
+			setAssessmentItem(false, false, false, false, false, 'assignment');
 			element.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
 		it('should dispatch event when all conditions are met', function() {
-			setAssessmentItem(false, false, false, false, 'assignment', '/user/activity/url');
+			setAssessmentItem(false, false, false, false, false, 'assignment', '/user/activity/url');
 			element.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.be.called;

@@ -61,6 +61,26 @@ describe('<d2l-upcoming-assessments>', function() {
 				element._getUpcomingAssessments([1, 2, 3, 4, 5, 6]);
 				expect(element._assessments.toString()).to.equal([1, 2, 3].toString());
 			});
+
+			it('should not display exempted assessments', function() {
+				element.isActivityUpcoming = sandbox.stub().returns(true);
+
+				element._getUpcomingAssessments([
+					{
+						name: 1,
+						isExempt: false
+					}, {
+						name: 2,
+						isExempt: true
+					}
+				]);
+				expect(element._assessments.toString()).to.equal([
+					{
+						name: 1,
+						isExempt: false
+					}
+				].toString());
+			});
 		});
 
 	});

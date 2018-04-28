@@ -156,6 +156,7 @@
 				var completionState = self._getCompletionState.call(self, userActivityUsage);
 				var dueDateState = self._getDueDateState.call(self, userActivityUsage, overdueUserUsages);
 				var endDateState = self._getEndDateState.call(self, userActivityUsage);
+				var isExempt = userActivityUsage.hasClass(self.HypermediaClasses.activities.exempt);
 
 				var userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
@@ -186,6 +187,7 @@
 							isDueToday: dueDateState.isDueToday,
 							isOverdue: dueDateState.isOverdue,
 							isEnded: endDateState.isEnded,
+							isExempt: isExempt,
 							type: type,
 							userActivityUsageHref: userActivityUsageHref
 						};

@@ -35,7 +35,7 @@ describe('d2l upcoming assessments behavior', function() {
 		return window.D2L.Hypermedia.Siren.Parse(entity);
 	}
 
-	function getUserActivityUsage(type, isComplete) {
+	function getUserActivityUsage(type, isComplete, isExempt) {
 		var activityRel;
 		if (type === 'quiz') {
 			activityRel = 'https://api.brightspace.com/rels/quiz';
@@ -43,8 +43,13 @@ describe('d2l upcoming assessments behavior', function() {
 			activityRel = 'https://api.brightspace.com/rels/assignment';
 		}
 
+		var classList = ['activity', 'user-' + type + '-activity'];
+		if (isExempt) {
+			classList.push('exempt');
+		}
+
 		var entity = {
-			class: ['activity', 'user-' + type + '-activity'],
+			class: classList,
 			entities: [{
 				class: ['due-date'],
 				properties: { date: dueDate },
@@ -430,7 +435,18 @@ describe('d2l upcoming assessments behavior', function() {
 					expect(response[0].isDueToday).to.equal(false);
 					expect(response[0].isOverdue).to.equal(true);
 					expect(response[0].isEnded).to.equal(false);
+					expect(response[0].isExempt).to.equal(false);
 					expect(response[0].type).to.equal('assignment');
+				});
+		});
+
+		it('should return isExempt is true when exempt', function() {
+			userUsage = getUserActivityUsage('assignment', false, true);
+			userUsages = parse({ entities: [userUsage] });
+
+			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+				.then(function(response) {
+					expect(response[0].isExempt).to.equal(true);
 				});
 		});
 	});
