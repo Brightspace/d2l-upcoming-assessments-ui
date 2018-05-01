@@ -306,11 +306,11 @@
 			this._updateAssessmentIcon(assessmentItem);
 			this._updateAssessmentType(assessmentItem);
 
-			this._showComplete = assessmentItem.isCompleted && !assessmentItem.isExempt;
+			this._showComplete = assessmentItem.isCompleted;
 			this._showDueToday = !assessmentItem.isCompleted && assessmentItem.isDueToday && !assessmentItem.isOverdue && !assessmentItem.isExempt;
 			this._showOverdue = !assessmentItem.isCompleted && !assessmentItem.isEnded && assessmentItem.isOverdue && !assessmentItem.isExempt;
-			this._showEnded = !assessmentItem.isCompleted && assessmentItem.isEnded && !assessmentItem.isExempt;
-			this._showExempt = assessmentItem.isExempt;
+			this._showEnded = !assessmentItem.isCompleted && assessmentItem.isEnded;
+			this._showExempt = !assessmentItem.isCompleted && !assessmentItem.isEnded && assessmentItem.isExempt;
 
 			if (assessmentItem.endDate) {
 				var relativeDateString = this._getRelativeDateString(assessmentItem.endDate);
