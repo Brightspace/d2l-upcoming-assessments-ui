@@ -42,6 +42,7 @@ describe('<d2l-upcoming-assessments>', function() {
 
 			it('should set the assessments', function() {
 				element.isActivityUpcoming = sandbox.stub().returns(true);
+				element._isActivityExempted = sandbox.stub().returns(false);
 				element._getInfo = sandbox.stub().returns(Promise.resolve());
 
 				element._getUpcomingAssessments([1, 2, 3]);
@@ -50,6 +51,7 @@ describe('<d2l-upcoming-assessments>', function() {
 
 			it('should set the assessments count', function() {
 				element.isActivityUpcoming = sandbox.stub().returns(true);
+				element._isActivityExempted = sandbox.stub().returns(false);
 
 				element._getUpcomingAssessments([1, 2, 3]);
 				expect(element.totalCount).to.equal(3);
@@ -57,29 +59,10 @@ describe('<d2l-upcoming-assessments>', function() {
 
 			it('should truncate the assessments at 3', function() {
 				element.isActivityUpcoming = sandbox.stub().returns(true);
+				element._isActivityExempted = sandbox.stub().returns(false);
 
 				element._getUpcomingAssessments([1, 2, 3, 4, 5, 6]);
 				expect(element._assessments.toString()).to.equal([1, 2, 3].toString());
-			});
-
-			it('should not display exempted assessments', function() {
-				element.isActivityUpcoming = sandbox.stub().returns(true);
-
-				element._getUpcomingAssessments([
-					{
-						name: 1,
-						isExempt: false
-					}, {
-						name: 2,
-						isExempt: true
-					}
-				]);
-				expect(element._assessments.toString()).to.equal([
-					{
-						name: 1,
-						isExempt: false
-					}
-				].toString());
 			});
 		});
 
