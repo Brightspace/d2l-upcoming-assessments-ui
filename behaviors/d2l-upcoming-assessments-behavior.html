@@ -410,7 +410,7 @@
 			return statusConfig;
 		},
 
-		_isActivityExempted(activity) {
+		_isActivityExempted: function(activity) {
 			return activity.statusConfig.text === this._exemptedText;
 		}
 	};
