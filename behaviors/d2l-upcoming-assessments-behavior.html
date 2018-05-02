@@ -408,6 +408,10 @@
 			}
 
 			return statusConfig;
+		},
+
+		_isActivityExempted(activity) {
+			return activity.statusConfig.text === this._exemptedText;
 		}
 	};
 
