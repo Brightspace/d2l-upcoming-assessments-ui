@@ -214,15 +214,11 @@
 					<div class="spacer" hidden></div>
 					<div class="meta-info">
 						<div class="spacer"></div>
-						<d2l-status-indicator state="success" text="[[localize('activityComplete')]]" hidden$="[[!_showComplete]]"></d2l-status-indicator>
-						<d2l-status-indicator state="default" text="[[localize('activityDueToday')]]" hidden$="[[!_showDueToday]]"></d2l-status-indicator>
-						<d2l-status-indicator state="alert" text="[[localize('activityOverdue')]]" hidden$="[[!_showOverdue]]"></d2l-status-indicator>
-						<d2l-status-indicator state="success" text="[[localize('activityExempted')]]" hidden$="[[!_showExempt]]"></d2l-status-indicator>
+						<d2l-status-indicator state="[[_statusConfig.state]]" text="[[localize(_statusConfig.text)]]" hidden$="[[!_statusConfig]]"></d2l-status-indicator>
 						<div class="meta-text" hidden$="[[!_showEndsText]]">
 							<div class="meta-text emphasis">[[_endsText]]</div>
 							<iron-icon class="separator-icon" icon="d2l-tier1:bullet"></iron-icon>
 						</div>
-						<d2l-status-indicator state="null" text="[[localize('activityEnded')]]" hidden$="[[!_showEnded]]"></d2l-status-indicator>
 					</div>
 					<div class="meta-info">
 						<div class="spacer"></div>
@@ -263,25 +259,9 @@
 				value: ''
 			},
 			_endsText: String,
-			_showComplete: {
-				type: Boolean,
-				value: false
-			},
-			_showDueToday: {
-				type: Boolean,
-				value: false
-			},
-			_showOverdue: {
-				type: Boolean,
-				value: false
-			},
-			_showEnded: {
-				type: Boolean,
-				value: false
-			},
-			_showExempt: {
-				type: Boolean,
-				value: false
+			_statusConfig: {
+				type: Object,
+				value: null
 			},
 			_showEndsText: {
 				type: Boolean,
@@ -306,11 +286,7 @@
 			this._updateAssessmentIcon(assessmentItem);
 			this._updateAssessmentType(assessmentItem);
 
-			this._showComplete = assessmentItem.isCompleted;
-			this._showDueToday = !assessmentItem.isCompleted && assessmentItem.isDueToday && !assessmentItem.isOverdue && !assessmentItem.isExempt;
-			this._showOverdue = !assessmentItem.isCompleted && !assessmentItem.isEnded && assessmentItem.isOverdue && !assessmentItem.isExempt;
-			this._showEnded = !assessmentItem.isCompleted && assessmentItem.isEnded;
-			this._showExempt = !assessmentItem.isCompleted && !assessmentItem.isEnded && assessmentItem.isExempt;
+			this._statusConfig = assessmentItem.statusConfig;
 
 			if (assessmentItem.endDate) {
 				var relativeDateString = this._getRelativeDateString(assessmentItem.endDate);

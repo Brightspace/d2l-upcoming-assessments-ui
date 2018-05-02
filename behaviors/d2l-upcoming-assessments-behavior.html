@@ -37,7 +37,27 @@
 			_previousPeriodUrl: String,
 			_nextPeriodUrl: String,
 			_periodStart: String,
-			_periodEnd: String
+			_periodEnd: String,
+			_completeText: {
+				type: String,
+				value: 'activityComplete'
+			},
+			_endedText: {
+				type: String,
+				value: 'activityEnded'
+			},
+			_exemptedText: {
+				type: String,
+				value: 'activityExempted'
+			},
+			_overdueText: {
+				type: String,
+				value: 'activityOverdue'
+			},
+			_dueTodayText: {
+				type: String,
+				value: 'activityDueToday'
+			}
 		},
 
 		_getCompletionState: function(userActivityUsage) {
@@ -78,6 +98,12 @@
 			return {
 				endDate: endDate,
 				isEnded: activityIsEnded
+			};
+		},
+
+		_getExemptState: function(userActivityUsage) {
+			return {
+				isExempt: userActivityUsage.hasClass(this.HypermediaClasses.activities.exempt)
 			};
 		},
 
@@ -156,7 +182,15 @@
 				var completionState = self._getCompletionState.call(self, userActivityUsage);
 				var dueDateState = self._getDueDateState.call(self, userActivityUsage, overdueUserUsages);
 				var endDateState = self._getEndDateState.call(self, userActivityUsage);
-				var isExempt = userActivityUsage.hasClass(self.HypermediaClasses.activities.exempt);
+				var exemptState = self._getExemptState.call(self, userActivityUsage);
+
+				var statusConfig = self._createStatusConfig(
+					completionState.isCompleted,
+					endDateState.isEnded,
+					exemptState.isExempt,
+					dueDateState.isOverdue,
+					dueDateState.isDueToday
+				);
 
 				var userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
@@ -183,11 +217,7 @@
 							info: info,
 							dueDate: dueDateState.dueDate,
 							endDate: endDateState.endDate,
-							isCompleted: completionState.isCompleted,
-							isDueToday: dueDateState.isDueToday,
-							isOverdue: dueDateState.isOverdue,
-							isEnded: endDateState.isEnded,
-							isExempt: isExempt,
+							statusConfig: statusConfig,
 							type: type,
 							userActivityUsageHref: userActivityUsageHref
 						};
@@ -345,6 +375,39 @@
 			}).join('&');
 
 			return queryString ? action.href + '?' + queryString : action.href;
+		},
+
+		_createStatusConfig: function(isCompleted, isEnded, isExempt, isOverdue, isDueToday) {
+			var statusConfig = null;
+
+			if (isCompleted) {
+				statusConfig = {
+					state: 'success',
+					text: this._completeText
+				};
+			} else if (isEnded) {
+				statusConfig = {
+					state: 'null',
+					text: this._endedText
+				};
+			} else if (isExempt) {
+				statusConfig = {
+					state: 'success',
+					text: this._exemptedText
+				};
+			} else if (isOverdue) {
+				statusConfig = {
+					state: 'alert',
+					text: this._overdueText
+				};
+			} else if (isDueToday) {
+				statusConfig = {
+					state: 'default',
+					text: this._dueTodayText
+				};
+			}
+
+			return statusConfig;
 		}
 	};
 
