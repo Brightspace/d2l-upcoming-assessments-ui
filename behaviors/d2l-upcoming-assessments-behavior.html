@@ -37,28 +37,14 @@
 			_previousPeriodUrl: String,
 			_nextPeriodUrl: String,
 			_periodStart: String,
-			_periodEnd: String,
-			_completeText: {
-				type: String,
-				value: 'activityComplete'
-			},
-			_endedText: {
-				type: String,
-				value: 'activityEnded'
-			},
-			_exemptedText: {
-				type: String,
-				value: 'activityExempted'
-			},
-			_overdueText: {
-				type: String,
-				value: 'activityOverdue'
-			},
-			_dueTodayText: {
-				type: String,
-				value: 'activityDueToday'
-			}
+			_periodEnd: String
 		},
+
+		_completeText: 'activityComplete',
+		_endedText: 'activityEnded',
+		_exemptedText: 'activityExempted',
+		_overdueText: 'activityOverdue',
+		_dueTodayText: 'activityDueToday',
 
 		_getCompletionState: function(userActivityUsage) {
 			return {
