@@ -32,6 +32,7 @@
     "webcomponentsjs": "^0.7.0",
     "d2l-colors": "^2.2.3",
     "d2l-icons": "^4.10.0",
-    "iron-iconset-svg": "^2.1.0"
+    "iron-iconset-svg": "^2.1.0",
+    "iron-meta": "^2.1.1"
   }
 }
