@@ -118,12 +118,12 @@
 				var startDateDate = new Date(this._periodStart);
 				var endDateDate = new Date(this._periodEnd);
 
-				var startDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(startDateDate);
+				var startDateString = this.formatDate(startDateDate, { format: 'monthDay' });
 				var endDateString;
 				if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
 					endDateString = endDateDate.getDate();
 				} else {
-					endDateString = new window.d2lIntl.DateTimeFormat(this.locale, { format: 'monthDay' }).format(endDateDate);
+					endDateString = this.formatDate(endDateDate, { format: 'monthDay' });
 				}
 
 				this._currentPeriodText = this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
