@@ -1,17 +1,17 @@
 <link rel="import" href="../../d2l-localize-behavior/d2l-localize-behavior.html">
-<link rel="import" href="../lang/ar.html">
-<link rel="import" href="../lang/en.html">
-<link rel="import" href="../lang/de.html">
-<link rel="import" href="../lang/es.html">
-<link rel="import" href="../lang/fr.html">
-<link rel="import" href="../lang/ja.html">
-<link rel="import" href="../lang/ko.html">
-<link rel="import" href="../lang/nl.html">
-<link rel="import" href="../lang/pt.html">
-<link rel="import" href="../lang/sv.html">
-<link rel="import" href="../lang/tr.html">
-<link rel="import" href="../lang/zh-tw.html">
-<link rel="import" href="../lang/zh.html">
+<link rel="import" href="../build/langterms/ar.html">
+<link rel="import" href="../build/langterms/de.html">
+<link rel="import" href="../build/langterms/en.html">
+<link rel="import" href="../build/langterms/es.html">
+<link rel="import" href="../build/langterms/fr.html">
+<link rel="import" href="../build/langterms/ja.html">
+<link rel="import" href="../build/langterms/ko.html">
+<link rel="import" href="../build/langterms/nl.html">
+<link rel="import" href="../build/langterms/pt.html">
+<link rel="import" href="../build/langterms/sv.html">
+<link rel="import" href="../build/langterms/tr.html">
+<link rel="import" href="../build/langterms/zh-TW.html">
+<link rel="import" href="../build/langterms/zh.html">
 
 <script>
 	'use strict';
@@ -21,7 +21,6 @@
 		window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
 
 		/*
-		* Behavior for elements that require localization, based on `app-localize-behavior`
 		* @polymerBehavior window.D2L.UpcomingAssessments.LocalizeBehavior
 		*/
 		window.D2L.UpcomingAssessments.LocalizeBehaviorImpl = {
@@ -29,9 +28,9 @@
 				resources: {
 					value: function() {
 						return {
-							'en': this.en,
 							'ar': this.ar,
 							'de': this.de,
+							'en': this.en,
 							'es': this.es,
 							'fr': this.fr,
 							'ja': this.ja,
@@ -41,7 +40,7 @@
 							'sv': this.sv,
 							'tr': this.tr,
 							'zh': this.zh,
-							'zh-tw': this.zhTw
+							'zh-TW': this['zh-TW']
 						};
 					}
 				}
@@ -52,19 +51,19 @@
 		window.D2L.UpcomingAssessments.LocalizeBehavior = [
 			D2L.PolymerBehaviors.LocalizeBehavior,
 			window.D2L.UpcomingAssessments.LocalizeBehaviorImpl,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangArBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangEnBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangDeBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangEsBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangFrBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangJaBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangKoBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangNlBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangPtBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangSvBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangTrBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangZhTwBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior.LangZhBehavior
+			window.D2L.UpcomingAssessments.LangArBehavior,
+			window.D2L.UpcomingAssessments.LangDeBehavior,
+			window.D2L.UpcomingAssessments.LangEnBehavior,
+			window.D2L.UpcomingAssessments.LangEsBehavior,
+			window.D2L.UpcomingAssessments.LangFrBehavior,
+			window.D2L.UpcomingAssessments.LangJaBehavior,
+			window.D2L.UpcomingAssessments.LangKoBehavior,
+			window.D2L.UpcomingAssessments.LangNlBehavior,
+			window.D2L.UpcomingAssessments.LangPtBehavior,
+			window.D2L.UpcomingAssessments.LangSvBehavior,
+			window.D2L.UpcomingAssessments.LangTrBehavior,
+			window.D2L.UpcomingAssessments.LangZhTWBehavior,
+			window.D2L.UpcomingAssessments.LangZhBehavior
 		];
 	})();
 </script>

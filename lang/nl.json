@@ -1,0 +1,23 @@
+{
+  "activityComplete": "Voltooien",
+  "activityDueToday": "Moet vandaag af",
+  "activityEnded": "Gesloten",
+  "activityExempted": "Exempted",
+  "activityOverdue": "Achterstallig",
+  "assignment": "Opdracht",
+  "closeSimpleOverlayText": "Terug naar dashboard",
+  "closeSimpleOverlayTextMobile": "Dashboard",
+  "currentPeriod": "{startDate} - {endDate}",
+  "dueDateShort": "Uiterste datum {dueDate}",
+  "dueDateLongImminent": "{prefix}: {dueDate}",
+  "endDateShort": "Eindigt op {endDate}",
+  "errorMessage": "Er lijkt een probleem op te treden bij het laden van deze widget. We zijn ermee bezig en zullen het probleem zo spoedig mogelijk verhelpen.",
+  "goNextText": "volgende",
+  "goPreviousText": "vorige",
+  "noAssessmentsInThisTimeFrame": "{userName} heeft geen werk dat binnen dit tijdskader af moet zijn.",
+  "noUpcomingAssessments": "{userName} heeft geen werk dat in de komende 2 weken af moet zijn.",
+  "quiz": "Test",
+  "today": "Vandaag",
+  "tomorrow": "Morgen",
+  "viewAllAssignments": "Al het werk weergeven"
+}

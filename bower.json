@@ -1,5 +1,6 @@
 {
   "name": "d2l-upcoming-assessments",
+  "version": "4.0.0",
   "description": "Widget to display upcoming assessments",
   "main": "d2l-upcoming-assessments.html",
   "dependencies": {

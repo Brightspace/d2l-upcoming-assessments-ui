@@ -1,0 +1,17 @@
+<script>
+	'use strict';
+
+	(function() {
+		/* eslint-disable quotes, indent */
+		window.D2L = window.D2L || {};
+		window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
+
+		/**
+		 * <%- data.comment %>
+		 * @polymerBehavior window.D2L.UpcomingAssessments.Lang<%- data.properLang %>Behavior
+		 */
+		window.D2L.UpcomingAssessments.Lang<%- data.properLang %>Behavior = {
+			'<%- data.lang %>': <%- data.resources %>
+		};
+	})();
+</script>

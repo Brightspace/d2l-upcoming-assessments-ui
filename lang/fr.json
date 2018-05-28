@@ -1,0 +1,23 @@
+{
+  "activityComplete": "Terminer",
+  "activityDueToday": "À remettre aujourd’hui",
+  "activityEnded": "Fermé",
+  "activityExempted": "Exempted",
+  "activityOverdue": "En retard",
+  "assignment": "Travail",
+  "closeSimpleOverlayText": "Retour au tableau de bord",
+  "closeSimpleOverlayTextMobile": "Tableau de bord",
+  "currentPeriod": "{startDate} - {endDate}",
+  "dueDateShort": "Échéance {dueDate}",
+  "dueDateLongImminent": "{prefix} : {dueDate}",
+  "endDateShort": "Prend fin le {endDate}",
+  "errorMessage": "Il semble y avoir un problème de chargement de ce composant graphique. Nous travaillons à remédier au problème le plus vite possible.",
+  "goNextText": "suivant",
+  "goPreviousText": "précédent",
+  "noAssessmentsInThisTimeFrame": "{userName} n'a aucun travail à remettre durant cette période.",
+  "noUpcomingAssessments": "{userName} n'a aucun travail à remettre au cours des deux prochaines semaines.",
+  "quiz": "Questionnaire",
+  "today": "Aujourd'hui",
+  "tomorrow": "Demain",
+  "viewAllAssignments": "Afficher tous les travaux"
+}

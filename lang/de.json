@@ -1,0 +1,23 @@
+{
+  "activityComplete": "Abgeschlossen",
+  "activityDueToday": "Heute fällig",
+  "activityEnded": "Geschlossen",
+  "activityExempted": "Exempted",
+  "activityOverdue": "Überfällig",
+  "assignment": "Übung",
+  "closeSimpleOverlayText": "Zurück zum Dashboard",
+  "closeSimpleOverlayTextMobile": "Dashboard",
+  "currentPeriod": "{startDate} – {endDate}",
+  "dueDateShort": "Abgabetermin: {dueDate}",
+  "dueDateLongImminent": "{prefix}: {dueDate}",
+  "endDateShort": "Endet am {endDate}",
+  "errorMessage": "Offenbar gibt es ein Problem beim Laden dieses Widgets. Wir arbeiten daran und werden es so schnell wie möglich beheben.",
+  "goNextText": "weiter",
+  "goPreviousText": "zurück",
+  "noAssessmentsInThisTimeFrame": "{userName} haben in diesem Zeitraum keine fälligen Übungen.",
+  "noUpcomingAssessments": "{userName} haben in den nächsten zwei Wochen keine fälligen Übungen.",
+  "quiz": "Test",
+  "today": "Heute",
+  "tomorrow": "Morgen",
+  "viewAllAssignments": "Alle Arbeiten anzeigen"
+}
