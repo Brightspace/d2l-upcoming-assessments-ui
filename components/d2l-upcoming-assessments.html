@@ -11,6 +11,12 @@
 <link rel="import" href="d2l-assessments-list.html">
 <link rel="import" href="d2l-date-dropdown.html">
 
+<!--
+	`d2l-upcoming-assessments`
+	A Widget for viewing upcoming assessments
+
+	@demo demo/d2l-upcoming-assessments.html
+-->
 <dom-module id="d2l-upcoming-assessments">
 	<template>
 		<style>
@@ -125,15 +131,14 @@
 			<div hidden$="[[!_showError]]" class="error-message">[[localize('errorMessage')]]</div>
 		</div>
 
-		<a class="view-all-assignments-link"
-			is="d2l-link"
+		<d2l-link class="view-all-assignments-link"
 			href="javascript:void(0);"
 			on-tap="openAllAssignmentsView"
 			on-keypress="_keypressOpenAllAssignmentsView"
 			hidden$=[[_showError]]
 			tabindex="0">
 			<h3>[[localize('viewAllAssignments')]]</h3>
-		</a>
+	</d2l-link>
 	</template>
 
 	<script>

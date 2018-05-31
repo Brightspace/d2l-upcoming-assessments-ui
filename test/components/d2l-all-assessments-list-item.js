@@ -45,7 +45,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 		it('should not display the badge when statusConfig is null', function() {
 			setAssessmentItem(false, false, false, null, 'assignment', 'https://example.com');
 			var statusBadge = element.$$('d2l-status-indicator');
-			expect(statusBadge.text).to.eql(null);
+			expect(statusBadge.text || '').to.eql('');
 			expect(statusBadge.state).to.eql(undefined);
 		});
 

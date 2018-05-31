@@ -1,4 +1,4 @@
-<link rel="import" href="../../app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../../d2l-localize-behavior/d2l-localize-behavior.html">
 <link rel="import" href="../lang/ar.html">
 <link rel="import" href="../lang/en.html">
 <link rel="import" href="../lang/de.html">
@@ -26,19 +26,6 @@
 		*/
 		window.D2L.UpcomingAssessments.LocalizeBehaviorImpl = {
 			properties: {
-				language: {
-					type: String,
-					computed: '_determineLanguage(locale, resources)'
-				},
-				locale: {
-					type: String,
-					value: function() {
-						return document.documentElement.lang
-							|| document.documentElement.getAttribute('data-lang-default')
-							|| 'en-us';
-					}
-				},
-				useKeyIfMissing: true,
 				resources: {
 					value: function() {
 						return {
@@ -58,27 +45,12 @@
 						};
 					}
 				}
-			},
-			_determineLanguage: function(locale, resources) {
-				locale = locale.toLowerCase();
-
-				if (resources[locale]) {
-					return locale;
-				}
-
-				var langAndRegion = locale.split('-');
-
-				if (resources[langAndRegion[0]]) {
-					return langAndRegion[0];
-				}
-
-				return 'en';
 			}
 		};
 
 		/* @polymerBehavior */
 		window.D2L.UpcomingAssessments.LocalizeBehavior = [
-			Polymer.AppLocalizeBehavior,
+			D2L.PolymerBehaviors.LocalizeBehavior,
 			window.D2L.UpcomingAssessments.LocalizeBehaviorImpl,
 			window.D2L.UpcomingAssessments.LocalizeBehavior.LangArBehavior,
 			window.D2L.UpcomingAssessments.LocalizeBehavior.LangEnBehavior,

@@ -17,7 +17,7 @@ describe('<d2l-date-dropdown>', function() {
 	describe('value', function() {
 		describe('value tests', function() {
 			it('should default value to empty', function() {
-				expect(elem.value).to.be.empty;
+				expect(elem.value || '').to.equal('');
 				expect(elem.hasAttribute('value')).to.be.true;
 			});
 			it('should set property when setting attribute', function() {
@@ -28,12 +28,12 @@ describe('<d2l-date-dropdown>', function() {
 				elem.value = '2017-07-01';
 				expect(elem.getAttribute('value')).to.equal('2017-07-01');
 			});
-			it('should set vaadin picker when element value set', function() {
+			it('should set d2l date picker when element value set', function() {
 				elem.value = '2017-06-01';
-				expect(elem.$$('vaadin-date-picker-light').value).to.equal('2017-06-01');
+				expect(elem.$$('d2l-date-picker').value).to.equal('2017-06-01');
 			});
-			it('should set element value when vaadin picker value set', function() {
-				elem.$$('vaadin-date-picker-light').value = '2017-07-01';
+			it('should set element value when date picker value set', function() {
+				elem.$$('d2l-date-picker').value = '2017-07-01';
 				expect(elem.value).to.equal('2017-07-01');
 			});
 		});

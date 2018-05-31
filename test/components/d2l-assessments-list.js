@@ -58,25 +58,30 @@ describe('<d2l-assessments-list>', function() {
 
 	describe('list rendering', function() {
 
-		it('renders the correct number of list items', function() {
+		it('renders the correct number of list items', function(done) {
 			element.set('assessmentItems', assessmentItems);
-			element.$$('template').render();
-
-			var listElements = Polymer.dom(element.root).querySelectorAll('d2l-assessments-list-item');
-
-			expect(listElements.length).to.equal(assessmentItems.length);
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				var listElements = Polymer.dom(element.root).querySelectorAll('d2l-assessments-list-item');
+				expect(listElements.length).to.equal(assessmentItems.length);
+				done();
+			});
 		});
 
-		it('re-renders the list when a new set of items is supplied', function() {
+		it('re-renders the list when a new set of items is supplied', function(done) {
 			element.set('assessmentItems', assessmentItems);
-			element.$$('template').render();
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				var template = element.$$('template');
+				template && template.render && template.render();
 
-			element.set('assessmentItems', newAssessmentItems);
-			element.$$('template').render();
+				element.set('assessmentItems', newAssessmentItems);
+				Polymer.RenderStatus.afterNextRender(element, () => {
+					template && template.render && template.render();
 
-			var listElements = Polymer.dom(element.root).querySelectorAll('d2l-assessments-list-item');
-
-			expect(listElements.length).to.equal(newAssessmentItems.length);
+					var listElements = Polymer.dom(element.root).querySelectorAll('d2l-assessments-list-item');
+					expect(listElements.length).to.equal(newAssessmentItems.length);
+					done();
+				});
+			});
 		});
 
 	});

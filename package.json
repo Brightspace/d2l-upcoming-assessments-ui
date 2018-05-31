@@ -1,16 +1,16 @@
 {
   "name": "d2l-upcoming-assessments",
-  "version": "2.9.0",
+  "version": "3.0.0",
   "description": "A widget to display upcoming assessments for a given user",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "postinstall": "bower install",
+    "postinstall": "polymer install --variants",
     "test": "npm run test:lint:js && npm run test:lint:wc && npm run test:wct",
     "test:local": "npm run test:lint:js && npm run test:lint:wc && npm run test:wct:local",
-    "test:lint:js": "eslint --ext .js,.html . behaviors/ components/ demo/ lang/ test/",
+    "test:lint:js": "eslint --ext .js,.html behaviors/ components/ demo/ lang/ test/",
     "test:lint:wc": "polymer lint",
     "test:wct": "polymer test -p",
     "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test -p --skip-plugin sauce"
@@ -29,12 +29,11 @@
   },
   "homepage": "https://github.com/Brightspace/upcoming-assessments-ui#readme",
   "devDependencies": {
-    "bower": "^1.8.0",
     "cross-env": "^5.0.1",
     "eslint": "^4.13.1",
     "eslint-config-brightspace": "^0.4.0",
     "eslint-config-google": "^0.9.1",
-    "eslint-plugin-html": "^4.0.1",
+    "eslint-plugin-html": "~4.0.1",
     "frau-ci": "^1.33.2",
     "polymer-cli": "~1.6.0",
     "web-component-tester": "^6.5.0"

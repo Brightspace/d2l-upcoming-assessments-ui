@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+	<head>
+		<title>d2l-all-assessments demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+		<link rel="import" href="../../d2l-typography/d2l-typography.html">
+		<link rel="import" href="../components/d2l-all-assessments.html">
+		<custom-style include="d2l-typography">
+			<style is="custom-style" include="d2l-typography"></style>
+		</custom-style>
+		<style>
+			d2l-all-assessments {
+				display: block;
+			    height: 100%;
+				box-shadow: 1px 1px 10px gray;
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body unresolved class="d2l-typography">
+		<dom-module id="d2l-all-assessments-demo">
+			<template>
+				<d2l-all-assessments user-url="[[userUrl]]" get-token="[[getToken]]" assignment-details-enabled></d2l-all-assessments>
+			</template>
+			<script>
+				Polymer({
+					is: 'd2l-all-assessments-demo',
+					properties: {
+						userUrl: {
+							type: String,
+							value: ''
+						},
+						getToken: {
+							type: Function,
+							value: function() {
+								return function() {
+									return Promise.resolve('');
+								};
+							}
+						}
+					}
+				});
+			</script>
+		</dom-module>
+		<div>
+			<h2>All Assessments</h2>
+			<demo-snippet>
+				<template>
+					<d2l-all-assessments-demo>
+					</d2l-all-assessments-demo>
+				</template>
+			</demo-snippet>
+		</div>
+	</body>
+</html>

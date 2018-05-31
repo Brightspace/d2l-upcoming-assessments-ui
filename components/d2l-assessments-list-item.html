@@ -227,11 +227,16 @@
 		},
 
 		_computeCanOpenActivityDetails: function(assessmentItem, activityDetailsEnabled) {
-			return activityDetailsEnabled && assessmentItem.type === 'assignment' && !!assessmentItem.userActivityUsageHref;
+			return activityDetailsEnabled
+				&& assessmentItem
+				&& assessmentItem.type === 'assignment'
+				&& !!assessmentItem.userActivityUsageHref;
 		},
 
 		_canOpenActivityDetailsUpdated: function() {
-			var activityContainer = this.$$('.activity-container');
+			if (!this.assessmentItem) {
+				return;
+			}
 			var self = this;
 			var event = new CustomEvent('open-immersive-page', {
 				bubbles: true,
@@ -248,6 +253,7 @@
 				}
 			};
 
+			var activityContainer = this.$$('.activity-container');
 			if (this._canOpenActivityDetails) {
 				activityContainer.classList.add('has-activity-details');
 				activityContainer.setAttribute('role', 'link');

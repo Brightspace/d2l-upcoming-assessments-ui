@@ -75,36 +75,44 @@ describe('<d2l-assessments-list-item>', function() {
 
 	describe('item rendering', function() {
 
-		it('renders the correct data for a quiz', function() {
+		it('renders the correct data for a quiz', function(done) {
 			var quizItem = setActivityItem('quiz');
 
-			expect(element.$$('.assessment-title').textContent).to.equal(quizItem.name);
-			expect(element.$$('.course-name').textContent).to.equal(quizItem.courseName);
-			expect(element.$$('.assessment-type').textContent).to.equal(quizItem.itemType);
-			expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:quizzing');
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				expect(element.$$('.assessment-title').textContent).to.equal(quizItem.name);
+				expect(element.$$('.course-name').textContent).to.equal(quizItem.courseName);
+				expect(element.$$('.assessment-type').textContent).to.equal(quizItem.itemType);
+				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:quizzing');
+				done();
+			});
 		});
 
-		it('renders the correct data for an assignment', function() {
+		it('renders the correct data for an assignment', function(done) {
 			var assignmentItem = setActivityItem('assignment');
 
-			expect(element.$$('.assessment-title').textContent).to.equal(assignmentItem.name);
-			expect(element.$$('.course-name').textContent).to.equal(assignmentItem.courseName);
-			expect(element.$$('.assessment-type').textContent).to.equal(assignmentItem.itemType);
-			expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:assignments');
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				expect(element.$$('.assessment-title').textContent).to.equal(assignmentItem.name);
+				expect(element.$$('.course-name').textContent).to.equal(assignmentItem.courseName);
+				expect(element.$$('.assessment-type').textContent).to.equal(assignmentItem.itemType);
+				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:assignments');
+				done();
+			});
 		});
 
-		it('has a completion checkmark when completed', function() {
+		it('has a completion checkmark when completed', function(done) {
 			setActivityItem('assignment', true);
-			element.$$('template').render();
-
-			expect(element.$$('.completion-icon')).to.exist;
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				expect(element.$$('.completion-icon')).to.exist;
+				done();
+			});
 		});
 
-		it('doesn\'t have a completion checkmark when not completed', function() {
+		it('doesn\'t have a completion checkmark when not completed', function(done) {
 			setActivityItem('quiz');
-			element.$$('template').render();
-
-			expect(element.$$('.completion-icon')).to.not.exist;
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				expect(element.$$('.completion-icon')).to.not.exist;
+				done();
+			});
 		});
 
 	});
@@ -153,17 +161,22 @@ describe('<d2l-assessments-list-item>', function() {
 			{ event: 'enter' },
 			{ event: 'space' }
 		].forEach(testCase => {
-			it(`should not dispatch event for non-assignment grade items and event is ${testCase.event}`, function() {
+			it(`should not dispatch event for non-assignment grade items and event is ${testCase.event}`, function(done) {
 				element.activityDetailsEnabled = true;
 				var processedEvent = getEvent(testCase.event);
 
 				setActivityItem('quiz', false, '/path/to/userActivityUsageQuiz');
 				container.dispatchEvent(processedEvent);
-				expect(element.dispatchEvent).to.not.be.called;
+				Polymer.RenderStatus.afterNextRender(element, () => {
+					expect(element.dispatchEvent).to.not.be.called;
 
-				setActivityItem(null, false, null);
-				container.dispatchEvent(processedEvent);
-				expect(element.dispatchEvent).to.not.be.called;
+					setActivityItem(null, false, null);
+					container.dispatchEvent(processedEvent);
+					Polymer.RenderStatus.afterNextRender(element, () => {
+						expect(element.dispatchEvent).to.not.be.called;
+						done();
+					});
+				});
 			});
 		});
 
