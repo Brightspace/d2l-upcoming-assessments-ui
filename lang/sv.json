@@ -8,6 +8,7 @@
   "closeSimpleOverlayText": "Tillbaka till instrumentpanelen",
   "closeSimpleOverlayTextMobile": "Instrumentpanel",
   "currentPeriod": "{startDate} – {endDate}",
+  "discussion": "Discussion",
   "dueDateShort": "Förfallodatum {dueDate}",
   "dueDateLongImminent": "{prefix}: {dueDate}",
   "endDateShort": "Slutar {endDate}",

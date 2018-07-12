@@ -87,6 +87,18 @@ describe('<d2l-assessments-list-item>', function() {
 			});
 		});
 
+		it('renders the correct data for a discussion', function(done) {
+			var discussionItem = setActivityItem('discussion');
+
+			Polymer.RenderStatus.afterNextRender(element, () => {
+				expect(element.$$('.assessment-title').textContent).to.equal(discussionItem.name);
+				expect(element.$$('.course-name').textContent).to.equal(discussionItem.courseName);
+				expect(element.$$('.assessment-type').textContent).to.equal(discussionItem.itemType);
+				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:discussions');
+				done();
+			});
+		});
+
 		it('renders the correct data for an assignment', function(done) {
 			var assignmentItem = setActivityItem('assignment');
 

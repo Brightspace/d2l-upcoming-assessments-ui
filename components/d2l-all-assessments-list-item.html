@@ -324,11 +324,13 @@
 			var icon = 'd2l-tier3:';
 			if (assessmentItem.type === 'assignment') this.assessmentIcon = icon + 'assignments';
 			else if (assessmentItem.type === 'quiz') this.assessmentIcon = icon + 'quizzing';
+			else if (assessmentItem.type === 'discussion') this.assessmentIcon = icon + 'discussions';
 		},
 
 		_updateAssessmentType: function(assessmentItem) {
 			if (assessmentItem.type === 'assignment') this.assessmentType = this.localize('assignment');
 			else if (assessmentItem.type === 'quiz') this.assessmentType = this.localize('quiz');
+			else if (assessmentItem.type === 'discussion') this.assessmentType = this.localize('discussion');
 			else this.assessmentType = '';
 		},
 

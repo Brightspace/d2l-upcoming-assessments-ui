@@ -8,6 +8,7 @@
   "closeSimpleOverlayText": "ダッシュボードに戻る",
   "closeSimpleOverlayTextMobile": "ダッシュボード",
   "currentPeriod": "{startDate} ～ {endDate}",
+  "discussion": "Discussion",
   "dueDateShort": "期限 {dueDate}",
   "dueDateLongImminent": "{prefix}: {dueDate}",
   "endDateShort": "終了 {endDate}",

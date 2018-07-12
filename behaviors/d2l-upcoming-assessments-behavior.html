@@ -99,7 +99,10 @@
 				type = 'assignment';
 			} else if (activity.hasClass(this.HypermediaClasses.quizzes.quiz)) {
 				type = 'quiz';
+			} else if (activity.hasClass(this.HypermediaClasses.discussions.topic)) {
+				type = 'discussion';
 			}
+
 			return type;
 		},
 
@@ -110,7 +113,8 @@
 
 		_getActivityRequest: function(userActivityUsage, getToken, userUrl) {
 			var activityLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.assignment)
-					|| userActivityUsage.getLinkByRel(this.HypermediaRels.quiz) || {}).href;
+					|| userActivityUsage.getLinkByRel(this.HypermediaRels.quiz)
+					|| userActivityUsage.getLinkByRel(this.HypermediaRels.Discussions.topic) || {}).href;
 			return Promise.resolve(this._fetchEntityWithToken(activityLink, getToken, userUrl))
 				.catch(function(err) {
 					var status = typeof err === 'number' ? err : err && err.status;
@@ -127,6 +131,10 @@
 
 		_getQuizDescription: function(activity) {
 			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Quizzes.description));
+		},
+
+		_getDiscussionDescription: function(activity) {
+			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Discussions.description));
 		},
 
 		_getRichTextValuePreferPlainText: function(richtextEntity) {
@@ -151,15 +159,20 @@
 
 			var overdueAssignments = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userAssignmentActivity);
 			var overdueQuizzes = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userQuizActivity);
+			var overdueDiscussions = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userDiscussionActivity);
 			var overdueUserUsages = [];
 			overdueUserUsages = overdueUserUsages.concat(overdueAssignments);
 			overdueUserUsages = overdueUserUsages.concat(overdueQuizzes);
+			overdueUserUsages = overdueUserUsages.concat(overdueDiscussions);
 
 			var assignmentUserUsages = userActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userAssignmentActivity);
 			var quizUserUsages = userActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userQuizActivity);
+			var discussionUserUsages = userActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userDiscussionActivity);
+
 			var supportedUserUsages = [];
 			supportedUserUsages = supportedUserUsages.concat(assignmentUserUsages);
 			supportedUserUsages = supportedUserUsages.concat(quizUserUsages);
+			supportedUserUsages = supportedUserUsages.concat(discussionUserUsages);
 
 			supportedUserUsages.forEach(function(userActivityUsage) {
 				var organizationRequest = self._getOrganizationRequest.call(self, userActivityUsage, getToken, userUrl);
@@ -195,6 +208,8 @@
 							info = self._getQuizDescription.call(self, activity);
 						} else if (type === 'assignment') {
 							info = self._getAssignmentInstructions.call(self, activity);
+						} else if (type === 'discussion') {
+							info = self._getDiscussionDescription.call(self, activity);
 						}
 
 						return {

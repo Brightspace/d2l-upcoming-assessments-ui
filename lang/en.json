@@ -8,6 +8,7 @@
   "closeSimpleOverlayText": "Back to Dashboard",
   "closeSimpleOverlayTextMobile": "Dashboard",
   "currentPeriod": "{startDate} - {endDate}",
+  "discussion": "Discussion",
   "dueDateShort": "Due {dueDate}",
   "dueDateLongImminent": "{prefix}: {dueDate}",
   "endDateShort": "Ends {endDate}",

@@ -41,6 +41,8 @@ describe('d2l upcoming assessments behavior', function() {
 			activityRel = 'https://api.brightspace.com/rels/quiz';
 		} else if (type === 'assignment') {
 			activityRel = 'https://api.brightspace.com/rels/assignment';
+		} else if (type === 'discussion') {
+			activityRel = 'https://discussions.api.brightspace.com/rels/topic';
 		}
 
 		var classList = ['activity', 'user-' + type + '-activity'];
@@ -87,13 +89,15 @@ describe('d2l upcoming assessments behavior', function() {
 
 	function getActivity(type) {
 		var subEntities = [];
-		if (type === 'quiz') {
+		if (type === 'quiz' || type === 'discussion') {
 			subEntities.push(getDescription());
 		} else {
 			subEntities.push(getInstructions());
 		}
+		var activityClass = type === 'discussion' ? 'https://discussions.api.brightspace.com/rels/topic' : type;
+
 		var entity = {
-			class: [type],
+			class: [activityClass],
 			properties: {
 				name: activityName
 			},

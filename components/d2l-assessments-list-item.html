@@ -217,12 +217,14 @@
 			var icon = 'd2l-tier2:';
 			if (assessmentItem.type === 'assignment') return icon + 'assignments';
 			if (assessmentItem.type === 'quiz') return icon + 'quizzing';
+			if (assessmentItem.type === 'discussion') return icon + 'discussions';
 			return '';
 		},
 
 		_getAssessmentType: function(assessmentItem) {
 			if (assessmentItem.type === 'assignment') return this.localize('assignment');
 			if (assessmentItem.type === 'quiz') return this.localize('quiz');
+			if (assessmentItem.type === 'discussion') return this.localize('discussion');
 			return '';
 		},
 
