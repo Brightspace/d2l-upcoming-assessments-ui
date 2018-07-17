@@ -173,7 +173,7 @@ describe('<d2l-assessments-list-item>', function() {
 			{ event: 'enter' },
 			{ event: 'space' }
 		].forEach(testCase => {
-			it(`should not dispatch event for non-assignment grade items and event is ${testCase.event}`, function(done) {
+			it(`should not dispatch event for quiz grade items and event is ${testCase.event}`, function(done) {
 				element.activityDetailsEnabled = true;
 				var processedEvent = getEvent(testCase.event);
 
@@ -193,13 +193,16 @@ describe('<d2l-assessments-list-item>', function() {
 		});
 
 		[
-			{ event: 'click' },
-			{ event: 'enter' },
-			{ event: 'space' }
+			{ type: 'assignment', event: 'click' },
+			{ type: 'assignment', event: 'enter' },
+			{ type: 'assignment', event: 'space' },
+			{ type: 'discussion', event: 'click' },
+			{ type: 'discussion', event: 'enter' },
+			{ type: 'discussion', event: 'space' }
 		].forEach(testCase => {
-			it(`should dispatch event when all conditions are met and event is ${testCase.event}`, function() {
+			it(`should dispatch event for ${testCase.type} when all conditions are met and event is ${testCase.event}`, function() {
 				element.activityDetailsEnabled = true;
-				setActivityItem('assignment', false, '/path/to/userActivityUsageAssignment');
+				setActivityItem(testCase.type, false, '/path/to/userActivityUsageAssignment');
 				var processedEvent = getEvent(testCase.event);
 				container.dispatchEvent(processedEvent);
 				expect(element.dispatchEvent).to.have.been.calledOnce;

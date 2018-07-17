@@ -231,7 +231,7 @@
 		_computeCanOpenActivityDetails: function(assessmentItem, activityDetailsEnabled) {
 			return activityDetailsEnabled
 				&& assessmentItem
-				&& assessmentItem.type === 'assignment'
+				&& (assessmentItem.type === 'assignment' || assessmentItem.type === 'discussion')
 				&& !!assessmentItem.userActivityUsageHref;
 		},
 

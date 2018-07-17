@@ -335,7 +335,9 @@
 		},
 
 		_computeCanOpenActivityDetails: function(assessmentItem, assignmentDetailsEnabled) {
-			return assignmentDetailsEnabled && assessmentItem.type === 'assignment' && !!assessmentItem.userActivityUsageHref;
+			return assignmentDetailsEnabled
+				&& (assessmentItem.type === 'assignment' || assessmentItem.type === 'discussion')
+				&& !!assessmentItem.userActivityUsageHref;
 		},
 
 		_openActivityDetails: function() {

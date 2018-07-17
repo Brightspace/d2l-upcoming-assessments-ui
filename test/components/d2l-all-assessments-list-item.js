@@ -95,7 +95,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
-		it('should not dispatch event for non-assignment assessment items', function() {
+		it('should not dispatch event for quiz assessment items', function() {
 			setAssessmentItem(false, false, false, null, 'quiz');
 			element.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
@@ -109,8 +109,15 @@ describe('<d2l-all-assessments-list-item>', function() {
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
-		it('should dispatch event when all conditions are met', function() {
+		it('should dispatch event when all conditions are met for an assignment', function() {
 			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url');
+			element.assignmentDetailsEnabled = true;
+			element._openActivityDetails();
+			expect(element.dispatchEvent).to.be.called;
+		});
+
+		it('should dispatch event when all conditions are met for a discussion', function() {
+			setAssessmentItem(false, false, false, null, 'discussion', '/user/activity/url');
 			element.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.be.called;
