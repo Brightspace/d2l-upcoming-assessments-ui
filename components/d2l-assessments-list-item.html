@@ -231,7 +231,7 @@
 			return '';
 		},
 
-		_computeCanOpenActivityDetails: function(assessmentItem) {
+		_computeCanOpenActivityDetails: function(assessmentItem, flags) {
 			return this._canOpenItemType(assessmentItem, flags)
 				&& !!assessmentItem.userActivityUsageHref;
 		},

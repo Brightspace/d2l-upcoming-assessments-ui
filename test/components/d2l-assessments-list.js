@@ -46,6 +46,10 @@ describe('<d2l-assessments-list>', function() {
 
 	beforeEach(function() {
 		element = fixture('basic');
+		element.flags = {
+			assignmentDetailsEnabled: true,
+			discussionDetailsEnabled: true
+		};
 	});
 
 	describe('smoke test', function() {

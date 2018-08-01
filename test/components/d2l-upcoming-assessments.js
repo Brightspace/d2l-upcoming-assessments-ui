@@ -8,6 +8,10 @@ describe('<d2l-upcoming-assessments>', function() {
 
 	beforeEach(function() {
 		element = fixture('basic');
+		element.flags = {
+			assignmentDetailsEnabled: true,
+			discussionDetailsEnabled: true
+		};
 	});
 
 	describe('smoke test', function() {

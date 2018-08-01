@@ -164,8 +164,8 @@ describe('<d2l-assessments-list-item>', function() {
 			{ assignmentLocation: '/path/to/userActivityUsageAssignment', flags: { activityDetailsEnabled: true }, event: 'tab' }
 		].forEach(testCase => {
 			it(`should not dispatch event if assignment details enabled is ${testCase.flags.activityDetailsEnabled}, userActivityUsageHref is ${testCase.assignmentLocation}, and event is ${testCase.event}`, function() {
-				setActivityItem('assignment', false, testCase.assignmentLocation);
 				element.flags = testCase.flags;
+				setActivityItem('assignment', false, testCase.assignmentLocation);
 				var processedEvent = getEvent(testCase.event);
 				container.dispatchEvent(processedEvent, true);
 				expect(element.dispatchEvent).to.not.be.called;
@@ -178,7 +178,10 @@ describe('<d2l-assessments-list-item>', function() {
 			{ event: 'space' }
 		].forEach(testCase => {
 			it(`should not dispatch event for quiz grade items and event is ${testCase.event}`, function(done) {
-				element.activityDetailsEnabled = true;
+				element.flags = {
+					activityDetailsEnabled: true,
+					discussionDetailsEnabled: true
+				};
 				var processedEvent = getEvent(testCase.event);
 
 				setActivityItem('quiz', false, '/path/to/userActivityUsageQuiz');
@@ -205,7 +208,10 @@ describe('<d2l-assessments-list-item>', function() {
 			{ type: 'discussion', event: 'space' }
 		].forEach(testCase => {
 			it(`should dispatch event for ${testCase.type} when all conditions are met and event is ${testCase.event}`, function() {
-				element.activityDetailsEnabled = true;
+				element.flags = {
+					assignmentDetailsEnabled: true,
+					discussionDetailsEnabled: true
+				};
 				setActivityItem(testCase.type, false, '/path/to/userActivityUsageAssignment');
 				var processedEvent = getEvent(testCase.event);
 				container.dispatchEvent(processedEvent);
