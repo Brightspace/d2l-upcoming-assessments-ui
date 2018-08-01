@@ -124,7 +124,7 @@
 			<template is="dom-if" if="[[_showUpcomingAssessments(_assessments, _showError)]]">
 				<d2l-assessments-list
 					assessment-items=[[_assessments]]
-					activity-details-enabled=[[activityDetailsEnabled]]>
+					flags=[[flags]]>
 				</d2l-assessments-list>
 			</template>
 
@@ -162,9 +162,9 @@
 					reflectToAttribute: true,
 					value: 0
 				},
-				activityDetailsEnabled: {
-					type: Boolean,
-					value: false
+				flags: {
+					type: Object,
+					value: function() { return {}; }
 				},
 				_assessments: {
 					type: Array,

@@ -7,6 +7,10 @@ describe('<d2l-all-assessments-list-item>', function() {
 
 	beforeEach(function() {
 		element = fixture('basic');
+		element.flags = {
+			assignmentDetailsEnabled: true,
+			discussionDetailsEnabled: true
+		};
 	});
 
 	describe('smoke test', function() {
@@ -90,35 +94,35 @@ describe('<d2l-all-assessments-list-item>', function() {
 
 		it('should not dispatch event if activity details is not enabled', function() {
 			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url');
-			element.assignmentDetailsEnabled = false;
+			element.flags.assignmentDetailsEnabled = false;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
 		it('should not dispatch event for quiz assessment items', function() {
 			setAssessmentItem(false, false, false, null, 'quiz');
-			element.assignmentDetailsEnabled = true;
+			element.flags.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
 		it('should not dispatch event if userActivityUsageHref is null', function() {
 			setAssessmentItem(false, false, false, null, 'assignment');
-			element.assignmentDetailsEnabled = true;
+			element.flags.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.not.be.called;
 		});
 
 		it('should dispatch event when all conditions are met for an assignment', function() {
 			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url');
-			element.assignmentDetailsEnabled = true;
+			element.flags.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.be.called;
 		});
 
 		it('should dispatch event when all conditions are met for a discussion', function() {
 			setAssessmentItem(false, false, false, null, 'discussion', '/user/activity/url');
-			element.assignmentDetailsEnabled = true;
+			element.flags.assignmentDetailsEnabled = true;
 			element._openActivityDetails();
 			expect(element.dispatchEvent).to.be.called;
 		});

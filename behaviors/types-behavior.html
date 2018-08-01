@@ -24,7 +24,8 @@
 							userActivityUsageClass: this.HypermediaClasses.activities.userAssignmentActivity,
 							activityRel: this.HypermediaRels.assignment,
 							activityClass: this.HypermediaClasses.assignments.assignment,
-							noCompletion: false
+							noCompletion: false,
+							activityDetailsFeatureFlag: 'assignmentDetailsEnabled'
 						},
 						discussion: {
 							icon: 'discussions',
@@ -34,7 +35,8 @@
 							userActivityUsageClass: this.HypermediaClasses.activities.userDiscussionActivity,
 							activityRel: this.HypermediaRels.Discussions.topic,
 							activityClass: this.HypermediaClasses.discussions.topic,
-							noCompletion: true
+							noCompletion: true,
+							activityDetailsFeatureFlag: 'discussionDetailsEnabled'
 						},
 						quiz: {
 							icon: 'quizzing',
@@ -44,7 +46,8 @@
 							userActivityUsageClass: this.HypermediaClasses.activities.userQuizActivity,
 							activityRel: this.HypermediaRels.quiz,
 							activityClass: this.HypermediaClasses.quizzes.quiz,
-							noCompletion: false
+							noCompletion: false,
+							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 						}
 					};
 				}
@@ -64,9 +67,9 @@
 			return undefined;
 		},
 
-		_canOpenItemType: function(assessmentItem) {
-			var item = this._types[(assessmentItem || {}).type];
-			return !!((item || {}).canOpen);
+		_canOpenItemType: function(assessmentItem, flags) {
+			var item = this._types[(assessmentItem || {}).type] || {};
+			return item.canOpen && (!activityDetailsFeatureFlag || flags[item.activityDetailsFeatureFlag]);
 		}
 	};
 

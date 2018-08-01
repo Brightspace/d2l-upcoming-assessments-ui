@@ -46,7 +46,7 @@
 				assessment-items="[[_allActivities]]"
 				period-start="[[_periodStart]]"
 				period-end="[[_periodEnd]]"
-				assignment-details-enabled=[[assignmentDetailsEnabled]]>
+				flags=[[flags]]>
 			</d2l-all-assessments-list>
 		</template>
 		<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
@@ -63,9 +63,9 @@
 					computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _firstName)'
 				},
 				_currentPeriodText: String,
-				assignmentDetailsEnabled: {
-					type: Boolean,
-					value: false
+				flags: {
+					type: Object,
+					value: function() { return {}; }
 				},
 				locale: String
 			},

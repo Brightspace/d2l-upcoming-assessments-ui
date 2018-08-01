@@ -25,7 +25,11 @@
 	<body unresolved class="d2l-typography">
 		<dom-module id="d2l-all-assessments-demo">
 			<template>
-				<d2l-all-assessments user-url="[[userUrl]]" get-token="[[getToken]]" assignment-details-enabled></d2l-all-assessments>
+				<d2l-all-assessments
+					user-url="[[userUrl]]"
+					get-token="[[getToken]]"
+					flags="[[flags]]"
+				></d2l-all-assessments>
 			</template>
 			<script>
 				Polymer({
@@ -41,6 +45,13 @@
 								return function() {
 									return Promise.resolve('');
 								};
+							}
+						},
+						flags: {
+							type: Object,
+							value: {
+								assignmentDetailsEnabled: true,
+								discussionDetailsEnabled: true
 							}
 						}
 					}

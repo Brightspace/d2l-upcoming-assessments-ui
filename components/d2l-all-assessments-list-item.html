@@ -272,13 +272,13 @@
 				type: Boolean,
 				value: false
 			},
-			assignmentDetailsEnabled: {
-				type: Boolean,
-				value: false
+			flags: {
+				type: Object,
+				value: function() { return {}; }
 			},
 			_canOpenActivityDetails: {
 				type: Boolean,
-				computed: '_computeCanOpenActivityDetails(assessmentItem, assignmentDetailsEnabled)'
+				computed: '_computeCanOpenActivityDetails(assessmentItem, flags)'
 			}
 		},
 
@@ -332,10 +332,8 @@
 			this.assessmentType = item ? this.localize(item.assessmentType) : '';
 		},
 
-		// TODO: is there a discussionDetailsEnabled?
-		_computeCanOpenActivityDetails: function(assessmentItem, assignmentDetailsEnabled) {
-			return assignmentDetailsEnabled
-				&& this._canOpenItemType(assessmentItem)
+		_computeCanOpenActivityDetails: function(assessmentItem, flags) {
+			return this._canOpenItemType(assessmentItem, flags)
 				&& !!assessmentItem.userActivityUsageHref;
 		},
 

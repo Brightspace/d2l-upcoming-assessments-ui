@@ -42,7 +42,7 @@
 						<template is="dom-repeat" items="[[item.1]]">
 							<d2l-all-assessments-list-item
 								assessment-item="[[item]]"
-								assignment-details-enabled=[[assignmentDetailsEnabled]]>
+								flags=[[flags]]>
 							</d2l-assessments-list-item>
 						</template>
 					</div>
@@ -71,9 +71,9 @@
 						return [];
 					}
 				},
-				assignmentDetailsEnabled: {
-					type: Boolean,
-					value: false
+				flags: {
+					type: Object,
+					value: function() { return {}; }
 				}
 			},
 

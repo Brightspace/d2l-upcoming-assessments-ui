@@ -16,7 +16,7 @@
 		<template is="dom-repeat" items="[[assessmentItems]]">
 			<d2l-assessments-list-item
 				assessment-item="[[item]]"
-				activity-details-enabled="[[activityDetailsEnabled]]">
+				flags="[[flags]]">
 			</d2l-assessments-list-item>
 		</template>
 	</template>
@@ -34,9 +34,9 @@
 						return [];
 					}
 				},
-				activityDetailsEnabled: {
-					type: Boolean,
-					value: false
+				flags: {
+					type: Object,
+					value: function() { return {}; }
 				}
 			}
 

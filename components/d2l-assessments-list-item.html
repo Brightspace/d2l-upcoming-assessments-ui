@@ -157,13 +157,13 @@
 
 		properties: {
 			assessmentItem: Object,
-			activityDetailsEnabled: {
+			flags: {
 				type: Boolean,
 				value: false
 			},
 			_canOpenActivityDetails: {
 				type: Boolean,
-				computed: '_computeCanOpenActivityDetails(assessmentItem, activityDetailsEnabled)',
+				computed: '_computeCanOpenActivityDetails(assessmentItem, flags)',
 				observer: '_canOpenActivityDetailsUpdated'
 			}
 		},
@@ -231,9 +231,8 @@
 			return '';
 		},
 
-		_computeCanOpenActivityDetails: function(assessmentItem, activityDetailsEnabled) {
-			return activityDetailsEnabled
-				&& this._canOpenItemType(assessmentItem)
+		_computeCanOpenActivityDetails: function(assessmentItem) {
+			return this._canOpenItemType(assessmentItem, flags)
 				&& !!assessmentItem.userActivityUsageHref;
 		},
 
