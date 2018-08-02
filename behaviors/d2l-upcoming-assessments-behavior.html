@@ -1,8 +1,7 @@
-<link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../d2l-fetch-siren-entity-behavior/d2l-fetch-siren-entity-behavior.html">
-<link rel="import" href="../../d2l-hm-constants-behavior/d2l-hm-constants-behavior.html">
 <link rel="import" href="../../siren-parser-import/siren-parser.html">
 <link rel="import" href="./date-behavior.html">
+<link rel="import" href="./types-behavior.html">
+<link rel="import" href="./status-badge-behavior.html">
 
 <script>
 	'use strict';
@@ -40,81 +39,23 @@
 			_periodEnd: String
 		},
 
-		_completeText: 'activityComplete',
-		_endedText: 'activityEnded',
-		_exemptedText: 'activityExempted',
-		_overdueText: 'activityOverdue',
-		_dueTodayText: 'activityDueToday',
-
-		_getCompletionState: function(userActivityUsage) {
-			return {
-				isCompleted: !!userActivityUsage.getSubEntityByClass(this.HypermediaClasses.activities.complete)
-			};
-		},
-
-		_getDueDateState: function(userActivityUsage, overdueUserActivityUsages) {
-			var activityIsOverdue = false;
-			var activityIsDueToday = false;
-			var dueDate;
-			var dueDateEntity = userActivityUsage.getSubEntityByClass(this.HypermediaClasses.dates.dueDate);
-			if (dueDateEntity) {
-				dueDate = dueDateEntity.properties.date;
-				activityIsDueToday = this.getDateDiffInCalendarDays(dueDate) === 0;
-				activityIsOverdue = overdueUserActivityUsages.some(function(overdueUserUsage) {
-					return overdueUserUsage.getLinkByRel('self').href === userActivityUsage.getLinkByRel('self').href;
-				});
-			}
-
-			return {
-				dueDate: dueDate,
-				isOverdue: activityIsOverdue,
-				isDueToday: activityIsDueToday
-			};
-		},
-
-		_getEndDateState: function(userActivityUsage) {
-			var activityIsEnded = false;
-			var endDate;
-			var endDateEntity = userActivityUsage.getSubEntityByClass(this.HypermediaClasses.dates.endDate);
-			if (endDateEntity) {
-				endDate = endDateEntity.properties.date;
-				activityIsEnded = this.getDateDiffInCalendarDays(endDate) < 0;
-			}
-
-			return {
-				endDate: endDate,
-				isEnded: activityIsEnded
-			};
-		},
-
-		_getExemptState: function(userActivityUsage) {
-			return {
-				isExempt: userActivityUsage.hasClass(this.HypermediaClasses.activities.exempt)
-			};
-		},
-
-		_getActivityType: function(activity) {
-			var type;
-			if (activity.hasClass(this.HypermediaClasses.assignments.assignment)) {
-				type = 'assignment';
-			} else if (activity.hasClass(this.HypermediaClasses.quizzes.quiz)) {
-				type = 'quiz';
-			} else if (activity.hasClass(this.HypermediaClasses.discussions.topic)) {
-				type = 'discussion';
-			}
-
-			return type;
-		},
-
 		_getOrganizationRequest: function(userActivityUsage, getToken, userUrl) {
 			var organizationLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.organization) || {}).href;
 			return this._fetchEntityWithToken(organizationLink, getToken, userUrl);
 		},
 
+		_findActivityHref: function(userActivityUsage) {
+			for (var i = 0; i < this._allTypes.length; i++) {
+				var link = userActivityUsage.getLinkByRel((this._types[this._allTypes[i]] || {}).activityRel);
+				if (link) {
+					return link.href;
+				}
+			}
+			return '';
+		},
+
 		_getActivityRequest: function(userActivityUsage, getToken, userUrl) {
-			var activityLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.assignment)
-					|| userActivityUsage.getLinkByRel(this.HypermediaRels.quiz)
-					|| userActivityUsage.getLinkByRel(this.HypermediaRels.Discussions.topic) || {}).href;
+			var activityLink = this._findActivityHref(userActivityUsage);
 			return Promise.resolve(this._fetchEntityWithToken(activityLink, getToken, userUrl))
 				.catch(function(err) {
 					var status = typeof err === 'number' ? err : err && err.status;
@@ -125,16 +66,12 @@
 				});
 		},
 
-		_getAssignmentInstructions: function(activity) {
-			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Assignments.instructions));
-		},
-
-		_getQuizDescription: function(activity) {
-			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Quizzes.description));
-		},
-
-		_getDiscussionDescription: function(activity) {
-			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(this.HypermediaRels.Discussions.description));
+		_getInstructions: function(type, activity) {
+			var item = this._types[type];
+			if (!item) {
+				return '';
+			}
+			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(item.instructionsRel));
 		},
 
 		_getRichTextValuePreferPlainText: function(richtextEntity) {
@@ -146,6 +83,24 @@
 			return richtextEntity.properties.text || richtextEntity.properties.html;
 		},
 
+		_concatActivityUsageTypes: function(usageList) {
+			var usages = [];
+			this._allTypes.forEach(function(typeString) {
+				var type = this._types[typeString];
+				var entities = usageList.getSubEntitiesByClass(type.userActivityUsageClass);
+				usages = usages.concat(entities);
+			}.bind(this));
+			return usages;
+		},
+
+		_getActivityStatus: function(type, userActivityUsage, overdueUserUsages) {
+			var item = this._types[type];
+			if (!item) {
+				return '';
+			}
+			return this._getStatusBadge(userActivityUsage, overdueUserUsages, item);
+		},
+
 		/*
 		* Returns an object that contains the information required to populate an assessment list item
 		*/
@@ -155,42 +110,13 @@
 			}
 
 			var requests = [];
-			var self = this;
 
-			var overdueAssignments = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userAssignmentActivity);
-			var overdueQuizzes = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userQuizActivity);
-			var overdueDiscussions = overdueUserActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userDiscussionActivity);
-			var overdueUserUsages = [];
-			overdueUserUsages = overdueUserUsages.concat(overdueAssignments);
-			overdueUserUsages = overdueUserUsages.concat(overdueQuizzes);
-			overdueUserUsages = overdueUserUsages.concat(overdueDiscussions);
-
-			var assignmentUserUsages = userActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userAssignmentActivity);
-			var quizUserUsages = userActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userQuizActivity);
-			var discussionUserUsages = userActivityUsages.getSubEntitiesByClass(self.HypermediaClasses.activities.userDiscussionActivity);
-
-			var supportedUserUsages = [];
-			supportedUserUsages = supportedUserUsages.concat(assignmentUserUsages);
-			supportedUserUsages = supportedUserUsages.concat(quizUserUsages);
-			supportedUserUsages = supportedUserUsages.concat(discussionUserUsages);
+			var overdueUserUsages = this._concatActivityUsageTypes(overdueUserActivityUsages);
+			var supportedUserUsages = this._concatActivityUsageTypes(userActivityUsages);
 
 			supportedUserUsages.forEach(function(userActivityUsage) {
-				var organizationRequest = self._getOrganizationRequest.call(self, userActivityUsage, getToken, userUrl);
-				var activityRequest = self._getActivityRequest.call(self, userActivityUsage, getToken, userUrl);
-
-				var completionState = self._getCompletionState.call(self, userActivityUsage);
-				var dueDateState = self._getDueDateState.call(self, userActivityUsage, overdueUserUsages);
-				var endDateState = self._getEndDateState.call(self, userActivityUsage);
-				var exemptState = self._getExemptState.call(self, userActivityUsage);
-
-				var statusConfig = self._createStatusConfig(
-					completionState.isCompleted,
-					endDateState.isEnded,
-					exemptState.isExempt,
-					dueDateState.isOverdue,
-					dueDateState.isDueToday
-				);
-
+				var organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl);
+				var activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl);
 				var userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
 				var request = Promise.all([activityRequest, organizationRequest])
@@ -202,31 +128,25 @@
 							return null;
 						}
 
-						var type = self._getActivityType.call(self, activity);
-						var info;
-						if (type === 'quiz') {
-							info = self._getQuizDescription.call(self, activity);
-						} else if (type === 'assignment') {
-							info = self._getAssignmentInstructions.call(self, activity);
-						} else if (type === 'discussion') {
-							info = self._getDiscussionDescription.call(self, activity);
-						}
+						var type = this._getActivityType(activity);
+						var statusDetails = this._getActivityStatus(type, userActivityUsage, overdueUserUsages);
+						var info = this._getInstructions(type, activity);
 
 						return {
 							name: activity.properties.name,
 							courseName: organization.properties.name,
 							info: info,
-							dueDate: dueDateState.dueDate,
-							endDate: endDateState.endDate,
-							statusConfig: statusConfig,
+							dueDate: statusDetails.dueDateState.dueDate,
+							endDate: statusDetails.endDateState.endDate,
+							statusConfig: statusDetails.statusConfig,
 							type: type,
 							userActivityUsageHref: userActivityUsageHref,
-							isCompleted: completionState.isCompleted
+							isCompleted: statusDetails.completionState.isCompleted
 						};
-					});
+					}.bind(this));
 
 				requests.push(request);
-			});
+			}.bind(this));
 
 			return Promise.all(requests)
 				.then(function(responses) {
@@ -379,39 +299,6 @@
 			return queryString ? action.href + '?' + queryString : action.href;
 		},
 
-		_createStatusConfig: function(isCompleted, isEnded, isExempt, isOverdue, isDueToday) {
-			var statusConfig = null;
-
-			if (isCompleted) {
-				statusConfig = {
-					state: 'success',
-					text: this._completeText
-				};
-			} else if (isEnded) {
-				statusConfig = {
-					state: 'null',
-					text: this._endedText
-				};
-			} else if (isExempt) {
-				statusConfig = {
-					state: 'success',
-					text: this._exemptedText
-				};
-			} else if (isOverdue) {
-				statusConfig = {
-					state: 'alert',
-					text: this._overdueText
-				};
-			} else if (isDueToday) {
-				statusConfig = {
-					state: 'default',
-					text: this._dueTodayText
-				};
-			}
-
-			return statusConfig;
-		},
-
 		_upcomingAssessmentsBehaviour_resetData: function() {
 			this._showError = false;
 			this._firstName = null;
@@ -425,8 +312,10 @@
 
 	window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior = [
 		window.D2L.UpcomingAssessments.DateBehavior,
+		D2L.UpcomingAssessments.TypesBehavior,
 		D2L.PolymerBehaviors.FetchSirenEntityBehavior,
 		window.D2L.Hypermedia.HMConstantsBehavior,
+		window.D2L.UpcomingAssessments.StatusBadgeBehavior,
 		upcomingAssessmentsBehaviorImpl
 	];
 

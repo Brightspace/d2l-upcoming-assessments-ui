@@ -7,6 +7,7 @@
 <link rel="import" href="../../d2l-icons/tier2-icons.html">
 <link rel="import" href="../behaviors/date-behavior.html">
 <link rel="import" href="../behaviors/localize-behavior.html">
+<link rel="import" href="../behaviors/types-behavior.html">
 
 <dom-module id="d2l-assessments-list-item">
 	<template>
@@ -124,9 +125,9 @@
 						<d2l-icon class="activity-icon" icon="[[_getAssessmentIcon(assessmentItem)]]"></d2l-icon>
 					</div>
 					<div class="info-container">
-						<h3 class="assessment-title">{{assessmentItem.name}}</h3>
+						<h3 class="assessment-title">[[assessmentItem.name]]</h3>
 						<div class="assessment-info">
-							<div class="course-name">{{assessmentItem.courseName}}</div>
+							<div class="course-name">[[assessmentItem.courseName]]</div>
 							<div class="assessment-details">
 								<div class="assessment-type">[[_getAssessmentType(assessmentItem)]]</div>
 								<template is="dom-if" if="[[_hasDueDate(assessmentItem)]]">
@@ -169,7 +170,8 @@
 
 		behaviors: [
 			window.D2L.UpcomingAssessments.DateBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior
+			window.D2L.UpcomingAssessments.LocalizeBehavior,
+			window.D2L.UpcomingAssessments.TypesBehavior
 		],
 
 		_hasDueDate: function(item) {
@@ -214,24 +216,24 @@
 		},
 
 		_getAssessmentIcon: function(assessmentItem) {
-			var icon = 'd2l-tier2:';
-			if (assessmentItem.type === 'assignment') return icon + 'assignments';
-			if (assessmentItem.type === 'quiz') return icon + 'quizzing';
-			if (assessmentItem.type === 'discussion') return icon + 'discussions';
+			var item = this._types[(assessmentItem || {}).type];
+			if (item) {
+				return 'd2l-tier2:' + item.icon;
+			}
 			return '';
 		},
 
 		_getAssessmentType: function(assessmentItem) {
-			if (assessmentItem.type === 'assignment') return this.localize('assignment');
-			if (assessmentItem.type === 'quiz') return this.localize('quiz');
-			if (assessmentItem.type === 'discussion') return this.localize('discussion');
+			var item = this._types[assessmentItem.type];
+			if (item) {
+				return this.localize(item.assessmentType);
+			}
 			return '';
 		},
 
 		_computeCanOpenActivityDetails: function(assessmentItem, activityDetailsEnabled) {
 			return activityDetailsEnabled
-				&& assessmentItem
-				&& (assessmentItem.type === 'assignment' || assessmentItem.type === 'discussion')
+				&& this._canOpenItemType(assessmentItem)
 				&& !!assessmentItem.userActivityUsageHref;
 		},
 
