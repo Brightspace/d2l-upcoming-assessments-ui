@@ -1,6 +1,7 @@
 {
   "activityComplete": "완료",
   "activityDueToday": "기한: 오늘",
+  "activityEndsToday": "Ends Today",
   "activityEnded": "닫힘",
   "activityExempted": "면제됨",
   "activityOverdue": "기한 경과",

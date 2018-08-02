@@ -1,6 +1,7 @@
 {
   "activityComplete": "完成",
   "activityDueToday": "今天截止",
+  "activityEndsToday": "Ends Today",
   "activityEnded": "已關閉",
   "activityExempted": "免修",
   "activityOverdue": "逾期",

@@ -1,6 +1,7 @@
 {
   "activityComplete": "Abgeschlossen",
   "activityDueToday": "Heute fällig",
+  "activityEndsToday": "Ends Today",
   "activityEnded": "Geschlossen",
   "activityExempted": "Ausgenommen",
   "activityOverdue": "Überfällig",

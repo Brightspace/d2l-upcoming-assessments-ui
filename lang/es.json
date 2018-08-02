@@ -1,6 +1,7 @@
 {
   "activityComplete": "Completo",
   "activityDueToday": "Entregar hoy",
+  "activityEndsToday": "Ends Today",
   "activityEnded": "Cerrado",
   "activityExempted": "Eximido",
   "activityOverdue": "Vencido",
