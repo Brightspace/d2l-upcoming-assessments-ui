@@ -8,7 +8,7 @@
   "closeSimpleOverlayText": "Panoya Geri Dön",
   "closeSimpleOverlayTextMobile": "Pano",
   "currentPeriod": "{startDate} - {endDate}",
-  "discussion": "Discussion",
+  "discussion": "Tartışma",
   "dueDateShort": "Süresinin Dolma Tarihi: {dueDate}",
   "dueDateLongImminent": "{prefix}: {dueDate}",
   "endDateShort": "Şu Tarihte Sona Erer: {endDate}",
@@ -20,5 +20,5 @@
   "quiz": "Sınav",
   "today": "Bugün",
   "tomorrow": "Yarın",
-  "viewAllAssignments": "Tüm işleri görüntüle"
+  "viewAllAssignments": "Tüm çalışmaları görüntüle"
 }
