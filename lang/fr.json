@@ -11,7 +11,7 @@
   "currentPeriod": "{startDate} - {endDate}",
   "discussion": "Discussion",
   "dueDateShort": "Échéance {dueDate}",
-  "dueDateLongImminent": "{prefix}: {dueDate}",
+  "dueDateLongImminent": "{prefix} : {dueDate}",
   "endDateShort": "Prend fin le {endDate}",
   "errorMessage": "Il semble y avoir un problème avec le chargement de ce composant graphique. Nous travaillons à rétablir la situation aussi rapidement que possible.",
   "goNextText": "suivant",

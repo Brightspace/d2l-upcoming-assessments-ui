@@ -9,7 +9,7 @@
   "closeSimpleOverlayText": "대시보드로 돌아가기",
   "closeSimpleOverlayTextMobile": "대시보드",
   "currentPeriod": "{startDate} - {endDate}",
-  "discussion": "Discussion",
+  "discussion": "토론",
   "dueDateShort": "기한: {dueDate}",
   "dueDateLongImminent": "{prefix}: {dueDate}",
   "endDateShort": "{endDate} 종료",
