@@ -178,21 +178,21 @@
 		},
 
 		_getUserActivityUsages: function(userEntity, getToken, userUrl) {
-			var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
+			var myActivitiesLink = (userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities#empty') || {}).href;
 			var self = this;
 
 			if (myActivitiesLink) {
-				return this._getCustomRangeAction(myActivitiesLink, userUrl)
-					.then(function(actitiviesLink) {
-						return self._fetchEntityWithToken(actitiviesLink, getToken, userUrl);
+				return this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl)
+					.then(function(activitiesEntity) {
+						var customRangeActionHref = self._getCustomRangeAction(activitiesEntity);
+
+						return self._fetchEntityWithToken(customRangeActionHref, getToken, userUrl);
 					});
 			}
 		},
 
-		_getOverdueActivities: function(activities, getToken, userUrl) {
-			var overdueActivitiesLink = (activities.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;
-
-			if (overdueActivitiesLink) {
+		_getOverdueActivities: function(activitiesEntity, getToken, userUrl) {
+			var overdueActivitiesLink = (activitiesEntity.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;			if (overdueActivitiesLink) {
 				return this._fetchEntityWithToken(overdueActivitiesLink, getToken, userUrl);
 			}
 
@@ -200,22 +200,15 @@
 			return window.D2L.Hypermedia.Siren.Parse({});
 		},
 
-		_getCustomRangeAction: function(activitiesUrl, userUrl) {
-			if (!activitiesUrl) {
-				return Promise.reject();
-			}
-
+		_getCustomRangeAction: function(activitiesEntity) {
 			var self = this;
 
-			return this._fetchEntityWithToken(activitiesUrl, this.getToken, userUrl)
-				.then(function(activities) {
-					var currentTime = new Date();
-					var parameters = self._getCustomDateRangeParameters(currentTime);
-					var action = (activities.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
+			var currentTime = new Date();
+			var parameters = self._getCustomDateRangeParameters(currentTime);
+			var action = (activitiesEntity.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
 
-					self._selectCustomDateRangeAction = action;
-					return self._createActionUrl(action, parameters);
-				});
+			self._selectCustomDateRangeAction = action;
+			return self._createActionUrl(action, parameters);
 		},
 
 		_getCustomDateRangeParameters: function(selectedDate) {
@@ -244,11 +237,15 @@
 			return this._fetchEntityWithToken(this.userUrl, this.getToken)
 				.then(function(userEntity) {
 					self._firstName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
-					var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
-					return self._getCustomRangeAction(myActivitiesLink, self.userUrl)
-						.then(function(customActivitiesLink) {
-							return self._loadActivitiesForPeriod(customActivitiesLink);
-						});
+					var myActivitiesLink = (userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities#empty') || {}).href;
+
+					// @TODO @FIXME: Gross, but for performance, get the empty activities response,
+					// so we can parallelize the call to get activities for a period, and overdue activities
+					// (which doesn't yet exist as a link on the user entity - but maybe it should be)
+					return self._fetchEntityWithToken(myActivitiesLink, self.getToken, self.userUrl);
+				})
+				.then(function(activitiesEntity) {
+					return self._loadActivitiesForPeriod(activitiesEntity);
 				})
 				.catch(function() {
 					self._showError = true;
@@ -256,31 +253,32 @@
 				});
 		},
 
-		_loadActivitiesForPeriod: function(periodUrl) {
+		_loadActivitiesForPeriod: function(activitiesEntity) {
+			var periodUrl = this._getCustomRangeAction(activitiesEntity);
+
 			if (!periodUrl) {
 				return Promise.reject();
 			}
 
 			var self = this;
-			var userActivityUsages;
+			var userActivitiesRequest = this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl);
+			var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, this.getToken, this.userUrl);
 
-			return this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl)
-				.then(function(userUsages) {
-					userActivityUsages = userUsages;
+			return Promise.all([userActivitiesRequest, overdueActivitiesRequest])
+				.then(function(activitiesResponses) {
+					var userActivityUsages = activitiesResponses[0];
+					var overdueUserActivityUsages = activitiesResponses[1];
+
 					self._previousPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.previousPeriod) || {}).href;
 					self._nextPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.nextPeriod) || {}).href;
 					self._periodStart = userActivityUsages.properties.start;
 					self._periodEnd = userActivityUsages.properties.end;
 
-					return self._getOverdueActivities(userActivityUsages, self.getToken, self.userUrl);
-				})
-				.then(function(overdueUserActivityUsages) {
 					return self._getUserActivityUsagesInfos(userActivityUsages, overdueUserActivityUsages, self.getToken, self.userUrl);
 				})
 				.then(function(userActivityUsagesInfos) {
-					return self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
-				})
-				.then(function(activities) {
+					var activities = self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
+
 					self.set('_allActivities', activities);
 					return activities;
 				});
