@@ -179,7 +179,7 @@
 
 		_getUserActivityUsages: function(userEntity, getToken, userUrl) {
 			var myActivitiesLink = (
-				userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivitiesEmpty)
+				userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities#empty')
 				|| userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities)
 				|| {}
 			).href;
@@ -242,7 +242,7 @@
 				.then(function(userEntity) {
 					self._firstName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
 					var myActivitiesLink = (
-						userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivitiesEmpty)
+						userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities#empty')
 						|| userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities)
 						|| {}
 					).href;
