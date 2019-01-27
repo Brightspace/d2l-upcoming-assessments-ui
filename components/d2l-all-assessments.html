@@ -105,9 +105,7 @@
 
 			_onDateValueChanged: function(e) {
 				if (e.detail.date) {
-					var parameters = this._getCustomDateRangeParameters(e.detail.date);
-					var periodUrl = this._createActionUrl(this._selectCustomDateRangeAction, parameters);
-					return this._loadActivitiesForPeriod(periodUrl)
+					return this._loadActivitiesForPeriod(this.__activitiesEntity, e.detail.date)
 						.then(this._formatPeriodText.bind(this))
 						.catch(function() {
 							self._showError = true;

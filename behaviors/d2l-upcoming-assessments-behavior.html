@@ -205,14 +205,13 @@
 			return window.D2L.Hypermedia.Siren.Parse({});
 		},
 
-		_getCustomRangeAction: function(activitiesEntity) {
+		_getCustomRangeAction: function(activitiesEntity, dateObj) {
 			var self = this;
+			var date = dateObj || new Date();
 
-			var currentTime = new Date();
-			var parameters = self._getCustomDateRangeParameters(currentTime);
+			var parameters = self._getCustomDateRangeParameters(date);
 			var action = (activitiesEntity.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
 
-			self._selectCustomDateRangeAction = action;
 			return self._createActionUrl(action, parameters);
 		},
 
@@ -254,7 +253,9 @@
 					return self._fetchEntityWithToken(myActivitiesLink, self.getToken, self.userUrl);
 				})
 				.then(function(activitiesEntity) {
-					return self._loadActivitiesForPeriod(activitiesEntity);
+					self.__activitiesEntity = activitiesEntity;
+
+					return self._loadActivitiesForPeriod(activitiesEntity, new Date());
 				})
 				.catch(function() {
 					self._showError = true;
@@ -262,13 +263,8 @@
 				});
 		},
 
-		_loadActivitiesForPeriod: function(activitiesEntity) {
-			var periodUrl = this._getCustomRangeAction(activitiesEntity);
-
-			if (!periodUrl) {
-				return Promise.reject();
-			}
-
+		_loadActivitiesForPeriod: function(activitiesEntity, dateObj) {
+			var periodUrl = this._getCustomRangeAction(activitiesEntity, dateObj);
 			var self = this;
 			var userActivitiesRequest = this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl);
 			var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, this.getToken, this.userUrl);
