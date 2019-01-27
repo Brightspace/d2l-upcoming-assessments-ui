@@ -179,7 +179,7 @@
 
 		_getUserActivityUsages: function(userEntity, getToken, userUrl) {
 			var myActivitiesLink = (
-				userEntity.getLinkByRel('https://activities.api.brightspace.com/rels/my-activities#empty')
+				userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivitiesEmpty)
 				|| userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities)
 				|| {}
 			).href;
