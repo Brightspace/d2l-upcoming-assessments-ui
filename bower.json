@@ -8,7 +8,7 @@
     "d2l-colors": "^3.1.2",
     "d2l-date-picker": "BrightspaceUI/date-picker#^1.0.0",
     "d2l-fetch-siren-entity-behavior": "Brightspace/d2l-fetch-siren-entity-behavior#^5.0.2",
-    "d2l-hm-constants-behavior": "Brightspace/d2l-hm-constants-behavior#^5.19.4",
+    "d2l-hypermedia-constants": "Brightspace/d2l-hypermedia-constants#apalaniuk/hybrid/add-my-activities-empty-rel",
     "d2l-icons": "^4.14.2",
     "d2l-link": "^4.0.0",
     "d2l-page-load-progress": "^2.0.1",
