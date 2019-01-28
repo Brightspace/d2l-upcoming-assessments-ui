@@ -197,7 +197,9 @@
 		},
 
 		_getOverdueActivities: function(activitiesEntity, getToken, userUrl) {
-			var overdueActivitiesLink = (activitiesEntity.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;			if (overdueActivitiesLink) {
+			var overdueActivitiesLink = (activitiesEntity.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;
+
+			if (overdueActivitiesLink) {
 				return this._fetchEntityWithToken(overdueActivitiesLink, getToken, userUrl);
 			}
 
@@ -247,9 +249,6 @@
 						|| {}
 					).href;
 
-					// @TODO @FIXME: Gross, but for performance, get the empty activities response,
-					// so we can parallelize the call to get activities for a period, and overdue activities
-					// (which doesn't yet exist as a link on the user entity - but maybe it should be)
 					return self._fetchEntityWithToken(myActivitiesLink, self.getToken, self.userUrl);
 				})
 				.then(function(activitiesEntity) {
