@@ -38,7 +38,7 @@ describe('<d2l-all-assessments>', function() {
 			sandbox.restore();
 		});
 
-		describe.skip('_onDateValueChanged', function() {
+		describe('_onDateValueChanged', function() {
 			it('invokes _loadActivitiesForPeriod with the activities entity', function() {
 				element._loadActivitiesForPeriod = sandbox.stub().returns(Promise.resolve());
 				const activitiesEntity = {
@@ -64,22 +64,15 @@ describe('<d2l-all-assessments>', function() {
 
 				element.__activitiesEntity = activitiesEntity;
 
-				var date = new Date('Tue Sep 05 2017 00:00:00');
 				var dateObj = {
 					detail: {
-						date: date
+						date: new Date('Tue Sep 05 2017 00:00:00Z')
 					}
 				};
 
-				var start = new Date(activitiesEntity.actions[0].fields[0].value).toISOString();
-				var endDate = new Date(activitiesEntity.actions[0].fields[1].value);
-				endDate.setMilliseconds(999);
-				var end = endDate.toISOString();
-
-				var expectedUrl = 'http://www.foo.com?start=' + start + '&end=' + end;
 				return element._onDateValueChanged(dateObj)
 					.then(function() {
-						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(expectedUrl);
+						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(activitiesEntity);
 					});
 			});
 		});

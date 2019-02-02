@@ -4,12 +4,31 @@
 
 describe('d2l upcoming assessments behavior', function() {
 	var component, sandbox, getToken, userUrl, completionDate, dueDate, endDate;
-	var periodUrl = '/some/period/now/';
 	var activities = {
 		properties: {
 			start: '2017-07-19T16:20:07.567Z',
 			end: '2017-08-02T16:20:07.567Z'
 		}
+	};
+	const activitiesEntity = {
+		links: [{
+			rel: ['https://activities.api.brightspace.com/rels/overdue'],
+			href: 'http://www.foo.com/overdue'
+		}],
+		actions: [{
+			name: 'select-custom-date-range',
+			href: 'http://www.foo.com',
+			method: 'GET',
+			fields: [{
+				name:'start',
+				type:'text',
+				value:'2017-09-26T19:14:21.889Z'
+			}, {
+				name:'end',
+				type:'text',
+				value:'2017-10-03T19:14:21.889Z'
+			}]
+		}]
 	};
 	var activityHref = '/path/to/activity';
 	var activityName = 'Activity Name';
@@ -550,33 +569,10 @@ describe('d2l upcoming assessments behavior', function() {
 	});
 
 	describe('_getCustomRangeAction', function() {
-		const activitiesEntity = {
-			links: [{
-				rel: ['https://activities.api.brightspace.com/rels/overdue'],
-				href: 'http://www.foo.com/overdue'
-			}],
-			actions: [{
-				name: 'select-custom-date-range',
-				href: 'http://www.foo.com',
-				method: 'GET',
-				fields: [{
-					name:'start',
-					type:'text',
-					value:'2017-09-26T19:14:21.889Z'
-				}, {
-					name:'end',
-					type:'text',
-					value:'2017-10-03T19:14:21.889Z'
-				}]
-			}]
-		};
-
 		it('returns a URL for the correct period', function() {
+			const parsedActivitiesEntity = window.D2L.Hypermedia.Siren.Parse(activitiesEntity);
 			const testDate = new Date(2019, 0, 29);
-			const actionUrl = component._getCustomRangeAction(
-				window.D2L.Hypermedia.Siren.Parse(activitiesEntity),
-				testDate
-			);
+			const actionUrl = component._getCustomRangeAction(parsedActivitiesEntity, testDate);
 			const expectedStartDate = new Date(2019, 0, 27, 0, 0, 0, 0).toISOString();
 			const expectedEndDate = new Date(2019, 1, 9, 23, 59, 59, 999).toISOString();
 
@@ -590,7 +586,7 @@ describe('d2l upcoming assessments behavior', function() {
 		beforeEach(function() {
 			customRangeUrl = 'http://example.com?start=2017-09-20T12:00:00.000Z&end=2017-09-27T12:00:00.000Z';
 			myActivities = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
-			userEntity = window.D2L.Hypermedia.Siren.Parse({
+			userEntity = {
 				entities: [{
 					rel: ['https://api.brightspace.com/rels/first-name'],
 					properties: {
@@ -600,14 +596,15 @@ describe('d2l upcoming assessments behavior', function() {
 				links: [{
 					rel: ['https://activities.api.brightspace.com/rels/my-activities'],
 					href: 'http://example.com/my-activities'
-				}, {
-					rel: ['https://activities.api.brightspace.com/rels/my-activities#empty'],
-					href: 'http://example.com/my-activities#empty'
 				}]
-			});
+			};
+
+			const fetchEntityStub = sinon.stub();
+			fetchEntityStub.onFirstCall().returns(Promise.resolve(window.D2L.Hypermedia.Siren.Parse(userEntity)));
+			fetchEntityStub.onSecondCall().returns(Promise.resolve(window.D2L.Hypermedia.Siren.Parse(activitiesEntity)));
 
 			component.isActivityUpcoming = sinon.stub().returns(true);
-			component._fetchEntityWithToken = sinon.stub().returns(Promise.resolve(userEntity));
+			component._fetchEntityWithToken = fetchEntityStub;
 			component._getCustomRangeAction = sinon.stub().returns(customRangeUrl);
 			component._loadActivitiesForPeriod = sinon.stub().returns(Promise.resolve(myActivities));
 		});
@@ -634,9 +631,36 @@ describe('d2l upcoming assessments behavior', function() {
 			});
 		});
 
-		it.skip('should fetch activities with a custom date range', function() {
-			return component._getInfo().then(function() {
-				expect(component._getCustomRangeAction).to.have.been.calledWith('http://example.com/my-activities');
+		[{
+			description: 'should use the my-activities link relation when my-activities#empty is not available',
+			expectedLink: 'http://example.com/my-activities',
+			links: [{
+				rel: ['https://activities.api.brightspace.com/rels/my-activities'],
+				href: 'http://example.com/my-activities'
+			}]
+		}, {
+			description: 'should use the my-activities#empty link relation when available',
+			expectedLink: 'http://example.com/my-activities#empty',
+			links: [{
+				rel: ['https://activities.api.brightspace.com/rels/my-activities'],
+				href: 'http://example.com/my-activities'
+			}, {
+				rel: ['https://activities.api.brightspace.com/rels/my-activities#empty'],
+				href: 'http://example.com/my-activities#empty'
+			}]
+		}].forEach(ctx => {
+			it(ctx.description, function() {
+				const parsedUserEntity = window.D2L.Hypermedia.Siren.Parse(
+					Object.assign({}, userEntity, {
+						links: ctx.links
+					})
+				);
+
+				component._fetchEntityWithToken.onFirstCall().returns(Promise.resolve(parsedUserEntity));
+
+				return component._getInfo().then(function() {
+					expect(component._fetchEntityWithToken.getCall(1).args[0]).to.equal(ctx.expectedLink);
+				});
 			});
 		});
 
@@ -649,64 +673,42 @@ describe('d2l upcoming assessments behavior', function() {
 		});
 	});
 
-	describe.skip('_loadActivitiesForPeriod', function() {
+	describe('_loadActivitiesForPeriod', function() {
+		let userUsage;
 
-		it('does nothing if the provided url was not set', function() {
-			component._fetchEntityWithToken = sandbox.stub();
-			return component._loadActivitiesForPeriod()
-				.then(function() {
-					return Promise.reject('Expected _loadActivitiesForPeriod to reject');
-				})
-				.catch(function() {
-					expect(component._fetchEntityWithToken).to.not.have.been.called;
-				});
-		});
-
-		it('calls _fetchEntityWithToken for the provided url', function() {
-			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(
-				window.D2L.Hypermedia.Siren.Parse(activities)
-			));
-			return component._loadActivitiesForPeriod(periodUrl)
-				.then(function() {
-					expect(component._fetchEntityWithToken).to.have.been.calledWith(periodUrl);
-				});
-		});
-
-		it('should update allActivies with the activities in the period', function() {
-			var userUsage = {};
-			userUsage.getLinkByRel = sandbox.stub().returns();
-			userUsage.properties = {
-				start: 'start',
-				end: 'end'
+		beforeEach(function() {
+			userUsage = {
+				getLinkByRel: sandbox.stub().returns(),
+				properties: {
+					start: 'start',
+					end: 'end'
+				}
 			};
-
-			component._getFormattedPeriodText = sandbox.stub().returns('dateText');
+			userUsage.getLinkByRel = sandbox.stub().returns();
 
 			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
 			component._getOverdueActivities = sandbox.stub().returns(activities);
 			component._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
 			component._updateActivitiesInfo = sandbox.stub().returns(activities);
-			return component._loadActivitiesForPeriod(periodUrl)
+		});
+
+		it('should try to fetch activities for the correct period', function() {
+			const startDate = new Date(2017, 6, 16).toISOString();
+			const endDate = new Date(2017, 6, 29, 23, 59, 59, 999).toISOString();
+
+			const parsedActivitiesEntity = window.D2L.Hypermedia.Siren.Parse(activitiesEntity);
+
+			return component._loadActivitiesForPeriod(parsedActivitiesEntity, new Date('2017-07-21T16:20:07.567Z'))
 				.then(function() {
+					expect(component._fetchEntityWithToken).to.have.been.calledWith(`http://www.foo.com?start=${startDate}&end=${endDate}`);
 					expect(component._allActivities).to.equal(activities);
 				});
 		});
 
 		it('should not update the assessments with the activities in the period', function() {
-			var userUsage = {};
-			userUsage.getLinkByRel = sandbox.stub().returns();
-			userUsage.properties = {
-				start: 'start',
-				end: 'end'
-			};
+			const parsedActivitiesEntity = window.D2L.Hypermedia.Siren.Parse(activitiesEntity);
 
-			component._getFormattedPeriodText = sandbox.stub().returns('dateText');
-
-			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(userUsage));
-			component._getOverdueActivities = sandbox.stub().returns(activities);
-			component._getUserActivityUsagesInfos = sandbox.stub().returns(activities);
-			component._updateActivitiesInfo = sandbox.stub().returns(activities);
-			return component._loadActivitiesForPeriod(periodUrl)
+			return component._loadActivitiesForPeriod(parsedActivitiesEntity, new Date('2017-07-21T16:20:07.567Z'))
 				.then(function() {
 					expect(component._assessments).to.not.equal(activities);
 				});
