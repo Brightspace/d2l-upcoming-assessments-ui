@@ -4,32 +4,49 @@
 		<title>d2l-all-assessments demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+		<script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
 
-		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-		<link rel="import" href="../../d2l-typography/d2l-typography.html">
-		<link rel="import" href="../components/d2l-all-assessments.html">
-		<custom-style include="d2l-typography">
+		<script type="module" src="../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+		<script type="module" src="../../@polymer/iron-demo-helpers/demo-snippet.js"></script>
+		<script type="module" src="../../d2l-typography/d2l-typography.js"></script>
+		<script type="module" src="../components/d2l-all-assessments.js"></script>
+		<!-- FIXME(polymer-modulizer):
+		These imperative modules that innerHTML your HTML are
+		a hacky way to be sure that any mixins in included style
+		modules are ready before any elements that reference them are
+		instantiated, otherwise the CSS @apply mixin polyfill won't be
+		able to expand the underlying CSS custom properties.
+		See: https://github.com/Polymer/polymer-modulizer/issues/154
+		-->
+	<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style include="d2l-typography">
 			<style is="custom-style" include="d2l-typography"></style>
-		</custom-style>
-		<style>
+		</custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+		<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<style>
 			d2l-all-assessments {
 				display: block;
-			    height: 100%;
+				height: 100%;
 				box-shadow: 1px 1px 10px gray;
 				padding: 10px;
 			}
-		</style>
-	</head>
-	<body unresolved class="d2l-typography">
-		<dom-module id="d2l-all-assessments-demo">
-			<template strip-whitespace>
-				<d2l-all-assessments
-					user-url="[[userUrl]]"
-					get-token="[[getToken]]"
-					flags="[[flags]]"
-				></d2l-all-assessments>
+		</style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+		<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-demo">
+			<template strip-whitespace="">
+				<d2l-all-assessments user-url="[[userUrl]]" get-token="[[getToken]]" flags="[[flags]]"></d2l-all-assessments>
 			</template>
 			<script>
 				Polymer({
@@ -56,9 +73,13 @@
 						}
 					}
 				});
-			</script>
-		</dom-module>
-		<div>
+			&lt;/script>
+		</dom-module>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>Container = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
 			<h2>All Assessments</h2>
 			<demo-snippet>
 				<template>
@@ -66,6 +87,9 @@
 					</d2l-all-assessments-demo>
 				</template>
 			</demo-snippet>
-		</div>
+		</div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 	</body>
 </html>

@@ -4,58 +4,78 @@
 		<title>d2l-upcoming-assessments demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-		<script>
-			'use strict';
-			window.d2lfetch = {
-				fetch: function(req) {
-					return window.fetch(req.url);
-				}
-			};
-		</script>
+		<script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+		<script type="module">
+import '@polymer/iron-demo-helpers/demo-pages-shared-styles.js';
+import '@polymer/iron-demo-helpers/demo-snippet.js';
+import 'd2l-typography/d2l-typography.js';
+import '../components/d2l-upcoming-assessments.js';
+window.d2lfetch = {
+	fetch: function(req) {
+		return window.fetch(req.url);
+	}
+};
+</script>
 
-		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-		<link rel="import" href="../../d2l-typography/d2l-typography.html">
-		<link rel="import" href="../components/d2l-upcoming-assessments.html">
-		<custom-style include="d2l-typography">
+		<script type="module" src="../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+		<script type="module" src="../../@polymer/iron-demo-helpers/demo-snippet.js"></script>
+		<script type="module" src="../../d2l-typography/d2l-typography.js"></script>
+		<script type="module" src="../components/d2l-upcoming-assessments.js"></script>
+		<!-- FIXME(polymer-modulizer):
+		These imperative modules that innerHTML your HTML are
+		a hacky way to be sure that any mixins in included style
+		modules are ready before any elements that reference them are
+		instantiated, otherwise the CSS @apply mixin polyfill won't be
+		able to expand the underlying CSS custom properties.
+		See: https://github.com/Polymer/polymer-modulizer/issues/154
+		-->
+	<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style include="d2l-typography">
 			<style is="custom-style" include="d2l-typography"></style>
-		</custom-style>
+		</custom-style>`;
 
-		<style>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+		<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<style>
 			d2l-upcoming-assessments {
 				max-width: 500px;
 				box-shadow: 1px 1px 10px gray;
 				padding: 10px;
 			}
-		</style>
+		</style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 	</head>
 	<body unresolved class="d2l-typography">
-		<div class="vertical-section-container centered">
+		<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div class="vertical-section-container centered">
 			<h2>With Assessments</h2>
 			<demo-snippet>
 				<template>
-					<d2l-upcoming-assessments
-						user-url="data/user.withactivities.json"
-						token="foozleberries">
+					<d2l-upcoming-assessments user-url="data/user.withactivities.json" token="foozleberries">
 					</d2l-upcoming-assessments>
 				</template>
 			</demo-snippet>
 			<h2>Empty State</h2>
 			<demo-snippet>
 				<template>
-					<d2l-upcoming-assessments
-						user-url="data/user.noactivities.json"
-						token="foozleberries">
+					<d2l-upcoming-assessments user-url="data/user.noactivities.json" token="foozleberries">
 					</d2l-upcoming-assessments>
 				</template>
 			</demo-snippet>
 			<h2>Error State</h2>
 			<demo-snippet>
 				<template>
-					<d2l-upcoming-assessments
-						user-url="does-not-exist.json"
-						token="foozleberries">
+					<d2l-upcoming-assessments user-url="does-not-exist.json" token="foozleberries">
 					</d2l-upcoming-assessments>
 				</template>
 			</demo-snippet>
@@ -67,7 +87,14 @@
 						assessment.isActivityUpcoming = function() { return true; };
 					}, 100);
 				});
-			</script>
+			&lt;/script>
+		</div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script> assessment.isActivityUpcoming = function() { return true; };
+	}, 100);
+});
+</script>
 		</div>
 	</body>
 </html>

@@ -1,16 +1,18 @@
-<link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../d2l-colors/d2l-colors.html">
-<link rel="import" href="../../d2l-icons/d2l-icon.html">
-<link rel="import" href="../../d2l-icons/tier3-icons.html">
-<link rel="import" href="../../d2l-typography/d2l-typography-shared-styles.html">
-<link rel="import" href="../../iron-icon/iron-icon.html">
-<link rel="import" href="../../d2l-status-indicator/d2l-status-indicator.html">
-<link rel="import" href="../behaviors/date-behavior.html">
-<link rel="import" href="../behaviors/localize-behavior.html">
-<link rel="import" href="../behaviors/types-behavior.html">
+import '@polymer/polymer/polymer-legacy.js';
+import 'd2l-colors/d2l-colors.js';
+import 'd2l-icons/d2l-icon.js';
+import 'd2l-icons/tier3-icons.js';
+import 'd2l-typography/d2l-typography-shared-styles.js';
+import '@polymer/iron-icon/iron-icon.js';
+import 'd2l-status-indicator/d2l-status-indicator.js';
+import '../behaviors/date-behavior.js';
+import '../behaviors/localize-behavior.js';
+import '../behaviors/types-behavior.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+const $_documentContainer = document.createElement('template');
 
-<dom-module id="d2l-all-assessments-list-item">
-	<template strip-whitespace>
+$_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list-item">
+	<template strip-whitespace="">
 		<style>
 			:host {
 				display: block;
@@ -200,11 +202,7 @@
 			}
 
 		</style>
-		<div class$="[[_getAssessmentInfoCssClassNames(_canOpenActivityDetails)]]"
-			tabindex$="[[_getAssessmentInfoTabIndex(_canOpenActivityDetails)]]"
-			role$="[[_getAssessmentInfoRole(_canOpenActivityDetails)]]"
-			on-tap="_openActivityDetails"
-			on-keydown="_onKeydownOpenActivityDetails">
+		<div class$="[[_getAssessmentInfoCssClassNames(_canOpenActivityDetails)]]" tabindex$="[[_getAssessmentInfoTabIndex(_canOpenActivityDetails)]]" role$="[[_getAssessmentInfoRole(_canOpenActivityDetails)]]" on-tap="_openActivityDetails" on-keydown="_onKeydownOpenActivityDetails">
 			<div class="activity-info-container">
 				<div class="row">
 					<div class="activity-info">
@@ -240,154 +238,154 @@
 		</div>
 	</template>
 
-	<script>
-	'use strict';
+	
+</dom-module>`;
 
-	Polymer({
+document.head.appendChild($_documentContainer.content);
 
-		is: 'd2l-all-assessments-list-item',
+Polymer({
 
-		properties: {
-			assessmentItem: {
-				type: Object,
-				value: function() {
-					return {};
-				},
-				observer: '_onAssessmentItemChanged'
+	is: 'd2l-all-assessments-list-item',
+
+	properties: {
+		assessmentItem: {
+			type: Object,
+			value: function() {
+				return {};
 			},
-			assessmentIcon: {
-				type: String,
-				value: ''
-			},
-			assessmentType: {
-				type: String,
-				value: ''
-			},
-			_endsText: String,
-			_statusConfig: {
-				type: Object,
-				value: null
-			},
-			_showEndsText: {
-				type: Boolean,
-				value: false
-			},
-			flags: {
-				type: Object,
-				value: function() {
-					return {};
-				}
-			},
-			_canOpenActivityDetails: {
-				type: Boolean,
-				computed: '_computeCanOpenActivityDetails(assessmentItem, flags)'
+			observer: '_onAssessmentItemChanged'
+		},
+		assessmentIcon: {
+			type: String,
+			value: ''
+		},
+		assessmentType: {
+			type: String,
+			value: ''
+		},
+		_endsText: String,
+		_statusConfig: {
+			type: Object,
+			value: null
+		},
+		_showEndsText: {
+			type: Boolean,
+			value: false
+		},
+		flags: {
+			type: Object,
+			value: function() {
+				return {};
 			}
 		},
+		_canOpenActivityDetails: {
+			type: Boolean,
+			computed: '_computeCanOpenActivityDetails(assessmentItem, flags)'
+		}
+	},
 
-		behaviors: [
-			window.D2L.UpcomingAssessments.DateBehavior,
-			window.D2L.UpcomingAssessments.LocalizeBehavior,
-			window.D2L.UpcomingAssessments.TypesBehavior
-		],
+	behaviors: [
+		window.D2L.UpcomingAssessments.DateBehavior,
+		window.D2L.UpcomingAssessments.LocalizeBehavior,
+		window.D2L.UpcomingAssessments.TypesBehavior
+	],
 
-		_onAssessmentItemChanged: function(assessmentItem) {
-			this._updateAssessmentIcon(assessmentItem);
-			this._updateAssessmentType(assessmentItem);
+	_onAssessmentItemChanged: function(assessmentItem) {
+		this._updateAssessmentIcon(assessmentItem);
+		this._updateAssessmentType(assessmentItem);
 
-			this._statusConfig = assessmentItem.statusConfig;
+		this._statusConfig = assessmentItem.statusConfig;
 
-			if (assessmentItem.endDate) {
-				var relativeDateString = this._getRelativeDateString(assessmentItem.endDate);
-				this._endsText = this.localize('endDateShort', 'endDate', relativeDateString);
-				this._showEndsText = this._showOverdue;
-			}
-		},
+		if (assessmentItem.endDate) {
+			var relativeDateString = this._getRelativeDateString(assessmentItem.endDate);
+			this._endsText = this.localize('endDateShort', 'endDate', relativeDateString);
+			this._showEndsText = this._showOverdue;
+		}
+	},
 
-		_getRelativeDateString: function(dateUTC) {
-			if (!dateUTC) {
-				return;
-			}
-
-			var dateString;
-			var calendarDateDiff = this.getDateDiffInCalendarDays(dateUTC);
-
-			if (calendarDateDiff === 0) {
-				return this.localize('today');
-			} else if (calendarDateDiff === 1) {
-				return this.localize('tomorrow');
-			} else if (calendarDateDiff > 1 && calendarDateDiff < 7) {
-				dateString = new Date(dateUTC).toLocaleDateString(this.locale, { weekday: 'long' });
-			} else {
-				dateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(dateUTC));
-			}
-
-			return dateString;
-		},
-
-		_updateAssessmentIcon: function(assessmentItem) {
-			var item = this._types[(assessmentItem || {}).type];
-			if (!item) {
-				this.assessmentIcon = '';
-				return;
-			}
-			if (typeof item.icon === 'function') {
-				this.assessmentIcon = item.icon(assessmentItem);
-			} else {
-				this.assessmentIcon = item ? ('d2l-tier3:' + item.icon) : '';
-			}
-		},
-
-		_updateAssessmentType: function(assessmentItem) {
-			var item = this._types[assessmentItem.type];
-			this.assessmentType = item ? this.localize(item.assessmentType) : '';
-		},
-
-		_computeCanOpenActivityDetails: function(assessmentItem, flags) {
-			return this._canOpenItemType(assessmentItem, flags)
-				&& !!assessmentItem.userActivityUsageHref;
-		},
-
-		_openActivityDetails: function() {
-			var self = this;
-			if (this._canOpenActivityDetails) {
-				this.dispatchEvent(new CustomEvent('open-immersive-page', {
-					bubbles: true,
-					detail: {
-						pageName: 'activity-details',
-						userActivityUsageHref: self.assessmentItem.userActivityUsageHref
-					}
-				}));
-			}
-		},
-
-		_onKeydownOpenActivityDetails: function(e) {
-			if (e.keyCode === 13 || e.keyCode === 32) {
-				this._openActivityDetails();
-			}
-		},
-
-		_getAssessmentInfoCssClassNames: function(canOpenActivityDetails) {
-			var classNames = 'assessment-info';
-			if (canOpenActivityDetails) {
-				classNames = classNames + ' has-activity-details';
-			}
-			return classNames;
-		},
-
-		_getAssessmentInfoTabIndex: function(canOpenActivityDetails) {
-			if (canOpenActivityDetails) {
-				return 0;
-			}
-		},
-
-		_getAssessmentInfoRole: function(canOpenActivityDetails) {
-			var role = 'listItem';
-			if (canOpenActivityDetails) {
-				role += ' link';
-			}
-			return role;
+	_getRelativeDateString: function(dateUTC) {
+		if (!dateUTC) {
+			return;
 		}
 
-	});
-	</script>
-</dom-module>
+		var dateString;
+		var calendarDateDiff = this.getDateDiffInCalendarDays(dateUTC);
+
+		if (calendarDateDiff === 0) {
+			return this.localize('today');
+		} else if (calendarDateDiff === 1) {
+			return this.localize('tomorrow');
+		} else if (calendarDateDiff > 1 && calendarDateDiff < 7) {
+			dateString = new Date(dateUTC).toLocaleDateString(this.locale, { weekday: 'long' });
+		} else {
+			dateString = new Intl.DateTimeFormat(this.locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(dateUTC));
+		}
+
+		return dateString;
+	},
+
+	_updateAssessmentIcon: function(assessmentItem) {
+		var item = this._types[(assessmentItem || {}).type];
+		if (!item) {
+			this.assessmentIcon = '';
+			return;
+		}
+		if (typeof item.icon === 'function') {
+			this.assessmentIcon = item.icon(assessmentItem);
+		} else {
+			this.assessmentIcon = item ? ('d2l-tier3:' + item.icon) : '';
+		}
+	},
+
+	_updateAssessmentType: function(assessmentItem) {
+		var item = this._types[assessmentItem.type];
+		this.assessmentType = item ? this.localize(item.assessmentType) : '';
+	},
+
+	_computeCanOpenActivityDetails: function(assessmentItem, flags) {
+		return this._canOpenItemType(assessmentItem, flags)
+			&& !!assessmentItem.userActivityUsageHref;
+	},
+
+	_openActivityDetails: function() {
+		var self = this;
+		if (this._canOpenActivityDetails) {
+			this.dispatchEvent(new CustomEvent('open-immersive-page', {
+				bubbles: true,
+				detail: {
+					pageName: 'activity-details',
+					userActivityUsageHref: self.assessmentItem.userActivityUsageHref
+				}
+			}));
+		}
+	},
+
+	_onKeydownOpenActivityDetails: function(e) {
+		if (e.keyCode === 13 || e.keyCode === 32) {
+			this._openActivityDetails();
+		}
+	},
+
+	_getAssessmentInfoCssClassNames: function(canOpenActivityDetails) {
+		var classNames = 'assessment-info';
+		if (canOpenActivityDetails) {
+			classNames = classNames + ' has-activity-details';
+		}
+		return classNames;
+	},
+
+	_getAssessmentInfoTabIndex: function(canOpenActivityDetails) {
+		if (canOpenActivityDetails) {
+			return 0;
+		}
+	},
+
+	_getAssessmentInfoRole: function(canOpenActivityDetails) {
+		var role = 'listItem';
+		if (canOpenActivityDetails) {
+			role += ' link';
+		}
+		return role;
+	}
+
+});

@@ -1,6 +1,6 @@
 {
   "extends": [
-    "brightspace/polymer-config"
+    "brightspace/polymer-3-config"
   ],
   "rules": {
     "object-shorthand": [2, "never"]
