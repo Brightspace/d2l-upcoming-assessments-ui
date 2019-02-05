@@ -1,6 +1,7 @@
 /* global describe, it, expect, fixture, beforeEach, afterEach, sinon */
 
-'use strict';
+import SirenParse from 'siren-parser';
+import './d2l-upcoming-assessments-behavior-consumer.js';
 
 describe('d2l upcoming assessments behavior', function() {
 	var component, sandbox, getToken, userUrl, completionDate, dueDate, endDate;
@@ -32,7 +33,7 @@ describe('d2l upcoming assessments behavior', function() {
 	}
 
 	function parse(entity) {
-		return window.D2L.Hypermedia.Siren.Parse(entity);
+		return SirenParse(entity);
 	}
 
 	function getUserActivityUsage(type, isComplete, isExempt, isModuleContent) {
@@ -571,7 +572,7 @@ describe('d2l upcoming assessments behavior', function() {
 
 		it('calls _fetchEntityWithToken for the provided url', function() {
 			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(
-				window.D2L.Hypermedia.Siren.Parse(activities)
+				SirenParse(activities)
 			));
 			return component._getCustomRangeAction(periodUrl)
 				.then(function() {
@@ -586,7 +587,7 @@ describe('d2l upcoming assessments behavior', function() {
 		beforeEach(function() {
 			customRangeUrl = 'http://example.com?start=2017-09-20T12:00:00.000Z&end=2017-09-27T12:00:00.000Z';
 			myActivities = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
-			userEntity = window.D2L.Hypermedia.Siren.Parse({
+			userEntity = SirenParse({
 				entities: [{
 					rel: ['https://api.brightspace.com/rels/first-name'],
 					properties: {
@@ -657,7 +658,7 @@ describe('d2l upcoming assessments behavior', function() {
 
 		it('calls _fetchEntityWithToken for the provided url', function() {
 			component._fetchEntityWithToken = sandbox.stub().returns(Promise.resolve(
-				window.D2L.Hypermedia.Siren.Parse(activities)
+				SirenParse(activities)
 			));
 			return component._loadActivitiesForPeriod(periodUrl)
 				.then(function() {

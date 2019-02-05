@@ -1,6 +1,6 @@
 /* global describe, it, fixture, expect */
 
-'use strict';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 describe('<d2l-assessments-list-item>', function() {
 
@@ -13,7 +13,7 @@ describe('<d2l-assessments-list-item>', function() {
 	}
 
 	// sets and return activity item
-	function setActivityItem(type, completed, userActivityUsageHref) {
+	function setActivityItem(type, completed, userActivityUsageHref, cb) {
 		var capitalizedType = type && type[0].toUpperCase() + type.slice(1);
 		var activityItem = {
 			name: 'Math ' + capitalizedType,
@@ -27,9 +27,9 @@ describe('<d2l-assessments-list-item>', function() {
 		};
 
 		element.assessmentItem = activityItem;
-		Polymer.dom.flush();
-
-		return activityItem;
+		flush(function() {
+			cb(activityItem);
+		});
 	}
 
 	function getEvent(type) {
@@ -80,54 +80,56 @@ describe('<d2l-assessments-list-item>', function() {
 	describe('item rendering', function() {
 
 		it('renders the correct data for a quiz', function(done) {
-			var quizItem = setActivityItem('quiz');
-
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.assessment-title').textContent).to.equal(quizItem.name);
-				expect(element.$$('.course-name').textContent).to.equal(quizItem.courseName);
-				expect(element.$$('.assessment-type').textContent).to.equal(quizItem.itemType);
-				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:quizzing');
-				done();
+			setActivityItem('quiz', undefined, undefined, (quizItem) => {
+				afterNextRender(element, () => {
+					expect(element.$$('.assessment-title').textContent).to.equal(quizItem.name);
+					expect(element.$$('.course-name').textContent).to.equal(quizItem.courseName);
+					expect(element.$$('.assessment-type').textContent).to.equal(quizItem.itemType);
+					expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:quizzing');
+					done();
+				});
 			});
 		});
 
 		it('renders the correct data for a discussion', function(done) {
-			var discussionItem = setActivityItem('discussion');
-
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.assessment-title').textContent).to.equal(discussionItem.name);
-				expect(element.$$('.course-name').textContent).to.equal(discussionItem.courseName);
-				expect(element.$$('.assessment-type').textContent).to.equal(discussionItem.itemType);
-				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:discussions');
-				done();
+			setActivityItem('discussion', undefined, undefined, (discussionItem) => {
+				afterNextRender(element, () => {
+					expect(element.$$('.assessment-title').textContent).to.equal(discussionItem.name);
+					expect(element.$$('.course-name').textContent).to.equal(discussionItem.courseName);
+					expect(element.$$('.assessment-type').textContent).to.equal(discussionItem.itemType);
+					expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:discussions');
+					done();
+				});
 			});
 		});
 
 		it('renders the correct data for an assignment', function(done) {
-			var assignmentItem = setActivityItem('assignment');
-
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.assessment-title').textContent).to.equal(assignmentItem.name);
-				expect(element.$$('.course-name').textContent).to.equal(assignmentItem.courseName);
-				expect(element.$$('.assessment-type').textContent).to.equal(assignmentItem.itemType);
-				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:assignments');
-				done();
+			setActivityItem('assignment', undefined, undefined, (assignmentItem) => {
+				afterNextRender(element, () => {
+					expect(element.$$('.assessment-title').textContent).to.equal(assignmentItem.name);
+					expect(element.$$('.course-name').textContent).to.equal(assignmentItem.courseName);
+					expect(element.$$('.assessment-type').textContent).to.equal(assignmentItem.itemType);
+					expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:assignments');
+					done();
+				});
 			});
 		});
 
 		it('has a completion checkmark when completed', function(done) {
-			setActivityItem('assignment', true);
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.completion-icon')).to.exist;
-				done();
+			setActivityItem('assignment', true, undefined, () => {
+				afterNextRender(element, () => {
+					expect(element.$$('.completion-icon')).to.exist;
+					done();
+				});
 			});
 		});
 
 		it('doesn\'t have a completion checkmark when not completed', function(done) {
-			setActivityItem('quiz');
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.completion-icon')).to.not.exist;
-				done();
+			setActivityItem('quiz', undefined, undefined, () => {
+				afterNextRender(element, () => {
+					expect(element.$$('.completion-icon')).to.not.exist;
+					done();
+				});
 			});
 		});
 
@@ -163,12 +165,14 @@ describe('<d2l-assessments-list-item>', function() {
 			{ assignmentLocation: null, flags: { activityDetailsEnabled: true }, event: 'space' },
 			{ assignmentLocation: '/path/to/userActivityUsageAssignment', flags: { activityDetailsEnabled: true }, event: 'tab' }
 		].forEach(testCase => {
-			it(`should not dispatch event if assignment details enabled is ${testCase.flags.activityDetailsEnabled}, userActivityUsageHref is ${testCase.assignmentLocation}, and event is ${testCase.event}`, function() {
+			it(`should not dispatch event if assignment details enabled is ${testCase.flags.activityDetailsEnabled}, userActivityUsageHref is ${testCase.assignmentLocation}, and event is ${testCase.event}`, function(done) {
 				element.flags = testCase.flags;
-				setActivityItem('assignment', false, testCase.assignmentLocation);
-				var processedEvent = getEvent(testCase.event);
-				container.dispatchEvent(processedEvent, true);
-				expect(element.dispatchEvent).to.not.be.called;
+				setActivityItem('assignment', false, testCase.assignmentLocation, () => {
+					var processedEvent = getEvent(testCase.event);
+					container.dispatchEvent(processedEvent, true);
+					expect(element.dispatchEvent).to.not.be.called;
+					done();
+				});
 			});
 		});
 
@@ -184,16 +188,18 @@ describe('<d2l-assessments-list-item>', function() {
 				};
 				var processedEvent = getEvent(testCase.event);
 
-				setActivityItem('quiz', false, '/path/to/userActivityUsageQuiz');
-				container.dispatchEvent(processedEvent);
-				Polymer.RenderStatus.afterNextRender(element, () => {
-					expect(element.dispatchEvent).to.not.be.called;
-
-					setActivityItem(null, false, null);
+				setActivityItem('quiz', false, '/path/to/userActivityUsageQuiz', () => {
 					container.dispatchEvent(processedEvent);
-					Polymer.RenderStatus.afterNextRender(element, () => {
+					afterNextRender(element, () => {
 						expect(element.dispatchEvent).to.not.be.called;
-						done();
+
+						setActivityItem(null, false, null, () => {
+							container.dispatchEvent(processedEvent);
+							afterNextRender(element, () => {
+								expect(element.dispatchEvent).to.not.be.called;
+								done();
+							});
+						});
 					});
 				});
 			});
@@ -207,15 +213,17 @@ describe('<d2l-assessments-list-item>', function() {
 			{ type: 'discussion', event: 'enter' },
 			{ type: 'discussion', event: 'space' }
 		].forEach(testCase => {
-			it(`should dispatch event for ${testCase.type} when all conditions are met and event is ${testCase.event}`, function() {
+			it(`should dispatch event for ${testCase.type} when all conditions are met and event is ${testCase.event}`, function(done) {
 				element.flags = {
 					assignmentDetailsEnabled: true,
 					discussionDetailsEnabled: true
 				};
-				setActivityItem(testCase.type, false, '/path/to/userActivityUsageAssignment');
-				var processedEvent = getEvent(testCase.event);
-				container.dispatchEvent(processedEvent);
-				expect(element.dispatchEvent).to.have.been.calledOnce;
+				setActivityItem(testCase.type, false, '/path/to/userActivityUsageAssignment', () => {
+					var processedEvent = getEvent(testCase.event);
+					container.dispatchEvent(processedEvent);
+					expect(element.dispatchEvent).to.have.been.calledOnce;
+					done();
+				});
 			});
 		});
 	});

@@ -12,7 +12,6 @@
 import '@polymer/polymer/polymer-legacy.js';
 
 import 'd2l-colors/d2l-colors.js';
-import 'd2l-hypermedia-constants/d2l-hm-constants-behavior.js';
 import 'd2l-typography/d2l-typography-shared-styles.js';
 import '../behaviors/d2l-upcoming-assessments-behavior.js';
 import '../behaviors/date-behavior.js';
@@ -78,8 +77,7 @@ Polymer({
 	behaviors: [
 		window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior,
 		window.D2L.UpcomingAssessments.DateBehavior,
-		window.D2L.UpcomingAssessments.LocalizeBehavior,
-		window.D2L.Hypermedia.HMConstantsBehavior
+		window.D2L.UpcomingAssessments.LocalizeBehavior
 	],
 
 	listeners: {

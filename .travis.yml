@@ -6,7 +6,7 @@ sudo: required
 addons:
   chrome: stable
 before_script:
-- npm run test:lint:html
+- npm run test:lint:js
 - npm run test:lint:wc
 script:
 - set -e

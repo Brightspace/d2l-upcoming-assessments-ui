@@ -19,7 +19,7 @@ const config = {
 		data: {
 			lang: lang,
 			properLang: lang.charAt(0).toUpperCase() + lang.slice(1).replace('-', ''),
-			resources: JSON.stringify(localeResources[lang], null, '\t\t\t\t'),
+			resources: JSON.stringify(localeResources[lang], null, '\t\t'),
 			comment: 'This file is auto-generated. Do not modify.'
 		}
 	}))
@@ -38,7 +38,7 @@ function build() {
 			.pipe(ejs(data, options))
 			.pipe(rename({
 				basename: filename,
-				extname: '.html'
+				extname: '.js'
 			}))
 			.pipe(gulp.dest(options.root)))
 	);

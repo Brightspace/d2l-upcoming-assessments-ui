@@ -1,4 +1,4 @@
-import 'd2l-hypermedia-constants/d2l-hm-constants-behavior.js';
+import { Classes, Rels } from 'd2l-hypermedia-constants';
 import './status-badge-behavior.js';
 
 window.D2L = window.D2L || {};
@@ -17,10 +17,10 @@ var typesBehaviorImpl = {
 						icon: 'assignments',
 						assessmentType: 'assignment',
 						canOpen: true,
-						instructionsRel: this.HypermediaRels.Assignments.instructions,
-						userActivityUsageClass: this.HypermediaClasses.activities.userAssignmentActivity,
-						activityRel: this.HypermediaRels.assignment,
-						activityClass: this.HypermediaClasses.assignments.assignment,
+						instructionsRel: Rels.Assignments.instructions,
+						userActivityUsageClass: Classes.activities.userAssignmentActivity,
+						activityRel: Rels.assignment,
+						activityClass: Classes.assignments.assignment,
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'assignmentDetailsEnabled'
 					},
@@ -28,10 +28,10 @@ var typesBehaviorImpl = {
 						icon: 'discussions',
 						assessmentType: 'discussion',
 						canOpen: true,
-						instructionsRel: this.HypermediaRels.Discussions.description,
-						userActivityUsageClass: this.HypermediaClasses.activities.userDiscussionActivity,
-						activityRel: this.HypermediaRels.Discussions.topic,
-						activityClass: this.HypermediaClasses.discussions.topic,
+						instructionsRel: Rels.Discussions.description,
+						userActivityUsageClass: Classes.activities.userDiscussionActivity,
+						activityRel: Rels.Discussions.topic,
+						activityClass: Classes.discussions.topic,
 						noCompletion: true,
 						activityDetailsFeatureFlag: 'discussionDetailsEnabled'
 					},
@@ -39,10 +39,10 @@ var typesBehaviorImpl = {
 						icon: 'quizzing',
 						assessmentType: 'quiz',
 						canOpen: false,
-						instructionsRel: this.HypermediaRels.Quizzes.description,
-						userActivityUsageClass: this.HypermediaClasses.activities.userQuizActivity,
-						activityRel: this.HypermediaRels.quiz,
-						activityClass: this.HypermediaClasses.quizzes.quiz,
+						instructionsRel: Rels.Quizzes.description,
+						userActivityUsageClass: Classes.activities.userQuizActivity,
+						activityRel: Rels.quiz,
+						activityClass: Classes.quizzes.quiz,
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 					},
@@ -56,13 +56,13 @@ var typesBehaviorImpl = {
 						},
 						assessmentType: 'content',
 						canOpen: false,
-						instructionsRel: this.HypermediaRels.Content.description,
-						userActivityUsageClass: this.HypermediaClasses.activities.userContentActivity,
+						instructionsRel: Rels.Content.description,
+						userActivityUsageClass: Classes.activities.userContentActivity,
 						usagePredicate: function(userActivityUsage) {
-							return userActivityUsage && userActivityUsage.hasClass(this.HypermediaClasses.content.topic);
+							return userActivityUsage && userActivityUsage.hasClass(Classes.content.topic);
 						}.bind(this),
-						activityRel: this.HypermediaRels.content,
-						activityClass: this.HypermediaClasses.content.sequencedActivity,
+						activityRel: Rels.content,
+						activityClass: Classes.content.sequencedActivity,
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 					}
@@ -91,7 +91,6 @@ var typesBehaviorImpl = {
 };
 
 window.D2L.UpcomingAssessments.TypesBehavior = [
-	window.D2L.Hypermedia.HMConstantsBehavior,
 	window.D2L.UpcomingAssessments.StatusBadgeBehavior,
 	typesBehaviorImpl
 ];

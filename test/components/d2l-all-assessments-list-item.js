@@ -1,7 +1,5 @@
 /* global describe, it, fixture, expect, beforeEach, sinon */
 
-'use strict';
-
 describe('<d2l-all-assessments-list-item>', function() {
 	var element;
 
@@ -25,7 +23,7 @@ describe('<d2l-all-assessments-list-item>', function() {
 		return date;
 	}
 
-	function setAssessmentItem(isDueToday, isOverdue, isEnded, statusConfig, type, userActivityUsageHref) {
+	function setAssessmentItem(isDueToday, isOverdue, isEnded, statusConfig, type, userActivityUsageHref, cb) {
 		// If due today, 0; if overdue, negative; otherwise, positive
 		var dueDateModifier = isDueToday ? 0 : isOverdue ? -3 : 3;
 		var endDateModifier = isEnded ? -1 : 5;
@@ -42,25 +40,29 @@ describe('<d2l-all-assessments-list-item>', function() {
 		};
 
 		element.set('assessmentItem', item);
-		Polymer.dom.flush();
+		flush(cb);
 	}
 
 	describe('_updateActivityStatus', function() {
-		it('should not display the badge when statusConfig is null', function() {
-			setAssessmentItem(false, false, false, null, 'assignment', 'https://example.com');
-			var statusBadge = element.$$('d2l-status-indicator');
-			expect(statusBadge.text || '').to.eql('');
-			expect(statusBadge.state).to.eql(undefined);
+		it('should not display the badge when statusConfig is null', function(done) {
+			setAssessmentItem(false, false, false, null, 'assignment', 'https://example.com', function() {
+				var statusBadge = element.$$('d2l-status-indicator');
+				expect(statusBadge.text || '').to.eql('');
+				expect(statusBadge.state).to.eql(undefined);
+				done();
+			});
 		});
 
-		it('should display the badge when statusConfig has state and text', function() {
+		it('should display the badge when statusConfig has state and text', function(done) {
 			setAssessmentItem(false, false, false, {
 				state: 'success',
 				text: 'activityComplete'
-			}, 'assignment', 'https://example.com');
-			var statusBadge = element.$$('d2l-status-indicator');
-			expect(statusBadge.text).to.eql('Complete');
-			expect(statusBadge.state).to.eql('success');
+			}, 'assignment', 'https://example.com', function() {
+				var statusBadge = element.$$('d2l-status-indicator');
+				expect(statusBadge.text).to.eql('Complete');
+				expect(statusBadge.state).to.eql('success');
+				done();
+			});
 		});
 	});
 
@@ -92,39 +94,49 @@ describe('<d2l-all-assessments-list-item>', function() {
 			sandbox.restore();
 		});
 
-		it('should not dispatch event if activity details is not enabled', function() {
+		it('should not dispatch event if activity details is not enabled', function(done) {
 			element.flags = { assignmentDetailsEnabled: false };
-			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url');
-			element._openActivityDetails();
-			expect(element.dispatchEvent).to.not.be.called;
+			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url', function() {
+				element._openActivityDetails();
+				expect(element.dispatchEvent).to.not.be.called;
+				done();
+			});
 		});
 
-		it('should not dispatch event for quiz assessment items', function() {
+		it('should not dispatch event for quiz assessment items', function(done) {
 			element.flags = { assignmentDetailsEnabled: true };
-			setAssessmentItem(false, false, false, null, 'quiz');
-			element._openActivityDetails();
-			expect(element.dispatchEvent).to.not.be.called;
+			setAssessmentItem(false, false, false, null, 'quiz', undefined, function() {
+				element._openActivityDetails();
+				expect(element.dispatchEvent).to.not.be.called;
+				done();
+			});
 		});
 
-		it('should not dispatch event if userActivityUsageHref is null', function() {
+		it('should not dispatch event if userActivityUsageHref is null', function(done) {
 			element.flags = { assignmentDetailsEnabled: true };
-			setAssessmentItem(false, false, false, null, 'assignment');
-			element._openActivityDetails();
-			expect(element.dispatchEvent).to.not.be.called;
+			setAssessmentItem(false, false, false, null, 'assignment', undefined, function() {
+				element._openActivityDetails();
+				expect(element.dispatchEvent).to.not.be.called;
+				done();
+			});
 		});
 
-		it('should dispatch event when all conditions are met for an assignment', function() {
+		it('should dispatch event when all conditions are met for an assignment', function(done) {
 			element.flags = { assignmentDetailsEnabled: true };
-			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url');
-			element._openActivityDetails();
-			expect(element.dispatchEvent).to.be.called;
+			setAssessmentItem(false, false, false, null, 'assignment', '/user/activity/url', function() {
+				element._openActivityDetails();
+				expect(element.dispatchEvent).to.be.called;
+				done();
+			});
 		});
 
-		it('should dispatch event when all conditions are met for a discussion', function() {
+		it('should dispatch event when all conditions are met for a discussion', function(done) {
 			element.flags = { discussionDetailsEnabled: true };
-			setAssessmentItem(false, false, false, null, 'discussion', '/user/activity/url');
-			element._openActivityDetails();
-			expect(element.dispatchEvent).to.be.called;
+			setAssessmentItem(false, false, false, null, 'discussion', '/user/activity/url', function() {
+				element._openActivityDetails();
+				expect(element.dispatchEvent).to.be.called;
+				done();
+			});
 		});
 	});
 

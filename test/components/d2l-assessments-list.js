@@ -1,6 +1,7 @@
 /* global describe, it, fixture, expect, beforeEach */
 
-'use strict';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
 
 describe('<d2l-assessments-list>', function() {
 
@@ -64,8 +65,8 @@ describe('<d2l-assessments-list>', function() {
 
 		it('renders the correct number of list items', function(done) {
 			element.set('assessmentItems', assessmentItems);
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				var listElements = Polymer.dom(element.root).querySelectorAll('d2l-assessments-list-item');
+			afterNextRender(element, () => {
+				var listElements = dom(element.root).querySelectorAll('d2l-assessments-list-item');
 				expect(listElements.length).to.equal(assessmentItems.length);
 				done();
 			});
@@ -73,15 +74,15 @@ describe('<d2l-assessments-list>', function() {
 
 		it('re-renders the list when a new set of items is supplied', function(done) {
 			element.set('assessmentItems', assessmentItems);
-			Polymer.RenderStatus.afterNextRender(element, () => {
+			afterNextRender(element, () => {
 				var template = element.$$('template');
 				template && template.render && template.render();
 
 				element.set('assessmentItems', newAssessmentItems);
-				Polymer.RenderStatus.afterNextRender(element, () => {
+				afterNextRender(element, () => {
 					template && template.render && template.render();
 
-					var listElements = Polymer.dom(element.root).querySelectorAll('d2l-assessments-list-item');
+					var listElements = dom(element.root).querySelectorAll('d2l-assessments-list-item');
 					expect(listElements.length).to.equal(newAssessmentItems.length);
 					done();
 				});

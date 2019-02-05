@@ -1,6 +1,6 @@
 import '@polymer/polymer/polymer-legacy.js';
 import 'd2l-fetch-siren-entity-behavior/d2l-fetch-siren-entity-behavior.js';
-import 'd2l-hypermedia-constants/d2l-hm-constants-behavior.js';
+import { Classes } from 'd2l-hypermedia-constants';
 import './date-behavior.js';
 
 window.D2L = window.D2L || {};
@@ -61,14 +61,14 @@ var statusBadgeBehaviorImpl = {
 
 	_getCompletionState: function(userActivityUsage) {
 		return {
-			isCompleted: !!userActivityUsage.getSubEntityByClass(this.HypermediaClasses.activities.complete)
+			isCompleted: !!userActivityUsage.getSubEntityByClass(Classes.activities.complete)
 		};
 	},
 
 	_getDueDateState: function(userActivityUsage, overdueUserActivityUsages) {
 		var activityIsOverdue = false;
 		var activityIsDueToday = false;
-		var dueDateEntity = userActivityUsage.getSubEntityByClass(this.HypermediaClasses.dates.dueDate);
+		var dueDateEntity = userActivityUsage.getSubEntityByClass(Classes.dates.dueDate);
 		var dueDate;
 		if (dueDateEntity) {
 			dueDate = dueDateEntity.properties.date;
@@ -86,7 +86,7 @@ var statusBadgeBehaviorImpl = {
 	},
 
 	_getEndDateState: function(dateEntity) {
-		var endDateEntity = dateEntity.getSubEntityByClass(this.HypermediaClasses.dates.endDate);
+		var endDateEntity = dateEntity.getSubEntityByClass(Classes.dates.endDate);
 		var isEnded = false;
 		var endsToday = false;
 		var endDate;
@@ -107,7 +107,7 @@ var statusBadgeBehaviorImpl = {
 
 	_getExemptState: function(userActivityUsage) {
 		return {
-			isExempt: userActivityUsage.hasClass(this.HypermediaClasses.activities.exempt)
+			isExempt: userActivityUsage.hasClass(Classes.activities.exempt)
 		};
 	},
 
@@ -131,6 +131,5 @@ var statusBadgeBehaviorImpl = {
 window.D2L.UpcomingAssessments.StatusBadgeBehavior = [
 	D2L.PolymerBehaviors.FetchSirenEntityBehavior,
 	window.D2L.UpcomingAssessments.DateBehavior,
-	window.D2L.Hypermedia.HMConstantsBehavior,
 	statusBadgeBehaviorImpl
 ];

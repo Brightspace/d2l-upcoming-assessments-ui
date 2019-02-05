@@ -1,4 +1,5 @@
-import 'siren-parser/siren-parser.js';
+import SirenParse from 'siren-parser';
+import { Actions, Classes, Rels } from 'd2l-hypermedia-constants';
 import './date-behavior.js';
 import './types-behavior.js';
 import './status-badge-behavior.js';
@@ -37,7 +38,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_getOrganizationRequest: function(userActivityUsage, getToken, userUrl) {
-		var organizationLink = (userActivityUsage.getLinkByRel(this.HypermediaRels.organization) || {}).href;
+		var organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
 		return this._fetchEntityWithToken(organizationLink, getToken, userUrl);
 	},
 
@@ -76,7 +77,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_getRichTextValuePreferPlainText: function(richtextEntity) {
-		if (!richtextEntity || !richtextEntity.hasClass(this.HypermediaClasses.text.richtext) ||
+		if (!richtextEntity || !richtextEntity.hasClass(Classes.text.richtext) ||
 			(!richtextEntity.properties.text && !richtextEntity.properties.html)) {
 			return '';
 		}
@@ -175,7 +176,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_getUserActivityUsages: function(userEntity, getToken, userUrl) {
-		var myActivitiesLink = (userEntity.getLinkByRel(this.HypermediaRels.Activities.myActivities) || {}).href;
+		var myActivitiesLink = (userEntity.getLinkByRel(Rels.Activities.myActivities) || {}).href;
 		var self = this;
 
 		if (myActivitiesLink) {
@@ -187,14 +188,14 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_getOverdueActivities: function(activities, getToken, userUrl) {
-		var overdueActivitiesLink = (activities.getLinkByRel(this.HypermediaRels.Activities.overdue) || {}).href;
+		var overdueActivitiesLink = (activities.getLinkByRel(Rels.Activities.overdue) || {}).href;
 
 		if (overdueActivitiesLink) {
 			return this._fetchEntityWithToken(overdueActivitiesLink, getToken, userUrl);
 		}
 
 		// API doesn't include the overdue link if user doesn't have any overdue activities
-		return window.D2L.Hypermedia.Siren.Parse({});
+		return SirenParse({});
 	},
 
 	_getCustomRangeAction: function(activitiesUrl, userUrl) {
@@ -208,7 +209,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			.then(function(activities) {
 				var currentTime = new Date();
 				var parameters = self._getCustomDateRangeParameters(currentTime);
-				var action = (activities.getActionByName(self.HypermediaActions.activities.selectCustomDateRange) || {});
+				var action = (activities.getActionByName(Actions.activities.selectCustomDateRange) || {});
 
 				self._selectCustomDateRangeAction = action;
 				return self._createActionUrl(action, parameters);
@@ -240,8 +241,8 @@ var upcomingAssessmentsBehaviorImpl = {
 
 		return this._fetchEntityWithToken(this.userUrl, this.getToken)
 			.then(function(userEntity) {
-				self._firstName = (userEntity.getSubEntityByRel(self.HypermediaRels.firstName) || { properties: {} }).properties.name;
-				var myActivitiesLink = (userEntity.getLinkByRel(self.HypermediaRels.Activities.myActivities) || {}).href;
+				self._firstName = (userEntity.getSubEntityByRel(Rels.firstName) || { properties: {} }).properties.name;
+				var myActivitiesLink = (userEntity.getLinkByRel(Rels.Activities.myActivities) || {}).href;
 				return self._getCustomRangeAction(myActivitiesLink, self.userUrl)
 					.then(function(customActivitiesLink) {
 						return self._loadActivitiesForPeriod(customActivitiesLink);
@@ -264,8 +265,8 @@ var upcomingAssessmentsBehaviorImpl = {
 		return this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl)
 			.then(function(userUsages) {
 				userActivityUsages = userUsages;
-				self._previousPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.previousPeriod) || {}).href;
-				self._nextPeriodUrl = (userActivityUsages.getLinkByRel(self.HypermediaRels.Activities.nextPeriod) || {}).href;
+				self._previousPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.previousPeriod) || {}).href;
+				self._nextPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.nextPeriod) || {}).href;
 				self._periodStart = userActivityUsages.properties.start;
 				self._periodEnd = userActivityUsages.properties.end;
 
@@ -328,7 +329,6 @@ window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior = [
 	window.D2L.UpcomingAssessments.DateBehavior,
 	D2L.UpcomingAssessments.TypesBehavior,
 	D2L.PolymerBehaviors.FetchSirenEntityBehavior,
-	window.D2L.Hypermedia.HMConstantsBehavior,
 	window.D2L.UpcomingAssessments.StatusBadgeBehavior,
 	upcomingAssessmentsBehaviorImpl
 ];

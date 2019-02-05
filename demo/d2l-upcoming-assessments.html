@@ -79,22 +79,16 @@ $_documentContainer.innerHTML = `<div class="vertical-section-container centered
 					</d2l-upcoming-assessments>
 				</template>
 			</demo-snippet>
-			<script>
-				setTimeout(function() {
-					document.querySelectorAll('d2l-upcoming-assessments').forEach(function(assessment) {
-						assessment._isWhitelisted = function() { return true; };
-						assessment.getToken = function() { return Promise.resolve('foozleberries'); };
-						assessment.isActivityUpcoming = function() { return true; };
-					}, 100);
-				});
-			&lt;/script>
 		</div>`;
 
 document.body.appendChild($_documentContainer.content);
-</script> assessment.isActivityUpcoming = function() { return true; };
+setTimeout(function() {
+	document.querySelectorAll('d2l-upcoming-assessments').forEach(function(assessment) {
+		assessment._isWhitelisted = function() { return true; };
+		assessment.getToken = function() { return Promise.resolve('foozleberries'); };
+		assessment.isActivityUpcoming = function() { return true; };
 	}, 100);
 });
 </script>
-		</div>
 	</body>
 </html>
