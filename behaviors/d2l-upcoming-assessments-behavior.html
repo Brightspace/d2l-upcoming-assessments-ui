@@ -75,7 +75,11 @@
 			if (!item) {
 				return '';
 			}
-			return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(item.instructionsRel));
+			var instructionsActivity = item.instructionsRel && activity.getSubEntityByRel(item.instructionsRel);
+			if (!instructionsActivity && item.instructionsClass) {
+				instructionsActivity = activity.getSubEntityByClass(item.instructionsClass);
+			}
+			return this._getRichTextValuePreferPlainText(instructionsActivity);
 		},
 
 		_getRichTextValuePreferPlainText: function(richtextEntity) {
