@@ -15,6 +15,19 @@
 	var upcomingAssessmentsBehaviorImpl = {
 
 		properties: {
+			_activityTypes: {
+				type: Array,
+				value: function() {
+					return [
+						this.HypermediaClasses.activities.userAssignmentActivity,
+						this.HypermediaClasses.activities.userQuizActivity,
+						this.HypermediaClasses.activities.userDiscussionActivity,
+						this.HypermediaClasses.activities.userContentActivity,
+						this.HypermediaClasses.activities.userChecklistActivity,
+						this.HypermediaClasses.activities.userSurveyActivity
+					];
+				}
+			},
 			userUrl: String,
 			getToken: {
 				type: Object,
@@ -91,7 +104,9 @@
 			var usages = [];
 			this._allTypes.forEach(function(typeString) {
 				var type = this._types[typeString];
-				var entities = usageList.getSubEntitiesByClass(type.userActivityUsageClass);
+				var entities = usageList.filter(function(usage) {
+					return usage.hasClass(type.userActivityUsageClass);
+				});
 				if (type.usagePredicate) {
 					entities = entities.filter(type.usagePredicate);
 				}
@@ -119,7 +134,7 @@
 		* Returns an object that contains the information required to populate an assessment list item
 		*/
 		_getUserActivityUsagesInfos: function(userActivityUsages, overdueUserActivityUsages, getToken, userUrl) {
-			if (!userActivityUsages.entities) {
+			if (!Array.isArray(userActivityUsages) || userActivityUsages.length === 0) {
 				return;
 			}
 
@@ -278,7 +293,20 @@
 					self._periodStart = userActivityUsages.properties.start;
 					self._periodEnd = userActivityUsages.properties.end;
 
-					return self._getUserActivityUsagesInfos(userActivityUsages, overdueUserActivityUsages, self.getToken, self.userUrl);
+					var flattenActivityUsages = self._flattenActivities(userActivityUsages);
+					var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages);
+
+					return Promise.all([
+						flattenActivityUsages,
+						flattenOverdueActivityUsages
+					]).then(function(responses) {
+						return self._getUserActivityUsagesInfos(
+							responses[0],
+							responses[1],
+							self.getToken,
+							self.userUrl
+						);
+					});
 				})
 				.then(function(userActivityUsagesInfos) {
 					var activities = self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
@@ -326,6 +354,153 @@
 			this._nextPeriodUrl = null;
 			this._periodStart = null;
 			this._periodEnd = null;
+		},
+
+		/*
+		* Returns a flattened list of user-activity-usages, deduplicating where necessary
+		* If a user-content-activity points to a supported domain-specific user-activity-usage,
+		* that content activity is removed, and only the domain activity is added.
+		* Linked subentities are hydrated, and the date restrictions of the
+		* parent content activity are projected onto the child activity when missing.
+		*/
+		_flattenActivities: function(activities) {
+			var activitiesMap = new Map();
+			var parentActivitiesMap = new Map();
+			var allActivities = [];
+			var activityEntities = [];
+			var self = this;
+
+			if (Array.isArray(activities)) {
+				activityEntities = activities;
+			} else {
+				activityEntities = activities.entities || [];
+			}
+
+			activityEntities = activityEntities.map(function(entity) {
+				return window.D2L.Hypermedia.Siren.Parse(entity);
+			});
+
+			activityEntities.forEach(function(activity) {
+				var sirenActivity = window.D2L.Hypermedia.Siren.Parse(activity);
+				var childActivity = sirenActivity.getSubEntityByRel('https://activities.api.brightspace.com/rels/child-user-activity-usage');
+
+				if (childActivity) {
+					var childActivityHref = childActivity.href; // Save because parsing it dumps this..
+					childActivity =  window.D2L.Hypermedia.Siren.Parse(childActivity);
+					childActivity.href = childActivityHref;
+
+					var childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
+
+					parentActivitiesMap.set(childSelfLink, sirenActivity);
+
+					for (var index = 0; index < self._activityTypes.length; index++) {
+						if (childActivity.hasClass(self._activityTypes[index])) {
+							allActivities.push(childActivity);
+							break;
+						}
+					}
+				}
+
+				allActivities.push(sirenActivity);
+			});
+
+			// Flatten activities, preferring already-hydrated version of any entities
+			allActivities.forEach(function(activityEntity) {
+				var selfLink = (activityEntity.getLinkByRel('self') || {}).href
+					|| activityEntity.href;
+
+				if (activitiesMap.has(selfLink)) {
+					if (activitiesMap.get(selfLink).href !== undefined) {
+						activitiesMap.set(selfLink, activityEntity);
+					}
+				} else {
+					activitiesMap.set(selfLink, activityEntity);
+				}
+			});
+
+			return this._hydrateActivityEntities(Array.from(activitiesMap.values()))
+				.then(function(hydratedActivities) {
+					var activitiesToRemove = new Set();
+
+					// Normalize activity data prior to deduping; eg, some activities don't
+					// have a due date (surveys), while the content topic can
+					hydratedActivities
+						.forEach(function(activity) {
+							if (parentActivitiesMap.has(activity.getLinkByRel('self').href)) {
+								var parentActivity = parentActivitiesMap.get(activity.getLinkByRel('self').href);
+
+								if (activity.getSubEntitiesByClass('due-date').length === 0) {
+									var parentDueDates = parentActivity.getSubEntitiesByClass('due-date');
+
+									if (parentDueDates.length > 0) {
+										Array.isArray(activity.entities)
+											? activity.entities.push(parentDueDates[0])
+											: activity.entities = [parentDueDates[0]];
+									}
+								}
+
+								activitiesToRemove.add(parentActivity.getLinkByRel('self').href);
+							}
+
+							activitiesMap.set(activity.getLinkByRel('self').href, activity);
+						});
+
+					// If an activity is a child of a content activity,
+					// and we directly support the child entity activity type,
+					// remove the content entity.
+					Array.from(activitiesToRemove)
+						.forEach(function(activityHref) {
+							activitiesMap.delete(activityHref);
+						});
+
+					// Ensure all entities have helpers
+					var parsedPopulatedEntities = Array.from(activitiesMap.values())
+						.map(function(currActivity) {
+							return window.D2L.Hypermedia.Siren.Parse({
+								class: currActivity.class,
+								rel: currActivity.rel,
+								entities: currActivity.entities,
+								links: currActivity.links,
+								actions: currActivity.actions,
+								href: currActivity.href
+							});
+						});
+
+					return Promise.resolve(parsedPopulatedEntities);
+				});
+		},
+
+		/*
+		* On success, all activities, with linked subentities hydrated
+		*/
+		_hydrateActivityEntities: function(activityEntities) {
+			var self = this;
+
+			// Already-complete entities
+			var hydratedActivities = activityEntities
+				.filter(function(entity) {
+					return !entity.href;
+				});
+
+			var activityPromises = activityEntities
+				.filter(function(entity) {
+					return !!entity.href;
+				})
+				.map(function(entity) {
+					return self._fetchEntityWithToken(entity.href, self.getToken, self.userUrl)
+						.then(function(entity) {
+							return Promise.resolve(window.D2L.Hypermedia.Siren.Parse(entity));
+						});
+				});
+
+			return Promise.all(activityPromises)
+				.then(function(entities) {
+					entities.forEach(function(entity) {
+						hydratedActivities.push(entity);
+					});
+
+					return Promise.resolve(hydratedActivities);
+				});
 		}
 	};
 
