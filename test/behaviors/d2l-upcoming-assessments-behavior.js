@@ -395,7 +395,7 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsage = getUserActivityUsage('unsupported');
 			userUsages = parse({ entities: [userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.not.been.called;
 					expect(component._getActivityRequest).to.have.not.been.called;
@@ -406,7 +406,7 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsage = getUserActivityUsage('content', false, false, true);
 			userUsages = parse({ entities: [userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.not.been.called;
 					expect(component._getActivityRequest).to.have.not.been.called;
@@ -417,7 +417,7 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsage = getUserActivityUsage('content', false, false, false);
 			userUsages = parse({ entities: [userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.been.called;
 					expect(component._getActivityRequest).to.have.been.called;
@@ -425,14 +425,14 @@ describe('d2l upcoming assessments behavior', function() {
 		});
 
 		it('should call _getOrganizationRequest for the organization', function() {
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.been.called;
 				});
 		});
 
 		it('should call _getActivityRequest for the activity', function() {
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getActivityRequest).to.have.been.called;
 				});
@@ -441,7 +441,7 @@ describe('d2l upcoming assessments behavior', function() {
 		it('should set the info property to the value returned from _getInstructions', function() {
 			component._getInstructions = sandbox.stub().returns('bonita bonita bonita');
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function(response) {
 					expect(component._getInstructions).to.be.called;
 					expect(response[0].info).to.equal('bonita bonita bonita');
@@ -451,7 +451,7 @@ describe('d2l upcoming assessments behavior', function() {
 		it('should fail when all the activity requests fail', function() {
 			component._getActivityRequest = sandbox.stub().returns(Promise.resolve(null));
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					return Promise.reject('Expect failure');
 				})
@@ -466,7 +466,7 @@ describe('d2l upcoming assessments behavior', function() {
 
 			userUsages = parse({ entities: [userUsage, userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function(response) {
 					expect(component._getInstructions).to.be.called;
 					expect(response[0].info).to.equal('bonita bonita bonita');
@@ -499,7 +499,7 @@ describe('d2l upcoming assessments behavior', function() {
 				text: 'complete'
 			});
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function(response) {
 					expect(response[0].name).to.equal(activityName);
 					expect(response[0].courseName).to.equal(organizationName);
