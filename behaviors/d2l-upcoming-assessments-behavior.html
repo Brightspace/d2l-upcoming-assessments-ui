@@ -15,19 +15,6 @@
 	var upcomingAssessmentsBehaviorImpl = {
 
 		properties: {
-			_activityTypes: {
-				type: Array,
-				value: function() {
-					return [
-						this.HypermediaClasses.activities.userAssignmentActivity,
-						this.HypermediaClasses.activities.userQuizActivity,
-						this.HypermediaClasses.activities.userDiscussionActivity,
-						this.HypermediaClasses.activities.userContentActivity,
-						this.HypermediaClasses.activities.userChecklistActivity,
-						this.HypermediaClasses.activities.userSurveyActivity
-					];
-				}
-			},
 			userUrl: String,
 			getToken: {
 				type: Object,
@@ -380,31 +367,53 @@
 				.then(function(hydratedActivities) {
 					var activitiesMap = activitiesContext.activitiesMap;
 					var parentActivitiesMap = activitiesContext.parentActivitiesMap;
+					var redundantActivities = [];
 
 					// Normalize activity data prior to deduping; eg, some activities don't
 					// have a due date (surveys), while the content topic can
 					hydratedActivities.forEach(function(activity) {
+						var isChanged = false;
+
 						if (parentActivitiesMap.has(activity.getLinkByRel('self').href)) {
 							var parentActivity = parentActivitiesMap.get(activity.getLinkByRel('self').href);
 
-							if (activity.getSubEntitiesByClass('due-date').length === 0) {
-								var parentDueDates = parentActivity.getSubEntitiesByClass('due-date');
+							if (!activity.hasEntityByClass('due-date') && parentActivity.hasEntityByClass('due-date')) {
+								var parentDueDate = parentActivity.getSubEntityByClass('due-date');
 
-								if (parentDueDates.length > 0) {
-									Array.isArray(activity.entities)
-										? activity.entities.push(parentDueDates[0])
-										: activity.entities = [parentDueDates[0]];
-								}
+								Array.isArray(activity.entities)
+									? activity.entities.push(parentDueDate)
+									: activity.entities = [parentDueDate];
+
+								isChanged = true;
 							}
 
 							// We support the child activity directly, so delete parent content topic
-							activitiesMap.delete(parentActivity.getLinkByRel('self').href);
+							redundantActivities.push(parentActivity.getLinkByRel('self').href);
 						}
 
-						activitiesMap.set(activity.getLinkByRel('self').href, activity);
+						// Since downstream logic depends on Siren for the component's data model,
+						// we need to re-parse when we've added entities/links/actions so that helper
+						// functions are updated. Not great, but should be rare, and a good case for
+						// abstracting from Siren a bit more.
+						// Also need to create new object, as node-siren-parser might have guards for
+						// re-parsing in some cases..
+						var activityToSave = isChanged
+							? window.D2L.Hypermedia.Siren.Parse({
+								class: activity.class,
+								rel: activity.rel,
+								entities: activity.entities,
+								actions: activity.actions,
+								links: activity.links
+							})
+							: activity;
+
+						activitiesMap.set(activity.getLinkByRel('self').href, activityToSave);
 					});
 
-					return Promise.resolve(Array.from(activitiesMap.values()));
+					return Array.from(activitiesMap.values())
+						.filter(function(activityHref) {
+							return !redundantActivities.includes(activityHref.getLinkByRel('self').href);
+						});
 				});
 		},
 
@@ -414,35 +423,36 @@
 			var allActivities = [];
 			var self = this;
 
-			activityEntities = activityEntities.map(function(entity) {
-				return window.D2L.Hypermedia.Siren.Parse(entity);
-			});
+			activityEntities
+				.map(window.D2L.Hypermedia.Siren.Parse)
+				.forEach(function(activity) {
+					var childActivity = activity.getSubEntityByRel(self.HypermediaRels.Activities.childUserActivityUsage);
 
-			activityEntities.forEach(function(activity) {
-				var sirenActivity = window.D2L.Hypermedia.Siren.Parse(activity);
-				var childActivity = sirenActivity.getSubEntityByRel(self.HypermediaRels.Activities.childUserActivityUsage);
+					if (childActivity) {
+						// @NOTE: Possible bug in node-siren-parser means linked subentities don't have
+						// helper functions, so, re-parse if so.
+						if (childActivity.href) {
+							var childActivityHref = childActivity.href; // Save because parsing it in isolation dumps this..
+							childActivity =  window.D2L.Hypermedia.Siren.Parse(childActivity);
+							childActivity.href = childActivityHref;
+						}
 
-				if (childActivity) {
-					var childActivityHref = childActivity.href; // Save because parsing it dumps this..
-					childActivity =  window.D2L.Hypermedia.Siren.Parse(childActivity);
-					childActivity.href = childActivityHref;
+						var childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
 
-					var childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
+						parentActivitiesMap.set(childSelfLink, activity);
 
-					parentActivitiesMap.set(childSelfLink, sirenActivity);
-
-					for (var index = 0; index < self._activityTypes.length; index++) {
-						if (childActivity.hasClass(self._activityTypes[index])) {
-							allActivities.push(childActivity);
-							break;
+						for (var index = 0; index < self._activityTypes.length; index++) {
+							if (childActivity.hasClass(self._activityTypes[index])) {
+								allActivities.push(childActivity);
+								break;
+							}
 						}
 					}
-				}
 
-				allActivities.push(sirenActivity);
-			});
+					allActivities.push(activity);
+				});
 
-			// Flatten activities, preferring already-hydrated version of any entities
+			// Dedupe activities, preferring already-hydrated version of any entities
 			allActivities.forEach(function(activityEntity) {
 				var selfLink = (activityEntity.getLinkByRel('self') || {}).href
 					|| activityEntity.href;
@@ -476,13 +486,11 @@
 
 			var activityPromises = activityEntities
 				.filter(function(entity) {
-					return !!entity.href;
+					return entity.href;
 				})
 				.map(function(entity) {
 					return self._fetchEntityWithToken(entity.href, self.getToken, self.userUrl)
-						.then(function(entity) {
-							return Promise.resolve(window.D2L.Hypermedia.Siren.Parse(entity));
-						});
+						.then(window.D2L.Hypermedia.Siren.Parse);
 				});
 
 			return Promise.all(activityPromises)
@@ -491,7 +499,7 @@
 						hydratedActivities.push(entity);
 					});
 
-					return Promise.resolve(hydratedActivities);
+					return hydratedActivities;
 				});
 		}
 	};

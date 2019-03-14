@@ -12,6 +12,19 @@
 	*/
 	var typesBehaviorImpl = {
 		properties: {
+			_activityTypes: {
+				type: Array,
+				value: function() {
+					return [
+						this.HypermediaClasses.activities.userAssignmentActivity,
+						this.HypermediaClasses.activities.userQuizActivity,
+						this.HypermediaClasses.activities.userDiscussionActivity,
+						this.HypermediaClasses.activities.userContentActivity,
+						this.HypermediaClasses.activities.userChecklistActivity,
+						this.HypermediaClasses.activities.userSurveyActivity
+					];
+				}
+			},
 			_types: {
 				type: Object,
 				value: function() {
@@ -28,9 +41,8 @@
 							activityDetailsFeatureFlag: 'assignmentDetailsEnabled'
 						},
 						checklistItem: {
-							icon: function(assessmentItem) {
-								// checklist doesn't have a tier 3 icon
-								return assessmentItem.tier2IconKey || 'd2l-tier2:checklist';
+							icon: function() {
+								return 'd2l-tier2:checklist'; // checklist doesn't have a tier3 icon
 							},
 							assessmentType: 'checklistItem',
 							canOpen: false,
@@ -84,9 +96,8 @@
 							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 						},
 						survey: {
-							icon: function(assessmentItem) {
-								// survey doesn't have a tier 3 icon
-								return assessmentItem.tier2IconKey || 'd2l-tier2:surveys';
+							icon: function() {
+								return 'd2l-tier2:surveys'; // surveys doesn't have a tier3 icon
 							},
 							assessmentType: 'survey',
 							canOpen: false,
