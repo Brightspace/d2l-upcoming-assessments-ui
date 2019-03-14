@@ -238,7 +238,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list-item">
 		</div>
 	</template>
 
-	
+
 </dom-module>`;
 
 document.head.appendChild($_documentContainer.content);
@@ -355,7 +355,8 @@ Polymer({
 				detail: {
 					pageName: 'activity-details',
 					userActivityUsageHref: self.assessmentItem.userActivityUsageHref
-				}
+				},
+				composed: true
 			}));
 		}
 	},

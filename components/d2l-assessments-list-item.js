@@ -150,7 +150,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-assessments-list-item">
 			</div>
 	</template>
 
-	
+
 </dom-module>`;
 
 document.head.appendChild($_documentContainer.content);
@@ -255,7 +255,8 @@ Polymer({
 			detail: {
 				pageName: 'activity-details',
 				userActivityUsageHref: this.assessmentItem.userActivityUsageHref
-			}
+			},
+			composed: true
 		});
 
 		var onTap = function() { self.dispatchEvent(event); };

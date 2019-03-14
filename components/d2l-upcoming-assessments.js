@@ -139,7 +139,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-upcoming-assessments">
 	</d2l-link>
 	</template>
 
-	
+
 </dom-module>`;
 
 document.head.appendChild($_documentContainer.content);
@@ -254,7 +254,8 @@ Polymer({
 			detail: {
 				pageName: 'view-all-work'
 			},
-			bubbles: true
+			bubbles: true,
+			composed: true
 		}));
 	},
 
