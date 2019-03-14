@@ -802,4 +802,132 @@ describe('d2l upcoming assessments behavior', function() {
 		});
 	});
 
+	describe('activity usage flattening', function() {
+		var userContentActivity = {
+			'class': [
+				'user-content-activity',
+				'topic',
+				'activity'
+			],
+			'rel': [
+				'https://activities.api.brightspace.com/rels/user-activity-usage'
+			],
+			'entities': [{
+				'class': [
+					'user-checklist-activity', 'activity'
+				],
+				'rel': [
+					'https://activities.api.brightspace.com/rels/child-user-activity-usage'
+				],
+				'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_61000_1/usages/6609/users/14291'
+			}, {
+				'class': ['date', 'due-date'],
+				'rel': [
+					'https://api.brightspace.com/rels/date'
+				],
+				'properties': {
+					'date': '2019-03-13T22:00:00.000Z'
+				}
+			}, {
+				'rel': ['https://activities.api.brightspace.com/rels/completion']
+			}],
+			'links': [{
+				'rel': [
+					'https://activities.api.brightspace.com/rels/user-activity-usage',
+					'self'
+				],
+				'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_37000_97666/usages/6609/users/14291'
+			}]
+		};
+
+		const hydratedChildActivity = {
+			'class': [
+				'user-checklist-activity',
+				'activity'
+			],
+			'rel': [
+				'https://activities.api.brightspace.com/rels/user-activity-usage'
+			],
+			'entities': [{
+				'class': ['date', 'due-date'],
+				'rel': [
+					'https://api.brightspace.com/rels/date'
+				],
+				'properties': {
+					'date': '2019-03-14T22:15:00.000Z'
+				}
+			},
+			{
+				'class': ['date', 'end-date'],
+				'rel': ['https://api.brightspace.com/rels/date'],
+				'properties': {
+					'date': '2019-03-14T22:15:00.000Z'
+				}
+			},
+			{
+				'class': ['completion', 'incomplete'],
+				'rel': [
+					'item',
+					'https://activities.api.brightspace.com/rels/completion'
+				]
+			}],
+			'links': [{
+				'rel': [
+					'https://activities.api.brightspace.com/rels/user-activity-usage',
+					'self'
+				],
+				'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_61000_1/usages/6609/users/14291'
+			}]
+		};
+
+		const linkedActivitySubentity = {
+			'class': [
+				'user-checklist-activity', 'activity'
+			],
+			'rel': [
+				'https://activities.api.brightspace.com/rels/child-user-activity-usage'
+			],
+			'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_61000_1/usages/6609/users/14291'
+		};
+
+		it('uses content topic linked child subentity if no hydrated version exists', function() {
+			var result = component._createNormalizedEntityMap([
+				userContentActivity
+			]);
+
+			var resultActivities = Array.from(result.activitiesMap.values());
+
+			// Parsing trashes href on entity without parent
+			var linkedSubentity = window.D2L.Hypermedia.Siren.Parse(linkedActivitySubentity);
+			linkedSubentity.href = linkedActivitySubentity.href;
+
+			expect(resultActivities.length).to.equal(2);
+			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(userContentActivity));
+			expect(resultActivities).to.deep.include(linkedSubentity);
+		});
+
+		it('prefers hydrated versions of entities', function() {
+			const result = component._createNormalizedEntityMap([
+				userContentActivity,
+				hydratedChildActivity,
+			]);
+
+			var resultActivities = Array.from(result.activitiesMap.values());
+
+			expect(resultActivities.length).to.equal(2);
+			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(userContentActivity));
+			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(hydratedChildActivity));
+		});
+
+		it('maintains a map of child -> parent relationships', function() {
+			var result = component._createNormalizedEntityMap([
+				userContentActivity
+			]);
+
+			expect(result.parentActivitiesMap.has(linkedActivitySubentity.href));
+			expect(result.parentActivitiesMap.get(linkedActivitySubentity.href).getLinkByRel('self').href).to.equal(
+				window.D2L.Hypermedia.Siren.Parse(userContentActivity).getLinkByRel('self').href
+			);
+		});
+	});
 });

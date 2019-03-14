@@ -364,9 +364,6 @@
 		* parent content activity are projected onto the child activity when missing.
 		*/
 		_flattenActivities: function(activities) {
-			var activitiesMap = new Map();
-			var parentActivitiesMap = new Map();
-			var allActivities = [];
 			var activityEntities = [];
 			var self = this;
 
@@ -376,13 +373,54 @@
 				activityEntities = activities.entities || [];
 			}
 
+			var activitiesContext = this._createNormalizedEntityMap(activityEntities);
+			var flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
+
+			return self._hydrateActivityEntities(flattenedActivities)
+				.then(function(hydratedActivities) {
+					var activitiesMap = activitiesContext.activitiesMap;
+					var parentActivitiesMap = activitiesContext.parentActivitiesMap;
+
+					// Normalize activity data prior to deduping; eg, some activities don't
+					// have a due date (surveys), while the content topic can
+					hydratedActivities.forEach(function(activity) {
+						if (parentActivitiesMap.has(activity.getLinkByRel('self').href)) {
+							var parentActivity = parentActivitiesMap.get(activity.getLinkByRel('self').href);
+
+							if (activity.getSubEntitiesByClass('due-date').length === 0) {
+								var parentDueDates = parentActivity.getSubEntitiesByClass('due-date');
+
+								if (parentDueDates.length > 0) {
+									Array.isArray(activity.entities)
+										? activity.entities.push(parentDueDates[0])
+										: activity.entities = [parentDueDates[0]];
+								}
+							}
+
+							// We support the child activity directly, so delete parent content topic
+							activitiesMap.delete(parentActivity.getLinkByRel('self').href);
+						}
+
+						activitiesMap.set(activity.getLinkByRel('self').href, activity);
+					});
+
+					return Promise.resolve(Array.from(activitiesMap.values()));
+				});
+		},
+
+		_createNormalizedEntityMap: function(activityEntities) {
+			var activitiesMap = new Map();
+			var parentActivitiesMap = new Map();
+			var allActivities = [];
+			var self = this;
+
 			activityEntities = activityEntities.map(function(entity) {
 				return window.D2L.Hypermedia.Siren.Parse(entity);
 			});
 
 			activityEntities.forEach(function(activity) {
 				var sirenActivity = window.D2L.Hypermedia.Siren.Parse(activity);
-				var childActivity = sirenActivity.getSubEntityByRel('https://activities.api.brightspace.com/rels/child-user-activity-usage');
+				var childActivity = sirenActivity.getSubEntityByRel(self.HypermediaRels.Activities.childUserActivityUsage);
 
 				if (childActivity) {
 					var childActivityHref = childActivity.href; // Save because parsing it dumps this..
@@ -418,56 +456,10 @@
 				}
 			});
 
-			return this._hydrateActivityEntities(Array.from(activitiesMap.values()))
-				.then(function(hydratedActivities) {
-					var activitiesToRemove = new Set();
-
-					// Normalize activity data prior to deduping; eg, some activities don't
-					// have a due date (surveys), while the content topic can
-					hydratedActivities
-						.forEach(function(activity) {
-							if (parentActivitiesMap.has(activity.getLinkByRel('self').href)) {
-								var parentActivity = parentActivitiesMap.get(activity.getLinkByRel('self').href);
-
-								if (activity.getSubEntitiesByClass('due-date').length === 0) {
-									var parentDueDates = parentActivity.getSubEntitiesByClass('due-date');
-
-									if (parentDueDates.length > 0) {
-										Array.isArray(activity.entities)
-											? activity.entities.push(parentDueDates[0])
-											: activity.entities = [parentDueDates[0]];
-									}
-								}
-
-								activitiesToRemove.add(parentActivity.getLinkByRel('self').href);
-							}
-
-							activitiesMap.set(activity.getLinkByRel('self').href, activity);
-						});
-
-					// If an activity is a child of a content activity,
-					// and we directly support the child entity activity type,
-					// remove the content entity.
-					Array.from(activitiesToRemove)
-						.forEach(function(activityHref) {
-							activitiesMap.delete(activityHref);
-						});
-
-					// Ensure all entities have helpers
-					var parsedPopulatedEntities = Array.from(activitiesMap.values())
-						.map(function(currActivity) {
-							return window.D2L.Hypermedia.Siren.Parse({
-								class: currActivity.class,
-								rel: currActivity.rel,
-								entities: currActivity.entities,
-								links: currActivity.links,
-								actions: currActivity.actions,
-								href: currActivity.href
-							});
-						});
-
-					return Promise.resolve(parsedPopulatedEntities);
-				});
+			return {
+				activitiesMap: activitiesMap,
+				parentActivitiesMap: parentActivitiesMap,
+			};
 		},
 
 		/*

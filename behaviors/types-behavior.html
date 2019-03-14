@@ -34,7 +34,7 @@
 							},
 							assessmentType: 'checklistItem',
 							canOpen: false,
-							instructionsRel: 'https://checklists.api.brightspace.com/rels/description',
+							instructionsRel: this.HypermediaRels.Checklists.description,
 							userActivityUsageClass: this.HypermediaClasses.activities.userChecklistActivity,
 							activityRel: this.HypermediaRels.Checklists.checklistItem,
 							activityClass: 'checklist-item',
@@ -94,7 +94,7 @@
 							activityRel: this.HypermediaRels.Surveys.survey,
 							activityClass: 'survey',
 							noCompletion: false,
-							instructionsRel: 'https://surveys.api.brightspace.com/rels/description',
+							instructionsRel: this.HypermediaRels.Surveys.description,
 							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 						}
 					};
