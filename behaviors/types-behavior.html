@@ -27,25 +27,16 @@
 							noCompletion: false,
 							activityDetailsFeatureFlag: 'assignmentDetailsEnabled'
 						},
-						discussion: {
-							icon: 'discussions',
-							assessmentType: 'discussion',
-							canOpen: true,
-							instructionsRel: this.HypermediaRels.Discussions.description,
-							userActivityUsageClass: this.HypermediaClasses.activities.userDiscussionActivity,
-							activityRel: this.HypermediaRels.Discussions.topic,
-							activityClass: this.HypermediaClasses.discussions.topic,
-							noCompletion: true,
-							activityDetailsFeatureFlag: 'discussionDetailsEnabled'
-						},
-						quiz: {
-							icon: 'quizzing',
-							assessmentType: 'quiz',
+						checklistItem: {
+							icon: function() {
+								return 'd2l-tier2:checklist'; // checklist doesn't have a tier3 icon
+							},
+							assessmentType: 'checklistItem',
 							canOpen: false,
-							instructionsRel: this.HypermediaRels.Quizzes.description,
-							userActivityUsageClass: this.HypermediaClasses.activities.userQuizActivity,
-							activityRel: this.HypermediaRels.quiz,
-							activityClass: this.HypermediaClasses.quizzes.quiz,
+							instructionsRel: this.HypermediaRels.Checklists.description,
+							userActivityUsageClass: this.HypermediaClasses.activities.userChecklistActivity,
+							activityRel: this.HypermediaRels.Checklists.checklistItem,
+							activityClass: 'checklist-item',
 							noCompletion: false,
 							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 						},
@@ -68,13 +59,48 @@
 							activityClass: this.HypermediaClasses.content.sequencedActivity,
 							noCompletion: false,
 							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
+						},
+						discussion: {
+							icon: 'discussions',
+							assessmentType: 'discussion',
+							canOpen: true,
+							instructionsRel: this.HypermediaRels.Discussions.description,
+							userActivityUsageClass: this.HypermediaClasses.activities.userDiscussionActivity,
+							activityRel: this.HypermediaRels.Discussions.topic,
+							activityClass: this.HypermediaClasses.discussions.topic,
+							noCompletion: true,
+							activityDetailsFeatureFlag: 'discussionDetailsEnabled'
+						},
+						quiz: {
+							icon: 'quizzing',
+							assessmentType: 'quiz',
+							canOpen: false,
+							instructionsRel: this.HypermediaRels.Quizzes.description,
+							userActivityUsageClass: this.HypermediaClasses.activities.userQuizActivity,
+							activityRel: this.HypermediaRels.quiz,
+							activityClass: this.HypermediaClasses.quizzes.quiz,
+							noCompletion: false,
+							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
+						},
+						survey: {
+							icon: function() {
+								return 'd2l-tier2:surveys'; // surveys doesn't have a tier3 icon
+							},
+							assessmentType: 'survey',
+							canOpen: false,
+							userActivityUsageClass: this.HypermediaClasses.activities.userSurveyActivity,
+							activityRel: this.HypermediaRels.Surveys.survey,
+							activityClass: 'survey',
+							noCompletion: false,
+							instructionsRel: this.HypermediaRels.Surveys.description,
+							activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 						}
 					};
 				}
 			}
 		},
 
-		_allTypes: ['assignment', 'discussion', 'quiz', 'content'],
+		_allTypes: ['assignment', 'discussion', 'quiz', 'content', 'survey', 'checklistItem'],
 
 		_getActivityType: function(activity) {
 			for (var i = 0; i < this._allTypes.length; i++) {

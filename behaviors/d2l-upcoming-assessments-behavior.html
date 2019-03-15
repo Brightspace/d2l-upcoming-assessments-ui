@@ -88,16 +88,7 @@
 		},
 
 		_concatActivityUsageTypes: function(usageList) {
-			var usages = [];
-			this._allTypes.forEach(function(typeString) {
-				var type = this._types[typeString];
-				var entities = usageList.getSubEntitiesByClass(type.userActivityUsageClass);
-				if (type.usagePredicate) {
-					entities = entities.filter(type.usagePredicate);
-				}
-				usages = usages.concat(entities);
-			}.bind(this));
-			return usages;
+			return usageList.filter(this._isSupportedType.bind(this));
 		},
 
 		_getActivityStatus: function(type, userActivityUsage, overdueUserUsages) {
@@ -119,7 +110,7 @@
 		* Returns an object that contains the information required to populate an assessment list item
 		*/
 		_getUserActivityUsagesInfos: function(userActivityUsages, overdueUserActivityUsages, getToken, userUrl) {
-			if (!userActivityUsages.entities) {
+			if (!Array.isArray(userActivityUsages) || userActivityUsages.length === 0) {
 				return;
 			}
 
@@ -278,7 +269,20 @@
 					self._periodStart = userActivityUsages.properties.start;
 					self._periodEnd = userActivityUsages.properties.end;
 
-					return self._getUserActivityUsagesInfos(userActivityUsages, overdueUserActivityUsages, self.getToken, self.userUrl);
+					var flattenActivityUsages = self._flattenActivities(userActivityUsages);
+					var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages);
+
+					return Promise.all([
+						flattenActivityUsages,
+						flattenOverdueActivityUsages
+					]).then(function(responses) {
+						return self._getUserActivityUsagesInfos(
+							responses[0],
+							responses[1],
+							self.getToken,
+							self.userUrl
+						);
+					});
 				})
 				.then(function(userActivityUsagesInfos) {
 					var activities = self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
@@ -326,6 +330,169 @@
 			this._nextPeriodUrl = null;
 			this._periodStart = null;
 			this._periodEnd = null;
+		},
+
+		/*
+		* Returns a flattened list of user-activity-usages, deduplicating where necessary
+		* If a user-content-activity points to a supported domain-specific user-activity-usage,
+		* that content activity is removed, and only the domain activity is added.
+		* Linked subentities are hydrated, and the date restrictions of the
+		* parent content activity are projected onto the child activity when missing.
+		*/
+		_flattenActivities: function(activities) {
+			var activityEntities;
+			var self = this;
+
+			if (Array.isArray(activities)) {
+				activityEntities = activities;
+			} else {
+				activityEntities = activities.entities || [];
+			}
+
+			var supportedActivities = activityEntities.filter(this._isSupportedType.bind(this));
+
+			var activitiesContext = this._createNormalizedEntityMap(supportedActivities);
+			var flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
+
+			return self._hydrateActivityEntities(flattenedActivities)
+				.then(function(hydratedActivities) {
+					var activitiesMap = activitiesContext.activitiesMap;
+					var parentActivitiesMap = activitiesContext.parentActivitiesMap;
+					var redundantActivities = [];
+
+					// Normalize activity data prior to deduping; eg, some activities don't
+					// have a due date (surveys), while the content topic can
+					hydratedActivities.forEach(function(activity) {
+						var canonicalActivity = activity;
+						var activitySelfLink = activity.getLinkByRel('self').href;
+
+						if (parentActivitiesMap.has(activitySelfLink)) {
+							var parentActivity = parentActivitiesMap.get(activitySelfLink);
+
+							// There are cases where a content topic child activity (eg. a survey activity) doesn't
+							// have the same set of restrictions as the content topic itself. Because we only want to
+							// display one version of the same logical activity, we'll use the child activity,
+							// but ensure it has the superset of data from the content topic (due date).
+							// Since our data model is currently based on the LMS Siren entities,
+							// create and parse a new synthetic entity.
+							if (!activity.hasEntityByClass('due-date') && parentActivity.hasEntityByClass('due-date')) {
+								var parentDueDate = parentActivity.getSubEntityByClass('due-date');
+
+								// Create new object with updated helper functions
+								canonicalActivity = window.D2L.Hypermedia.Siren.Parse({
+									class: activity.class,
+									rel: activity.rel,
+									properties: activity.properties,
+									entities: [parentDueDate].concat(activity.entities || []),
+									actions: activity.actions,
+									links: activity.links
+								});
+							}
+
+							// Ensure we only have a single representation of the same logical activity,
+							// preferring the child activity
+							redundantActivities.push(parentActivity.getLinkByRel('self').href);
+						}
+
+						activitiesMap.set(activitySelfLink, canonicalActivity);
+					});
+
+					return Array.from(activitiesMap.values())
+						.filter(function(activity) {
+							return !redundantActivities.includes(activity.getLinkByRel('self').href);
+						});
+				});
+		},
+
+		_createNormalizedEntityMap: function(activityEntities) {
+			var activitiesMap = new Map();
+			var parentActivitiesMap = new Map();
+			var allActivities = [];
+			var self = this;
+
+			activityEntities
+				.map(window.D2L.Hypermedia.Siren.Parse)
+				.forEach(function(activity) {
+					var childActivity = activity.getSubEntityByRel(self.HypermediaRels.Activities.childUserActivityUsage);
+
+					if (childActivity) {
+						// @NOTE: Possible bug in node-siren-parser means linked subentities don't have
+						// helper functions, so, re-parse if so.
+						if (childActivity.href) {
+							var childActivityHref = childActivity.href; // Save because parsing it in isolation dumps this..
+							childActivity =  window.D2L.Hypermedia.Siren.Parse(childActivity);
+							childActivity.href = childActivityHref;
+						}
+
+						var childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
+
+						parentActivitiesMap.set(childSelfLink, activity);
+
+						if (self._isSupportedType(childActivity)) {
+							allActivities.push(childActivity);
+						}
+					}
+
+					allActivities.push(activity);
+				});
+
+			// Dedupe activities, preferring already-hydrated version of any entities
+			allActivities.forEach(function(activityEntity) {
+				var selfLink = (activityEntity.getLinkByRel('self') || {}).href
+					|| activityEntity.href;
+
+				// Save the entity if it doesn't exist, or the current representation is a linked subentity
+				// (has an href directly on the entity)
+				if (!activitiesMap.has(selfLink) || activitiesMap.get(selfLink).href !== undefined) {
+					activitiesMap.set(selfLink, activityEntity);
+				}
+			});
+
+			return {
+				activitiesMap: activitiesMap,
+				parentActivitiesMap: parentActivitiesMap,
+			};
+		},
+
+		/*
+		* On success, all activities, with linked subentities hydrated
+		*/
+		_hydrateActivityEntities: function(activityEntities) {
+			var self = this;
+
+			// Already-complete entities
+			var hydratedActivities = activityEntities
+				.filter(function(entity) {
+					return !entity.href;
+				});
+
+			var activityPromises = activityEntities
+				.filter(function(entity) {
+					return entity.href;
+				})
+				.map(function(entity) {
+					return self._fetchEntityWithToken(entity.href, self.getToken, self.userUrl)
+						.then(window.D2L.Hypermedia.Siren.Parse);
+				});
+
+			return Promise.all(activityPromises)
+				.then(function(entities) {
+					return hydratedActivities.concat(entities);
+				});
+		},
+
+		_isSupportedType: function(usage) {
+			var self = this;
+
+			return this._allTypes.some(function(typeString) {
+				var type = self._types[typeString];
+
+				if (usage.hasClass(type.userActivityUsageClass)) {
+					return type.usagePredicate
+						? type.usagePredicate(usage)
+						: true;
+				}
+			});
 		}
 	};
 
