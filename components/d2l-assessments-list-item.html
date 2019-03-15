@@ -221,7 +221,7 @@
 				return '';
 			}
 
-			return item.icon === 'function'
+			return typeof item.icon === 'function'
 				? item.icon(assessmentItem)
 				: 'd2l-tier2:' + item.icon;
 		},

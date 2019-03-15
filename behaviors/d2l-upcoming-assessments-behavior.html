@@ -88,18 +88,7 @@
 		},
 
 		_concatActivityUsageTypes: function(usageList) {
-			var usages = [];
-			this._allTypes.forEach(function(typeString) {
-				var type = this._types[typeString];
-				var entities = usageList.filter(function(usage) {
-					return usage.hasClass(type.userActivityUsageClass);
-				});
-				if (type.usagePredicate) {
-					entities = entities.filter(type.usagePredicate);
-				}
-				usages = usages.concat(entities);
-			}.bind(this));
-			return usages;
+			return usageList.filter(this._isSupportedType.bind(this));
 		},
 
 		_getActivityStatus: function(type, userActivityUsage, overdueUserUsages) {
@@ -360,7 +349,9 @@
 				activityEntities = activities.entities || [];
 			}
 
-			var activitiesContext = this._createNormalizedEntityMap(activityEntities);
+			var supportedActivities = activityEntities.filter(this._isSupportedType.bind(this));
+
+			var activitiesContext = this._createNormalizedEntityMap(supportedActivities);
 			var flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
 
 			return self._hydrateActivityEntities(flattenedActivities)
@@ -372,42 +363,36 @@
 					// Normalize activity data prior to deduping; eg, some activities don't
 					// have a due date (surveys), while the content topic can
 					hydratedActivities.forEach(function(activity) {
-						var isChanged = false;
+						var canonicalActivity = activity;
 
 						if (parentActivitiesMap.has(activity.getLinkByRel('self').href)) {
 							var parentActivity = parentActivitiesMap.get(activity.getLinkByRel('self').href);
 
+							// There are cases where a content topic child activity (eg. a survey activity) doesn't
+							// have the same set of restrictions as the content topic itself. Because we only want to
+							// display one version of the same logical activity, we'll use the child activity,
+							// but ensure it has the superset of data from the content topic (due date).
+							// Since our data model is currently based on the LMS Siren entities,
+							// create and parse a new synthetic entity.
 							if (!activity.hasEntityByClass('due-date') && parentActivity.hasEntityByClass('due-date')) {
 								var parentDueDate = parentActivity.getSubEntityByClass('due-date');
 
-								Array.isArray(activity.entities)
-									? activity.entities.push(parentDueDate)
-									: activity.entities = [parentDueDate];
-
-								isChanged = true;
+								// Create new object with updated helper functions
+								canonicalActivity = window.D2L.Hypermedia.Siren.Parse({
+									class: activity.class,
+									rel: activity.rel,
+									entities: [parentDueDate].concat(activity.entities || []),
+									actions: activity.actions,
+									links: activity.links
+								});
 							}
 
-							// We support the child activity directly, so delete parent content topic
+							// Ensure we only have a single representation of the same logical activity,
+							// preferring the child activity
 							redundantActivities.push(parentActivity.getLinkByRel('self').href);
 						}
 
-						// Since downstream logic depends on Siren for the component's data model,
-						// we need to re-parse when we've added entities/links/actions so that helper
-						// functions are updated. Not great, but should be rare, and a good case for
-						// abstracting from Siren a bit more.
-						// Also need to create new object, as node-siren-parser might have guards for
-						// re-parsing in some cases..
-						var activityToSave = isChanged
-							? window.D2L.Hypermedia.Siren.Parse({
-								class: activity.class,
-								rel: activity.rel,
-								entities: activity.entities,
-								actions: activity.actions,
-								links: activity.links
-							})
-							: activity;
-
-						activitiesMap.set(activity.getLinkByRel('self').href, activityToSave);
+						activitiesMap.set(activity.getLinkByRel('self').href, canonicalActivity);
 					});
 
 					return Array.from(activitiesMap.values())
@@ -441,11 +426,8 @@
 
 						parentActivitiesMap.set(childSelfLink, activity);
 
-						for (var index = 0; index < self._activityTypes.length; index++) {
-							if (childActivity.hasClass(self._activityTypes[index])) {
-								allActivities.push(childActivity);
-								break;
-							}
+						if (self._isSupportedType(childActivity)) {
+							allActivities.push(childActivity);
 						}
 					}
 
@@ -501,6 +483,20 @@
 
 					return hydratedActivities;
 				});
+		},
+
+		_isSupportedType: function(usage) {
+			var self = this;
+
+			return this._allTypes.some(function(typeString) {
+				var type = self._types[typeString];
+
+				if (usage.hasClass(type.userActivityUsageClass)) {
+					return type.usagePredicate
+						? type.usagePredicate(usage)
+						: true;
+				}
+			});
 		}
 	};
 
