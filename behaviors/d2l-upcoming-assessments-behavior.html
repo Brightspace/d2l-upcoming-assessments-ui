@@ -340,7 +340,7 @@
 		* parent content activity are projected onto the child activity when missing.
 		*/
 		_flattenActivities: function(activities) {
-			var activityEntities = [];
+			var activityEntities;
 			var self = this;
 
 			if (Array.isArray(activities)) {
@@ -364,9 +364,10 @@
 					// have a due date (surveys), while the content topic can
 					hydratedActivities.forEach(function(activity) {
 						var canonicalActivity = activity;
+						var activitySelfLink = activity.getLinkByRel('self').href;
 
-						if (parentActivitiesMap.has(activity.getLinkByRel('self').href)) {
-							var parentActivity = parentActivitiesMap.get(activity.getLinkByRel('self').href);
+						if (parentActivitiesMap.has(activitySelfLink)) {
+							var parentActivity = parentActivitiesMap.get(activitySelfLink);
 
 							// There are cases where a content topic child activity (eg. a survey activity) doesn't
 							// have the same set of restrictions as the content topic itself. Because we only want to
@@ -381,6 +382,7 @@
 								canonicalActivity = window.D2L.Hypermedia.Siren.Parse({
 									class: activity.class,
 									rel: activity.rel,
+									properties: activity.properties,
 									entities: [parentDueDate].concat(activity.entities || []),
 									actions: activity.actions,
 									links: activity.links
@@ -392,12 +394,12 @@
 							redundantActivities.push(parentActivity.getLinkByRel('self').href);
 						}
 
-						activitiesMap.set(activity.getLinkByRel('self').href, canonicalActivity);
+						activitiesMap.set(activitySelfLink, canonicalActivity);
 					});
 
 					return Array.from(activitiesMap.values())
-						.filter(function(activityHref) {
-							return !redundantActivities.includes(activityHref.getLinkByRel('self').href);
+						.filter(function(activity) {
+							return !redundantActivities.includes(activity.getLinkByRel('self').href);
 						});
 				});
 		},
@@ -439,11 +441,9 @@
 				var selfLink = (activityEntity.getLinkByRel('self') || {}).href
 					|| activityEntity.href;
 
-				if (activitiesMap.has(selfLink)) {
-					if (activitiesMap.get(selfLink).href !== undefined) {
-						activitiesMap.set(selfLink, activityEntity);
-					}
-				} else {
+				// Save the entity if it doesn't exist, or the current representation is a linked subentity
+				// (has an href directly on the entity)
+				if (!activitiesMap.has(selfLink) || activitiesMap.get(selfLink).href !== undefined) {
 					activitiesMap.set(selfLink, activityEntity);
 				}
 			});
@@ -477,11 +477,7 @@
 
 			return Promise.all(activityPromises)
 				.then(function(entities) {
-					entities.forEach(function(entity) {
-						hydratedActivities.push(entity);
-					});
-
-					return hydratedActivities;
+					return hydratedActivities.concat(entities);
 				});
 		},
 
