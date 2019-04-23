@@ -88,8 +88,8 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list-item">
 				margin-right: 30px;
 			}
 
-			[dir="rtl"] .activity-icon,
-			[dir="rtl"] .spacer {
+			:host(:dir(rtl)) .activity-icon,
+			:host(:dir(rtl)) .spacer {
 				margin-right: 0;
 				margin-left: 30px;
 			}
@@ -98,7 +98,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list-item">
 				margin-right: 10px;
 			}
 
-			[dir="rtl"] d2l-status-indicator:not([hidden]) {
+			:host(:dir(rtl)) d2l-status-indicator:not([hidden]) {
 				margin-left: 10px;
 				margin-right: 0px;
 			}
@@ -130,7 +130,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list-item">
 				height: 18px;
 			}
 
-			[dir="rtl"] .info {
+			:host(:dir(rtl)) .info {
 				padding-right: 0px;
 				padding-left: 30px;
 			}
@@ -177,7 +177,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list-item">
 				width: 20px;
 			}
 
-			[dir="rtl"] .indicator-container {
+			:host(:dir(rtl)) .indicator-container {
 				padding-left: 0;
 				margin-left: 0;
 				padding-right: 30px;

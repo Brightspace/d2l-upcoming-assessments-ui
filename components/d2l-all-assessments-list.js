@@ -32,7 +32,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list">
 					margin-left: 30px;
 				}
 
-				[dir="rtl"] .date-header {
+				:host(:dir(rtl)) .date-header {
 					margin-left: 0px;
 					margin-right: 30px;
 				}
