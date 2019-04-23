@@ -63,7 +63,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-upcoming-assessments">
 				margin-bottom: 10px;
 			}
 
-			:host-context([dir="rtl"]) h2 {
+			[dir="rtl"] h2 {
 				margin-left: 0px;
 				margin-right: 15px;
 			}

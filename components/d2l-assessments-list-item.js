@@ -57,7 +57,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-assessments-list-item">
 				fill: var(--d2l-color-olivine);
 				margin-left: 10px;
 			}
-			:host-context([dir="rtl"]) iron-icon.completion-icon {
+			[dir="rtl"] iron-icon.completion-icon {
 				margin-left: 0;
 				margin-right: 10px;
 			}
@@ -73,12 +73,12 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-assessments-list-item">
 				margin-right: 20px;
 			}
 
-			:host-context([dir="rtl"]) .activity-icon-container {
+			[dir="rtl"] .activity-icon-container {
 				margin-right: 0px;
 				margin-left: 20px;
 			}
 
-			:host-context([dir="rtl"]) .activity-icon[icon="d2l-tier2:assignments"] {
+			[dir="rtl"] .activity-icon[icon="d2l-tier2:assignments"] {
 				width: 26px;
 			}
 

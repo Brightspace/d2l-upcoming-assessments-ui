@@ -33,7 +33,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-date-dropdown">
 				text-decoration: none;
 			}
 
-			:host-context([dir="rtl"]) span {
+			[dir="rtl"] span {
 				padding-left: 7px;
 				padding-right: 0px;
 			}
@@ -58,7 +58,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-date-dropdown">
 				}
 			}
 
-			:host-context([dir="rtl"]) .d2l-dropdown-content-pointer {
+			[dir="rtl"] .d2l-dropdown-content-pointer {
 				left: 0;
 				right: calc(50% - 7px);
 				margin-top: 3px;
@@ -123,7 +123,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-date-dropdown">
 		</d2l-date-picker>
 	</template>
 
-	
+
 </dom-module>`;
 
 document.head.appendChild($_documentContainer.content);

@@ -32,7 +32,7 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list">
 					margin-left: 30px;
 				}
 
-				:host-context([dir="rtl"]) .date-header {
+				[dir="rtl"] .date-header {
 					margin-left: 0px;
 					margin-right: 30px;
 				}
@@ -43,13 +43,13 @@ $_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-list">
 					<div role="list">
 						<template is="dom-repeat" items="[[item.1]]">
 							<d2l-all-assessments-list-item assessment-item="[[item]]" flags="[[flags]]">
-							
+
 						</d2l-all-assessments-list-item></template>
 					</div>
-				
+
 			</template>
 	</template>
-	
+
 </dom-module>`;
 
 document.head.appendChild($_documentContainer.content);
