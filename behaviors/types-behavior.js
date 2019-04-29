@@ -24,6 +24,39 @@ var typesBehaviorImpl = {
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'assignmentDetailsEnabled'
 					},
+					checklistItem: {
+						icon: function() {
+							return 'd2l-tier2:checklist'; // checklist doesn't have a tier3 icon
+						},
+						assessmentType: 'checklistItem',
+						canOpen: false,
+						instructionsRel: this.HypermediaRels.Checklists.description,
+						userActivityUsageClass: Classes.activities.userChecklistActivity,
+						activityRel: this.HypermediaRels.Checklists.checklistItem,
+						activityClass: 'checklist-item',
+						noCompletion: false,
+						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
+					},
+					content: {
+						icon: function(assessmentItem) {
+							// content icons always tier 2
+							if (assessmentItem.tier2IconKey) {
+								return assessmentItem.tier2IconKey;
+							}
+							return 'd2l-tier2:content';
+						},
+						assessmentType: 'content',
+						canOpen: false,
+						instructionsRel: this.HypermediaRels.Content.description,
+						userActivityUsageClass: Classes.activities.userContentActivity,
+						usagePredicate: function(userActivityUsage) {
+							return userActivityUsage && userActivityUsage.hasClass(Classes.content.topic);
+						}.bind(this),
+						activityRel: this.HypermediaRels.content,
+						activityClass: Classes.content.sequencedActivity,
+						noCompletion: false,
+						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
+					},
 					discussion: {
 						icon: 'discussions',
 						assessmentType: 'discussion',
@@ -46,24 +79,17 @@ var typesBehaviorImpl = {
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 					},
-					content: {
-						icon: function(assessmentItem) {
-							// content icons always tier 2
-							if (assessmentItem.tier2IconKey) {
-								return assessmentItem.tier2IconKey;
-							}
-							return 'd2l-tier2:content';
+					survey: {
+						icon: function() {
+
 						},
-						assessmentType: 'content',
+						assessmentType: 'survey',
 						canOpen: false,
-						instructionsRel: Rels.Content.description,
-						userActivityUsageClass: Classes.activities.userContentActivity,
-						usagePredicate: function(userActivityUsage) {
-							return userActivityUsage && userActivityUsage.hasClass(Classes.content.topic);
-						}.bind(this),
-						activityRel: Rels.content,
-						activityClass: Classes.content.sequencedActivity,
+						userActivityUsageClass: Classes.activities.userSurveyActivity,
+						activityRel: Rels.Surveys.survey,
+						activityClass: 'survey',
 						noCompletion: false,
+						instructionsRel: Rels.Surveys.description,
 						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
 					}
 				};
@@ -71,7 +97,7 @@ var typesBehaviorImpl = {
 		}
 	},
 
-	_allTypes: ['assignment', 'discussion', 'quiz', 'content'],
+	_allTypes: ['assignment', 'discussion', 'quiz', 'content', 'survey', 'checklistItem'],
 
 	_getActivityType: function(activity) {
 		for (var i = 0; i < this._allTypes.length; i++) {

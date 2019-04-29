@@ -15,6 +15,7 @@ window.D2L.UpcomingAssessments.LangEnBehavior = {
 		"activityExempted": "Exempted",
 		"activityOverdue": "Overdue",
 		"assignment": "Assignment",
+		"checklistItem": "Checklist Item",
 		"closeSimpleOverlayText": "Back to Dashboard",
 		"closeSimpleOverlayTextMobile": "Dashboard",
 		"content": "Content",
@@ -29,6 +30,7 @@ window.D2L.UpcomingAssessments.LangEnBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} doesn't have any work due for this time frame.",
 		"noUpcomingAssessments": "{userName} doesn't have any work due in the next 2 weeks.",
 		"quiz": "Quiz",
+		"survey": "Survey",
 		"today": "Today",
 		"tomorrow": "Tomorrow",
 		"viewAllAssignments": "View all work"

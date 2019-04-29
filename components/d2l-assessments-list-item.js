@@ -225,11 +225,9 @@ Polymer({
 			return '';
 		}
 
-		if (typeof item.icon === 'function') {
-			return item.icon(assessmentItem);
-		} else {
-			return 'd2l-tier2:' + item.icon;
-		}
+		return typeof item.icon === 'function'
+			? item.icon(assessmentItem)
+			: 'd2l-tier2' + item.icon;
 	},
 
 	_getAssessmentType: function(assessmentItem) {

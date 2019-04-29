@@ -396,7 +396,7 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsage = getUserActivityUsage('unsupported');
 			userUsages = parse({ entities: [userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.not.been.called;
 					expect(component._getActivityRequest).to.have.not.been.called;
@@ -407,7 +407,7 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsage = getUserActivityUsage('content', false, false, true);
 			userUsages = parse({ entities: [userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.not.been.called;
 					expect(component._getActivityRequest).to.have.not.been.called;
@@ -418,7 +418,7 @@ describe('d2l upcoming assessments behavior', function() {
 			userUsage = getUserActivityUsage('content', false, false, false);
 			userUsages = parse({ entities: [userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.been.called;
 					expect(component._getActivityRequest).to.have.been.called;
@@ -426,14 +426,14 @@ describe('d2l upcoming assessments behavior', function() {
 		});
 
 		it('should call _getOrganizationRequest for the organization', function() {
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getOrganizationRequest).to.have.been.called;
 				});
 		});
 
 		it('should call _getActivityRequest for the activity', function() {
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					expect(component._getActivityRequest).to.have.been.called;
 				});
@@ -442,7 +442,7 @@ describe('d2l upcoming assessments behavior', function() {
 		it('should set the info property to the value returned from _getInstructions', function() {
 			component._getInstructions = sandbox.stub().returns('bonita bonita bonita');
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function(response) {
 					expect(component._getInstructions).to.be.called;
 					expect(response[0].info).to.equal('bonita bonita bonita');
@@ -452,7 +452,7 @@ describe('d2l upcoming assessments behavior', function() {
 		it('should fail when all the activity requests fail', function() {
 			component._getActivityRequest = sandbox.stub().returns(Promise.resolve(null));
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function() {
 					return Promise.reject('Expect failure');
 				})
@@ -467,7 +467,7 @@ describe('d2l upcoming assessments behavior', function() {
 
 			userUsages = parse({ entities: [userUsage, userUsage] });
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function(response) {
 					expect(component._getInstructions).to.be.called;
 					expect(response[0].info).to.equal('bonita bonita bonita');
@@ -500,7 +500,7 @@ describe('d2l upcoming assessments behavior', function() {
 				text: 'complete'
 			});
 
-			return component._getUserActivityUsagesInfos(userUsages, overdueUserUsages, getToken, userUrl)
+			return component._getUserActivityUsagesInfos(userUsages.entities, overdueUserUsages.entities, getToken, userUrl)
 				.then(function(response) {
 					expect(response[0].name).to.equal(activityName);
 					expect(response[0].courseName).to.equal(organizationName);
@@ -803,4 +803,132 @@ describe('d2l upcoming assessments behavior', function() {
 		});
 	});
 
+	describe('activity usage flattening', function() {
+		var userContentActivity = {
+			'class': [
+				'user-content-activity',
+				'topic',
+				'activity'
+			],
+			'rel': [
+				'https://activities.api.brightspace.com/rels/user-activity-usage'
+			],
+			'entities': [{
+				'class': [
+					'user-checklist-activity', 'activity'
+				],
+				'rel': [
+					'https://activities.api.brightspace.com/rels/child-user-activity-usage'
+				],
+				'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_61000_1/usages/6609/users/14291'
+			}, {
+				'class': ['date', 'due-date'],
+				'rel': [
+					'https://api.brightspace.com/rels/date'
+				],
+				'properties': {
+					'date': '2019-03-13T22:00:00.000Z'
+				}
+			}, {
+				'rel': ['https://activities.api.brightspace.com/rels/completion']
+			}],
+			'links': [{
+				'rel': [
+					'https://activities.api.brightspace.com/rels/user-activity-usage',
+					'self'
+				],
+				'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_37000_97666/usages/6609/users/14291'
+			}]
+		};
+
+		const hydratedChildActivity = {
+			'class': [
+				'user-checklist-activity',
+				'activity'
+			],
+			'rel': [
+				'https://activities.api.brightspace.com/rels/user-activity-usage'
+			],
+			'entities': [{
+				'class': ['date', 'due-date'],
+				'rel': [
+					'https://api.brightspace.com/rels/date'
+				],
+				'properties': {
+					'date': '2019-03-14T22:15:00.000Z'
+				}
+			},
+			{
+				'class': ['date', 'end-date'],
+				'rel': ['https://api.brightspace.com/rels/date'],
+				'properties': {
+					'date': '2019-03-14T22:15:00.000Z'
+				}
+			},
+			{
+				'class': ['completion', 'incomplete'],
+				'rel': [
+					'item',
+					'https://activities.api.brightspace.com/rels/completion'
+				]
+			}],
+			'links': [{
+				'rel': [
+					'https://activities.api.brightspace.com/rels/user-activity-usage',
+					'self'
+				],
+				'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_61000_1/usages/6609/users/14291'
+			}]
+		};
+
+		const linkedActivitySubentity = {
+			'class': [
+				'user-checklist-activity', 'activity'
+			],
+			'rel': [
+				'https://activities.api.brightspace.com/rels/child-user-activity-usage'
+			],
+			'href': 'https://38401c30-1afc-4ce9-b4df-b115908e21c2.activities.api.proddev.d2l/activities/6606_61000_1/usages/6609/users/14291'
+		};
+
+		it('uses content topic linked child subentity if no hydrated version exists', function() {
+			var result = component._createNormalizedEntityMap([
+				userContentActivity
+			]);
+
+			var resultActivities = Array.from(result.activitiesMap.values());
+
+			// Parsing trashes href on entity without parent
+			var linkedSubentity = window.D2L.Hypermedia.Siren.Parse(linkedActivitySubentity);
+			linkedSubentity.href = linkedActivitySubentity.href;
+
+			expect(resultActivities.length).to.equal(2);
+			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(userContentActivity));
+			expect(resultActivities).to.deep.include(linkedSubentity);
+		});
+
+		it('prefers hydrated versions of entities', function() {
+			const result = component._createNormalizedEntityMap([
+				userContentActivity,
+				hydratedChildActivity,
+			]);
+
+			var resultActivities = Array.from(result.activitiesMap.values());
+
+			expect(resultActivities.length).to.equal(2);
+			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(userContentActivity));
+			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(hydratedChildActivity));
+		});
+
+		it('maintains a map of child -> parent relationships', function() {
+			var result = component._createNormalizedEntityMap([
+				userContentActivity
+			]);
+
+			expect(result.parentActivitiesMap.has(linkedActivitySubentity.href));
+			expect(result.parentActivitiesMap.get(linkedActivitySubentity.href).getLinkByRel('self').href).to.equal(
+				window.D2L.Hypermedia.Siren.Parse(userContentActivity).getLinkByRel('self').href
+			);
+		});
+	});
 });
