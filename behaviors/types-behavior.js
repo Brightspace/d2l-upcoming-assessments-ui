@@ -47,12 +47,12 @@ var typesBehaviorImpl = {
 						},
 						assessmentType: 'content',
 						canOpen: false,
-						instructionsRel: this.HypermediaRels.Content.description,
+						instructionsRel: Rels.Content.description,
 						userActivityUsageClass: Classes.activities.userContentActivity,
 						usagePredicate: function(userActivityUsage) {
 							return userActivityUsage && userActivityUsage.hasClass(Classes.content.topic);
 						}.bind(this),
-						activityRel: this.HypermediaRels.content,
+						activityRel: Rels.content,
 						activityClass: Classes.content.sequencedActivity,
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
