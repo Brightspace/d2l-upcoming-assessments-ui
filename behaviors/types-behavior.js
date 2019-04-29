@@ -30,9 +30,9 @@ var typesBehaviorImpl = {
 						},
 						assessmentType: 'checklistItem',
 						canOpen: false,
-						instructionsRel: this.HypermediaRels.Checklists.description,
+						instructionsRel: Rels.Checklists.description,
 						userActivityUsageClass: Classes.activities.userChecklistActivity,
-						activityRel: this.HypermediaRels.Checklists.checklistItem,
+						activityRel: Rels.Checklists.checklistItem,
 						activityClass: 'checklist-item',
 						noCompletion: false,
 						activityDetailsFeatureFlag: 'NOT_IMPLEMENTED'
