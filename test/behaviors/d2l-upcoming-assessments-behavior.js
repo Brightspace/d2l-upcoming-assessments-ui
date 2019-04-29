@@ -899,11 +899,11 @@ describe('d2l upcoming assessments behavior', function() {
 			var resultActivities = Array.from(result.activitiesMap.values());
 
 			// Parsing trashes href on entity without parent
-			var linkedSubentity = window.D2L.Hypermedia.Siren.Parse(linkedActivitySubentity);
+			var linkedSubentity = SirenParse(linkedActivitySubentity);
 			linkedSubentity.href = linkedActivitySubentity.href;
 
 			expect(resultActivities.length).to.equal(2);
-			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(userContentActivity));
+			expect(resultActivities).to.deep.include(SirenParse(userContentActivity));
 			expect(resultActivities).to.deep.include(linkedSubentity);
 		});
 
@@ -916,8 +916,8 @@ describe('d2l upcoming assessments behavior', function() {
 			var resultActivities = Array.from(result.activitiesMap.values());
 
 			expect(resultActivities.length).to.equal(2);
-			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(userContentActivity));
-			expect(resultActivities).to.deep.include(window.D2L.Hypermedia.Siren.Parse(hydratedChildActivity));
+			expect(resultActivities).to.deep.include(SirenParse(userContentActivity));
+			expect(resultActivities).to.deep.include(SirenParse(hydratedChildActivity));
 		});
 
 		it('maintains a map of child -> parent relationships', function() {
@@ -927,7 +927,7 @@ describe('d2l upcoming assessments behavior', function() {
 
 			expect(result.parentActivitiesMap.has(linkedActivitySubentity.href));
 			expect(result.parentActivitiesMap.get(linkedActivitySubentity.href).getLinkByRel('self').href).to.equal(
-				window.D2L.Hypermedia.Siren.Parse(userContentActivity).getLinkByRel('self').href
+				SirenParse(userContentActivity).getLinkByRel('self').href
 			);
 		});
 	});
