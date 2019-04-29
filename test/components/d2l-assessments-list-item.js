@@ -116,26 +116,26 @@ describe('<d2l-assessments-list-item>', function() {
 		});
 
 		it('renders the correct data for a survey', function(done) {
-			var surveyItem = setActivityItem('survey');
-
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.assessment-title').textContent).to.equal(surveyItem.name);
-				expect(element.$$('.course-name').textContent).to.equal(surveyItem.courseName);
-				expect(element.$$('.assessment-type').textContent).to.equal(surveyItem.itemType);
-				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:surveys');
-				done();
+			setActivityItem('survey', undefined, undefined, (surveyItem) => {
+				afterNextRender(element, () => {
+					expect(element.$$('.assessment-title').textContent).to.equal(surveyItem.name);
+					expect(element.$$('.course-name').textContent).to.equal(surveyItem.courseName);
+					expect(element.$$('.assessment-type').textContent).to.equal(surveyItem.itemType);
+					expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:surveys');
+					done();
+				});
 			});
 		});
 
 		it('renders the correct data for a checklist item', function(done) {
-			var checklistItem = setActivityItem('checklistItem');
-
-			Polymer.RenderStatus.afterNextRender(element, () => {
-				expect(element.$$('.assessment-title').textContent).to.equal(checklistItem.name);
-				expect(element.$$('.course-name').textContent).to.equal(checklistItem.courseName);
-				expect(element.$$('.assessment-type').textContent).to.equal('Checklist Item');
-				expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:checklist');
-				done();
+			setActivityItem('checklistItem', undefined, undefined, (checklistItem) => {
+				afterNextRender(element, () => {
+					expect(element.$$('.assessment-title').textContent).to.equal(checklistItem.name);
+					expect(element.$$('.course-name').textContent).to.equal(checklistItem.courseName);
+					expect(element.$$('.assessment-type').textContent).to.equal('Checklist Item');
+					expect(element.$$('.activity-icon').icon).to.equal('d2l-tier2:checklist');
+					done();
+				});
 			});
 		});
 

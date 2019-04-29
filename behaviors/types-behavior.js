@@ -81,7 +81,7 @@ var typesBehaviorImpl = {
 					},
 					survey: {
 						icon: function() {
-
+							return 'd2l-tier2:surveys';
 						},
 						assessmentType: 'survey',
 						canOpen: false,
