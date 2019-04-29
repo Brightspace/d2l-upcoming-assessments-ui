@@ -227,7 +227,7 @@ Polymer({
 
 		return typeof item.icon === 'function'
 			? item.icon(assessmentItem)
-			: 'd2l-tier2' + item.icon;
+			: 'd2l-tier2:' + item.icon;
 	},
 
 	_getAssessmentType: function(assessmentItem) {
