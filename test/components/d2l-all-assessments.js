@@ -72,7 +72,7 @@ describe('<d2l-all-assessments>', function() {
 
 				return element._onDateValueChanged(dateObj)
 					.then(function() {
-						expect(element._loadActivitiesForPeriod).to.have.been.calledWith(activitiesEntity);
+						expect(element._loadActivitiesForPeriod.getCall(0).args[0].activitiesEntity).to.equal(activitiesEntity);
 					});
 			});
 		});

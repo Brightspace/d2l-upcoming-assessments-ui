@@ -622,7 +622,7 @@ describe('d2l upcoming assessments behavior', function() {
 			component.userUrl = 'http://example.com';
 
 			return component._getInfo().then(function() {
-				expect(component._fetchEntityWithToken).to.have.been.calledWith('http://example.com');
+				expect(component._fetchEntityWithToken.getCall(0).args[0].link).to.equal('http://example.com');
 			});
 		});
 
@@ -660,13 +660,13 @@ describe('d2l upcoming assessments behavior', function() {
 				component._fetchEntityWithToken.onFirstCall().returns(Promise.resolve(parsedUserEntity));
 
 				return component._getInfo().then(function() {
-					expect(component._fetchEntityWithToken.getCall(1).args[0]).to.equal(ctx.expectedLink);
+					expect(component._fetchEntityWithToken.getCall(1).args[0].link).to.equal(ctx.expectedLink);
 				});
 			});
 		});
 
 		it('should set the error state if things go wrong', function() {
-			component._loadActivitiesForPeriod = sinon.stub().returns(Promise.reject());
+			component._loadActivitiesForPeriod = sinon.stub().returns(Promise.reject(Error()));
 
 			return component._getInfo().then(function() {
 				expect(component._showError).to.be.true;
@@ -699,9 +699,14 @@ describe('d2l upcoming assessments behavior', function() {
 
 			const parsedActivitiesEntity = SirenParse(activitiesEntity);
 
-			return component._loadActivitiesForPeriod(parsedActivitiesEntity, new Date('2017-07-21T16:20:07.567Z'))
+			return component._loadActivitiesForPeriod({
+				activitiesEntity: parsedActivitiesEntity,
+				dateObj: new Date('2017-07-21T16:20:07.567Z'),
+				getToken: getToken,
+				userUrl: userUrl,
+			})
 				.then(function() {
-					expect(component._fetchEntityWithToken).to.have.been.calledWith(`http://www.foo.com?start=${startDate}&end=${endDate}`);
+					expect(component._fetchEntityWithToken.getCall(0).args[0].link).to.equal(`http://www.foo.com?start=${startDate}&end=${endDate}`);
 					expect(component._allActivities).to.equal(activities);
 				});
 		});
@@ -709,7 +714,12 @@ describe('d2l upcoming assessments behavior', function() {
 		it('should not update the assessments with the activities in the period', function() {
 			const parsedActivitiesEntity = SirenParse(activitiesEntity);
 
-			return component._loadActivitiesForPeriod(parsedActivitiesEntity, new Date('2017-07-21T16:20:07.567Z'))
+			return component._loadActivitiesForPeriod({
+				activitiesEntity: parsedActivitiesEntity,
+				dateObj: new Date('2017-07-21T16:20:07.567Z'),
+				getToken: getToken,
+				userUrl: userUrl,
+			})
 				.then(function() {
 					expect(component._assessments).to.not.equal(activities);
 				});

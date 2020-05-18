@@ -37,9 +37,16 @@ var upcomingAssessmentsBehaviorImpl = {
 		_periodEnd: String
 	},
 
-	_getOrganizationRequest: function(userActivityUsage, getToken, userUrl) {
+	_getOrganizationRequest: function(userActivityUsage, getToken, userUrl, abortController) {
 		var organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
-		return this._fetchEntityWithToken(organizationLink, getToken, userUrl);
+		return this._fetchEntityWithToken({
+			link: organizationLink,
+			userLink: userUrl,
+			getToken: getToken,
+			requestInit: {
+				signal: abortController && abortController.signal,
+			},
+		});
 	},
 
 	_findActivityHref: function(userActivityUsage) {
@@ -185,11 +192,18 @@ var upcomingAssessmentsBehaviorImpl = {
 		}
 	},
 
-	_getOverdueActivities: function(activitiesEntity, getToken, userUrl) {
+	_getOverdueActivities: function(activitiesEntity, getToken, userUrl, abortController) {
 		var overdueActivitiesLink = (activitiesEntity.getLinkByRel(Rels.Activities.overdue) || {}).href;
 
 		if (overdueActivitiesLink) {
-			return this._fetchEntityWithToken(overdueActivitiesLink, getToken, userUrl);
+			return this._fetchEntityWithToken({
+				link: overdueActivitiesLink,
+				userLink: userUrl,
+				getToken: getToken,
+				requestInit: {
+					signal: abortController && abortController.signal,
+				}
+			});
 		}
 
 		// API doesn't include the overdue link if user doesn't have any overdue activities
@@ -228,8 +242,29 @@ var upcomingAssessmentsBehaviorImpl = {
 	_getInfo: function() {
 		this._showError = false;
 		var self = this;
+		var userUrl = this.userUrl;
+		var getToken = this.getToken;
 
-		return this._fetchEntityWithToken(this.userUrl, this.getToken)
+		if (!this.__getInfoRequest) {
+			this.__getInfoRequest = Promise.resolve();
+		}
+
+		if (this.__getInfoAbortController) {
+			this.__getInfoAbortController.abort();
+		}
+
+		this.__getInfoRequest = this.__getInfoRequest
+			.then(() => {
+				this.__getInfoAbortController = new AbortController();
+
+				return this._fetchEntityWithToken({
+					link: userUrl,
+					getToken: getToken,
+					requestInit: {
+						signal: this.__getInfoAbortController.signal,
+					},
+				});
+			})
 			.then(function(userEntity) {
 				self._firstName = (userEntity.getSubEntityByRel(Rels.firstName) || { properties: {} }).properties.name;
 				var myActivitiesLink = (
@@ -238,24 +273,57 @@ var upcomingAssessmentsBehaviorImpl = {
 					|| {}
 				).href;
 
-				return self._fetchEntityWithToken(myActivitiesLink, self.getToken, self.userUrl);
+				return self._fetchEntityWithToken({
+					link: myActivitiesLink,
+					userLink: userUrl,
+					getToken: getToken,
+					requestInit: {
+						signal: self.__getInfoAbortController.signal,
+					}
+				});
 			})
 			.then(function(activitiesEntity) {
 				self.__activitiesEntity = activitiesEntity;
 
-				return self._loadActivitiesForPeriod(activitiesEntity, new Date());
+				return self._loadActivitiesForPeriod({
+					activitiesEntity: activitiesEntity,
+					dateObj: new Date(),
+					abortController: self.__getInfoAbortController,
+					userUrl: userUrl,
+					getToken: getToken,
+				});
 			})
-			.catch(function() {
-				self._showError = true;
-				self._firstName = null;
+			.catch(function(e) {
+				if (!(e instanceof Error) || e.name !== 'AbortError') {
+					self._showError = true;
+					self._firstName = null;
+				}
+			})
+			.finally(() => {
+				self.__getInfoAbortController = null;
 			});
+
+		return this.__getInfoRequest;
 	},
 
-	_loadActivitiesForPeriod: function(activitiesEntity, dateObj) {
+	_loadActivitiesForPeriod: function({
+		activitiesEntity,
+		dateObj,
+		abortController,
+		getToken,
+		userUrl,
+	}) {
 		var periodUrl = this._getCustomRangeAction(activitiesEntity, dateObj);
 		var self = this;
-		var userActivitiesRequest = this._fetchEntityWithToken(periodUrl, this.getToken, this.userUrl);
-		var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, this.getToken, this.userUrl);
+		var userActivitiesRequest = this._fetchEntityWithToken({
+			link: periodUrl,
+			userLink: userUrl,
+			getToken: getToken,
+			requestInit: {
+				signal: abortController && abortController.signal,
+			},
+		});
+		var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortController);
 
 		return Promise.all([userActivitiesRequest, overdueActivitiesRequest])
 			.then(function(activitiesResponses) {
@@ -267,8 +335,8 @@ var upcomingAssessmentsBehaviorImpl = {
 				self._periodStart = userActivityUsages.properties.start;
 				self._periodEnd = userActivityUsages.properties.end;
 
-				var flattenActivityUsages = self._flattenActivities(userActivityUsages);
-				var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages);
+				var flattenActivityUsages = self._flattenActivities(userActivityUsages, getToken, userUrl, abortController);
+				var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages, getToken, userUrl, abortController);
 				return Promise.all([
 					flattenActivityUsages,
 					flattenOverdueActivityUsages
@@ -276,13 +344,14 @@ var upcomingAssessmentsBehaviorImpl = {
 					return self._getUserActivityUsagesInfos(
 						responses[0],
 						responses[1],
-						self.getToken,
-						self.userUrl
+						getToken,
+						userUrl,
+						abortController,
 					);
 				});
 			})
 			.then(function(userActivityUsagesInfos) {
-				var activities = self._updateActivitiesInfo(userActivityUsagesInfos, self.getToken, self.userUrl);
+				var activities = self._updateActivitiesInfo(userActivityUsagesInfos, getToken, userUrl);
 
 				self.set('_allActivities', activities);
 				return activities;
@@ -336,7 +405,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	* Linked subentities are hydrated, and the date restrictions of the
 	* parent content activity are projected onto the child activity when missing.
 	*/
-	_flattenActivities: function(activities) {
+	_flattenActivities: function(activities, getToken, userUrl, abortController) {
 		var activityEntities;
 		var self = this;
 		if (Array.isArray(activities)) {
@@ -347,7 +416,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		var supportedActivities = activityEntities.filter(this._isSupportedType.bind(this));
 		var activitiesContext = this._createNormalizedEntityMap(supportedActivities);
 		var flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
-		return self._hydrateActivityEntities(flattenedActivities)
+		return self._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortController)
 			.then(function(hydratedActivities) {
 				var activitiesMap = activitiesContext.activitiesMap;
 				var parentActivitiesMap = activitiesContext.parentActivitiesMap;
@@ -404,7 +473,7 @@ var upcomingAssessmentsBehaviorImpl = {
 					// helper functions, so, re-parse if so.
 					if (childActivity.href) {
 						var childActivityHref = childActivity.href; // Save because parsing it in isolation dumps this..
-						childActivity =  SirenParse(childActivity);
+						childActivity = SirenParse(childActivity);
 						childActivity.href = childActivityHref;
 					}
 					var childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
@@ -434,7 +503,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* On success, all activities, with linked subentities hydrated
 	*/
-	_hydrateActivityEntities: function(activityEntities) {
+	_hydrateActivityEntities: function(activityEntities, getToken, userUrl, abortController) {
 		var self = this;
 		// Already-complete entities
 		var hydratedActivities = activityEntities
@@ -446,7 +515,14 @@ var upcomingAssessmentsBehaviorImpl = {
 				return entity.href;
 			})
 			.map(function(entity) {
-				return self._fetchEntityWithToken(entity.href, self.getToken, self.userUrl)
+				return self._fetchEntityWithToken({
+					link: entity.href,
+					userLink: userUrl,
+					getToken: getToken,
+					requestInit: {
+						signal: abortController && abortController.signal,
+					}
+				})
 					.then(SirenParse);
 			});
 		return Promise.all(activityPromises)
