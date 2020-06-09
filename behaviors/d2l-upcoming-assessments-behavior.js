@@ -255,13 +255,15 @@ var upcomingAssessmentsBehaviorImpl = {
 
 		this.__getInfoRequest = this.__getInfoRequest
 			.then(() => {
-				this.__getInfoAbortController = new AbortController();
+				if (window.AbortController) {
+					this.__getInfoAbortController = new AbortController();
+				}
 
 				return this._fetchEntityWithToken({
 					link: userUrl,
 					getToken: getToken,
 					requestInit: {
-						signal: this.__getInfoAbortController.signal,
+						signal: (this.__getInfoAbortController || {}).signal,
 					},
 				});
 			})
@@ -278,7 +280,7 @@ var upcomingAssessmentsBehaviorImpl = {
 					userLink: userUrl,
 					getToken: getToken,
 					requestInit: {
-						signal: self.__getInfoAbortController.signal,
+						signal: (self.__getInfoAbortController || {}).signal,
 					}
 				});
 			})
@@ -293,14 +295,15 @@ var upcomingAssessmentsBehaviorImpl = {
 					getToken: getToken,
 				});
 			})
-			.catch(function(e) {
+			.then(function() {
+				self.__getInfoAbortController = null;
+			}, function(e) {
+				self.__getInfoAbortController = null;
+
 				if (!(e instanceof Error) || e.name !== 'AbortError') {
 					self._showError = true;
 					self._firstName = null;
 				}
-			})
-			.finally(() => {
-				self.__getInfoAbortController = null;
 			});
 
 		return this.__getInfoRequest;

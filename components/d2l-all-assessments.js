@@ -136,14 +136,15 @@ Polymer({
 					});
 				})
 				.then(this._formatPeriodText.bind(this))
-				.catch((e) => {
+				.then(() => {
+					this.__dateChangeAbortController = null;
+				}, (e) => {
+					this.__dateChangeAbortController = null;
+
 					if (!(e instanceof Error) || e.name !== 'AbortError') {
 						this._showError = true;
 						this._firstName = null;
 					}
-				})
-				.finally(() => {
-					this.__dateChangeAbortController = null;
 				});
 
 			return this.__dateChangeActivityLoadRequest;
