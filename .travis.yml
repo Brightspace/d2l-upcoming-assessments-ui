@@ -9,7 +9,7 @@ before_script:
 script:
 - set -e
 - polymer test --skip-plugin sauce
-- 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then polymer test --skip-plugin local; fi'
+# - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then polymer test --skip-plugin local; fi'
 - if [ "$TRAVIS_BRANCH" == "master" ]; then frauci-update-version; fi
 env:
   global:
