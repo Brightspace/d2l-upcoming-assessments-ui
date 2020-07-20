@@ -130,7 +130,7 @@ Polymer({
 					return this._loadActivitiesForPeriod({
 						activitiesEntity: ctx.activitiesEntity,
 						dateObj: e.detail.date,
-						abortController: this.__dateChangeAbortController,
+						abortSignal: (this.__dateChangeAbortController || {}).signal,
 						getToken: ctx.getToken,
 						userUrl: ctx.userUrl,
 					});

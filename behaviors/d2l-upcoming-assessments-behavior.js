@@ -37,14 +37,14 @@ var upcomingAssessmentsBehaviorImpl = {
 		_periodEnd: String
 	},
 
-	_getOrganizationRequest: function(userActivityUsage, getToken, userUrl, abortController) {
+	_getOrganizationRequest: function(userActivityUsage, getToken, userUrl, abortSignal) {
 		var organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
 		return this._fetchEntityWithToken({
 			link: organizationLink,
 			userLink: userUrl,
 			getToken: getToken,
 			requestInit: {
-				signal: abortController && abortController.signal,
+				signal: abortSignal,
 			},
 		});
 	},
@@ -114,7 +114,13 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* Returns an object that contains the information required to populate an assessment list item
 	*/
-	_getUserActivityUsagesInfos: function(userActivityUsages, overdueUserActivityUsages, getToken, userUrl) {
+	_getUserActivityUsagesInfos: function(
+		userActivityUsages,
+		overdueUserActivityUsages,
+		getToken,
+		userUrl,
+		abortSignal,
+	) {
 		if (!Array.isArray(userActivityUsages) || userActivityUsages.length === 0) {
 			return;
 		}
@@ -125,7 +131,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		var supportedUserUsages = this._concatActivityUsageTypes(userActivityUsages);
 
 		supportedUserUsages.forEach(function(userActivityUsage) {
-			var organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl);
+			var organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl, abortSignal);
 			var activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl);
 			var userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
@@ -192,7 +198,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		}
 	},
 
-	_getOverdueActivities: function(activitiesEntity, getToken, userUrl, abortController) {
+	_getOverdueActivities: function(activitiesEntity, getToken, userUrl, abortSignal) {
 		var overdueActivitiesLink = (activitiesEntity.getLinkByRel(Rels.Activities.overdue) || {}).href;
 
 		if (overdueActivitiesLink) {
@@ -201,7 +207,7 @@ var upcomingAssessmentsBehaviorImpl = {
 				userLink: userUrl,
 				getToken: getToken,
 				requestInit: {
-					signal: abortController && abortController.signal,
+					signal: abortSignal,
 				}
 			});
 		}
@@ -290,7 +296,7 @@ var upcomingAssessmentsBehaviorImpl = {
 				return self._loadActivitiesForPeriod({
 					activitiesEntity: activitiesEntity,
 					dateObj: new Date(),
-					abortController: self.__getInfoAbortController,
+					abortSignal: (self.__getInfoAbortController || {}).signal,
 					userUrl: userUrl,
 					getToken: getToken,
 				});
@@ -312,7 +318,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	_loadActivitiesForPeriod: function({
 		activitiesEntity,
 		dateObj,
-		abortController,
+		abortSignal,
 		getToken,
 		userUrl,
 	}) {
@@ -323,10 +329,10 @@ var upcomingAssessmentsBehaviorImpl = {
 			userLink: userUrl,
 			getToken: getToken,
 			requestInit: {
-				signal: abortController && abortController.signal,
+				signal: abortSignal,
 			},
 		});
-		var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortController);
+		var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortSignal);
 
 		return Promise.all([userActivitiesRequest, overdueActivitiesRequest])
 			.then(function(activitiesResponses) {
@@ -338,8 +344,8 @@ var upcomingAssessmentsBehaviorImpl = {
 				self._periodStart = userActivityUsages.properties.start;
 				self._periodEnd = userActivityUsages.properties.end;
 
-				var flattenActivityUsages = self._flattenActivities(userActivityUsages, getToken, userUrl, abortController);
-				var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages, getToken, userUrl, abortController);
+				var flattenActivityUsages = self._flattenActivities(userActivityUsages, getToken, userUrl, abortSignal);
+				var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages, getToken, userUrl, abortSignal);
 				return Promise.all([
 					flattenActivityUsages,
 					flattenOverdueActivityUsages
@@ -349,7 +355,7 @@ var upcomingAssessmentsBehaviorImpl = {
 						responses[1],
 						getToken,
 						userUrl,
-						abortController,
+						abortSignal,
 					);
 				});
 			})
@@ -408,7 +414,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	* Linked subentities are hydrated, and the date restrictions of the
 	* parent content activity are projected onto the child activity when missing.
 	*/
-	_flattenActivities: function(activities, getToken, userUrl, abortController) {
+	_flattenActivities: function(activities, getToken, userUrl, abortSignal) {
 		var activityEntities;
 		var self = this;
 		if (Array.isArray(activities)) {
@@ -419,7 +425,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		var supportedActivities = activityEntities.filter(this._isSupportedType.bind(this));
 		var activitiesContext = this._createNormalizedEntityMap(supportedActivities);
 		var flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
-		return self._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortController)
+		return self._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortSignal)
 			.then(function(hydratedActivities) {
 				var activitiesMap = activitiesContext.activitiesMap;
 				var parentActivitiesMap = activitiesContext.parentActivitiesMap;
@@ -506,7 +512,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* On success, all activities, with linked subentities hydrated
 	*/
-	_hydrateActivityEntities: function(activityEntities, getToken, userUrl, abortController) {
+	_hydrateActivityEntities: function(activityEntities, getToken, userUrl, abortSignal) {
 		var self = this;
 		// Already-complete entities
 		var hydratedActivities = activityEntities
@@ -523,7 +529,7 @@ var upcomingAssessmentsBehaviorImpl = {
 					userLink: userUrl,
 					getToken: getToken,
 					requestInit: {
-						signal: abortController && abortController.signal,
+						signal: abortSignal,
 					}
 				})
 					.then(SirenParse);
