@@ -117,22 +117,16 @@ Polymer({
 				this.__dateChangeActivityLoadRequest = Promise.resolve();
 			}
 
-			const ctx = {
-				activitiesEntity: this.__activitiesEntity,
-				getToken: this.getToken,
-				userUrl: this.userUrl,
-			};
-
 			this.__dateChangeActivityLoadRequest = this.__dateChangeActivityLoadRequest
 				.then(() => {
 					this.__dateChangeAbortController = new AbortController();
 
 					return this._loadActivitiesForPeriod({
-						activitiesEntity: ctx.activitiesEntity,
+						activitiesEntity: this.__activitiesEntity,
 						dateObj: e.detail.date,
 						abortSignal: (this.__dateChangeAbortController || {}).signal,
-						getToken: ctx.getToken,
-						userUrl: ctx.userUrl,
+						getToken: this.getToken,
+						userUrl: this.userUrl,
 					});
 				})
 				.then(this._formatPeriodText.bind(this))
