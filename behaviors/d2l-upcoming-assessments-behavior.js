@@ -301,8 +301,10 @@ var upcomingAssessmentsBehaviorImpl = {
 					getToken: getToken,
 				});
 			})
-			.then(function() {
+			.then(function(activities) {
 				self.__getInfoAbortController = null;
+
+				return activities;
 			}, function(e) {
 				self.__getInfoAbortController = null;
 
