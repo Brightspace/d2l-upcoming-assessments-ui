@@ -6,6 +6,7 @@ import '../build/langterms/en.js';
 import '../build/langterms/es.js';
 import '../build/langterms/fr.js';
 import '../build/langterms/fr-fr.js';
+import '../build/langterms/fr-ON.js';
 import '../build/langterms/ja.js';
 import '../build/langterms/ko.js';
 import '../build/langterms/nl.js';
@@ -32,6 +33,7 @@ window.D2L.UpcomingAssessments.LocalizeBehaviorImpl = {
 					'es': this.es,
 					'fr': this.fr,
 					'fr-fr': this['fr-fr'],
+					'fr-ON': this['fr-ON'],
 					'ja': this.ja,
 					'ko': this.ko,
 					'nl': this.nl,
@@ -55,6 +57,8 @@ window.D2L.UpcomingAssessments.LocalizeBehavior = [
 	window.D2L.UpcomingAssessments.LangEnBehavior,
 	window.D2L.UpcomingAssessments.LangEsBehavior,
 	window.D2L.UpcomingAssessments.LangFrBehavior,
+	window.D2L.UpcomingAssessments.LangFrfrBehavior,
+	window.D2L.UpcomingAssessments.LangFrONBehavior,
 	window.D2L.UpcomingAssessments.LangJaBehavior,
 	window.D2L.UpcomingAssessments.LangKoBehavior,
 	window.D2L.UpcomingAssessments.LangNlBehavior,
