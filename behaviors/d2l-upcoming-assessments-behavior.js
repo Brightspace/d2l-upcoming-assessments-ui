@@ -33,7 +33,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		_periodEnd: String
 	},
 
-	_getOrganizationRequest: async function (userActivityUsage, getToken, userUrl, abortSignal) {
+	_getOrganizationRequest: async function(userActivityUsage, getToken, userUrl, abortSignal) {
 		const organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
 		return await this._fetchEntityWithToken({
 			link: organizationLink,
@@ -45,8 +45,8 @@ var upcomingAssessmentsBehaviorImpl = {
 		});
 	},
 
-	_findActivityHref: function (userActivityUsage) {
-		for (const i = 0; i < this._allTypes.length; i++) {
+	_findActivityHref: function(userActivityUsage) {
+		for (let i = 0; i < this._allTypes.length; i++) {
 			const activityRel = (this._types[this._allTypes[i]] || {}).activityRel;
 			if (!activityRel) {
 				continue;
@@ -59,7 +59,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return '';
 	},
 
-	_getActivityRequest: async function (userActivityUsage, getToken, userUrl) {
+	_getActivityRequest: async function(userActivityUsage, getToken, userUrl) {
 		const activityLink = this._findActivityHref(userActivityUsage);
 		try {
 			const activity = this._fetchEntityWithToken(activityLink, getToken, userUrl);
@@ -73,7 +73,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		}
 	},
 
-	_getInstructions: function (type, activity) {
+	_getInstructions: function(type, activity) {
 		const item = this._types[type];
 		if (!item) {
 			return '';
@@ -81,7 +81,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return this._getRichTextValuePreferPlainText(activity.getSubEntityByRel(item.instructionsRel));
 	},
 
-	_getRichTextValuePreferPlainText: function (richtextEntity) {
+	_getRichTextValuePreferPlainText: function(richtextEntity) {
 		if (!richtextEntity || !richtextEntity.hasClass(Classes.text.richtext) ||
 			(!richtextEntity.properties.text && !richtextEntity.properties.html)) {
 			return '';
@@ -90,11 +90,11 @@ var upcomingAssessmentsBehaviorImpl = {
 		return richtextEntity.properties.text || richtextEntity.properties.html;
 	},
 
-	_concatActivityUsageTypes: function (usageList) {
+	_concatActivityUsageTypes: function(usageList) {
 		return usageList.filter(this._isSupportedType.bind(this));
 	},
 
-	_getActivityStatus: function (type, userActivityUsage, overdueUserUsages) {
+	_getActivityStatus: function(type, userActivityUsage, overdueUserUsages) {
 		const item = this._types[type];
 		if (!item) {
 			return '';
@@ -102,7 +102,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return this._getStatusBadge(userActivityUsage, overdueUserUsages, item);
 	},
 
-	_getIconSetKey: function (entity, tierClass) {
+	_getIconSetKey: function(entity, tierClass) {
 		if (!entity.getSubEntityByClass(tierClass)) {
 			return null;
 		}
@@ -112,7 +112,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* Returns an object that contains the information required to populate an assessment list item
 	*/
-	_getUserActivityUsagesInfos: async function (
+	_getUserActivityUsagesInfos: async function(
 		userActivityUsages,
 		overdueUserActivityUsages,
 		getToken,
@@ -126,12 +126,12 @@ var upcomingAssessmentsBehaviorImpl = {
 		const overdueUserUsages = this._concatActivityUsageTypes(overdueUserActivityUsages);
 		const supportedUserUsages = this._concatActivityUsageTypes(userActivityUsages);
 
-		const requests = supportedUserUsages.map(async (userActivityUsage) => {
+		const requests = supportedUserUsages.map(async(userActivityUsage) => {
 			const organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl, abortSignal);
 			const activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl);
 			const userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
-			const [activity, organization] = await Promise.all([activityRequest, organizationRequest])
+			const [activity, organization] = await Promise.all([activityRequest, organizationRequest]);
 			if (!activity) {
 				return null;
 			}
@@ -166,7 +166,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return successResponses;
 	},
 
-	_getUserActivityUsages: async function (userEntity, getToken, userUrl) {
+	_getUserActivityUsages: async function(userEntity, getToken, userUrl) {
 		const myActivitiesLink = (
 			userEntity.getLinkByRel(Rels.Activities.myActivitiesEmpty)
 			|| userEntity.getLinkByRel(Rels.Activities.myActivities)
@@ -174,14 +174,14 @@ var upcomingAssessmentsBehaviorImpl = {
 		).href;
 
 		if (myActivitiesLink) {
-			const activitiesEntity = await this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl)
+			const activitiesEntity = await this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl);
 			const customRangeActionHref = this._getCustomRangeAction(activitiesEntity);
 
 			return this._fetchEntityWithToken(customRangeActionHref, getToken, userUrl);
 		}
 	},
 
-	_getOverdueActivities: function (activitiesEntity, getToken, userUrl, abortSignal) {
+	_getOverdueActivities: function(activitiesEntity, getToken, userUrl, abortSignal) {
 		const overdueActivitiesLink = (activitiesEntity.getLinkByRel(Rels.Activities.overdue) || {}).href;
 
 		if (overdueActivitiesLink) {
@@ -199,7 +199,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return SirenParse({});
 	},
 
-	_getCustomRangeAction: function (activitiesEntity, dateObj) {
+	_getCustomRangeAction: function(activitiesEntity, dateObj) {
 		const date = dateObj || new Date();
 
 		const parameters = this._getCustomDateRangeParameters(date);
@@ -208,7 +208,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return this._createActionUrl(action, parameters);
 	},
 
-	_getCustomDateRangeParameters: function (selectedDate) {
+	_getCustomDateRangeParameters: function(selectedDate) {
 		const day = selectedDate.getDay();
 		const startDate = new Date(selectedDate.setDate(selectedDate.getDate() - day));
 		startDate.setHours(0, 0, 0, 0);
@@ -223,7 +223,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		};
 	},
 
-	_getUser: function (userUrl, getToken) {
+	_getUser: function(userUrl, getToken) {
 		return this._fetchEntityWithToken(userUrl, getToken);
 	},
 
@@ -240,7 +240,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			this.__getInfoAbortController.abort();
 		}
 
-		this.__getInfoRequest = this.__getInfoRequest.then(async () => {
+		this.__getInfoRequest = this.__getInfoRequest.then(async() => {
 			try {
 				if (window.AbortController) {
 					this.__getInfoAbortController = new AbortController();
@@ -289,11 +289,11 @@ var upcomingAssessmentsBehaviorImpl = {
 					this._firstName = null;
 				}
 			}
-		})
+		});
 		return this.__getInfoRequest;
 	},
 
-	_loadActivitiesForPeriod: async function ({
+	_loadActivitiesForPeriod: async function({
 		activitiesEntity,
 		dateObj,
 		abortSignal,
@@ -311,7 +311,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		});
 		const overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortSignal);
 
-		const [userActivityUsages, overdueUserActivityUsages] = await Promise.all([userActivitiesRequest, overdueActivitiesRequest])
+		const [userActivityUsages, overdueUserActivityUsages] = await Promise.all([userActivitiesRequest, overdueActivitiesRequest]);
 		this._previousPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.previousPeriod) || {}).href;
 		this._nextPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.nextPeriod) || {}).href;
 		this._periodStart = userActivityUsages.properties.start;
@@ -338,7 +338,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return activities;
 	},
 
-	_updateActivitiesInfo: function (activities) {
+	_updateActivitiesInfo: function(activities) {
 		activities = activities || [];
 		return activities
 			.filter((activity) => {
@@ -349,7 +349,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			});
 	},
 
-	_createActionUrl: function (action, parameters) {
+	_createActionUrl: function(action, parameters) {
 		const query = {};
 		if (action.fields) {
 			action.fields.forEach((field) => {
@@ -368,7 +368,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return queryString ? action.href + '?' + queryString : action.href;
 	},
 
-	_upcomingAssessmentsBehaviour_resetData: function () {
+	_upcomingAssessmentsBehaviour_resetData: function() {
 		this._showError = false;
 		this._firstName = null;
 		this._allActivities = [];
@@ -385,7 +385,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	* Linked subentities are hydrated, and the date restrictions of the
 	* parent content activity are projected onto the child activity when missing.
 	*/
-	_flattenActivities: async function (activities, getToken, userUrl, abortSignal) {
+	_flattenActivities: async function(activities, getToken, userUrl, abortSignal) {
 		let activityEntities;
 		if (Array.isArray(activities)) {
 			activityEntities = activities;
@@ -398,14 +398,14 @@ var upcomingAssessmentsBehaviorImpl = {
 
 		const activitiesContext = this._createNormalizedEntityMap(supportedActivities);
 		const flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
-		const hydratedActivities = await this._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortSignal)
+		const hydratedActivities = await this._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortSignal);
 		const activitiesMap = activitiesContext.activitiesMap;
 		const parentActivitiesMap = activitiesContext.parentActivitiesMap;
 		const redundantActivities = [];
 		// Normalize activity data prior to deduping; eg, some activities don't
 		// have a due date (surveys), while the content topic can
 		hydratedActivities.forEach((activity) => {
-			const canonicalActivity = activity;
+			let canonicalActivity = activity;
 			const activitySelfLink = activity.getLinkByRel('self').href;
 			if (parentActivitiesMap.has(activitySelfLink)) {
 				const parentActivity = parentActivitiesMap.get(activitySelfLink);
@@ -439,7 +439,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			});
 	},
 
-	_createNormalizedEntityMap: function (activityEntities) {
+	_createNormalizedEntityMap: function(activityEntities) {
 		const activitiesMap = new Map();
 		const parentActivitiesMap = new Map();
 		const allActivities = [];
@@ -482,7 +482,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* On success, all activities, with linked subentities hydrated
 	*/
-	_hydrateActivityEntities: async function (activityEntities, getToken, userUrl, abortSignal) {
+	_hydrateActivityEntities: async function(activityEntities, getToken, userUrl, abortSignal) {
 		// Already-complete entities
 		const hydratedActivities = activityEntities
 			.filter(entity => {
@@ -507,7 +507,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		return hydratedActivities.concat(entities);
 	},
 
-	_isSupportedType: function (usage) {
+	_isSupportedType: function(usage) {
 		return this._allTypes.some(typeString => {
 			const type = this._types[typeString];
 			if (usage.hasClass(type.userActivityUsageClass)) {
