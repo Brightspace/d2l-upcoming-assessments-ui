@@ -62,11 +62,12 @@ var upcomingAssessmentsBehaviorImpl = {
 	_getActivityRequest: async function(userActivityUsage, getToken, userUrl) {
 		const activityLink = this._findActivityHref(userActivityUsage);
 		try {
-			const activity = this._fetchEntityWithToken(activityLink, getToken, userUrl);
+			const activity = await this._fetchEntityWithToken(activityLink, getToken, userUrl);
 			return activity;
 		} catch (err) {
 			const status = typeof err === 'number' ? err : err && err.status;
 			if (typeof status === 'number' && status >= 400 && status < 500) {
+
 				return null;
 			}
 			throw err;
