@@ -7,6 +7,77 @@ import './status-badge-behavior.js';
 window.D2L = window.D2L || {};
 window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
 
+class UpcomingAssessmentsTimer {
+	times;
+	constructor() {
+		this.times = {};
+	}
+
+	get active() {
+		// TODO: look for a flag on the window, create a util with "start timing and endtiming" methods
+		return true;
+	}
+
+	get logStartTimes() {
+		return false;
+	}
+
+	startTimer(key, requestType, wait) {
+		if (!this.active) {
+			return;
+		}
+
+		this.times[key] = this.times[key] || {};
+
+		this.times[key][requestType] = {
+			time: Date.now(),
+			requestType: requestType,
+		};
+		if (this.logStartTimes) {
+			console.log(`Starting requests for ${requestType} (${key})`); // eslint-disable-line no-console
+		}
+		return (resolveAllInBatch) => {
+			this.endTimer(key, requestType, { resolve: !wait, resolveAllInBatch: resolveAllInBatch });
+		};
+	}
+
+	endTimer(key, requestType, options = {}) {
+		if (!this.active) {
+			return;
+		}
+
+		const val = this.times[key][requestType];
+		val.endTime = (Date.now() - val.time) / 1000;
+		if (!val) {
+			console.log(`Requests done for ${key} ${requestType}, no initial timer was found`); // eslint-disable-line no-console
+			return;
+		}
+		if (options.resolve) {
+			console.log(`${val.requestType} fetched, elapsed time: ${val.endTime} seconds (${key})`); // eslint-disable-line no-console
+			delete this.times[key][requestType];
+		}
+		if (options.resolveAllInBatch) {
+			const innerMessages = {};
+			for (const i in this.times[key]) {
+				const cur = this.times[key][i];
+				innerMessages[cur.requestType] = `elapsed time: ${cur.endTime} seconds`;
+				delete this.times[key][i];
+			}
+			console.log(`${requestType} fetched, elapsed time: ${(Date.now() - val.time) / 1000} (${key})`, innerMessages);  // eslint-disable-line no-console
+		}
+	}
+
+	resetTimers() {
+		this.times = {};
+	}
+}
+
+function getTimerKey(str) {
+	return str + ' ' + Math.random() * 1000;
+}
+
+const timer = new UpcomingAssessmentsTimer();
+
 /*
 * @polymerBehavior window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior
 */
@@ -33,9 +104,10 @@ var upcomingAssessmentsBehaviorImpl = {
 		_periodEnd: String
 	},
 
-	_getOrganizationRequest: async function(userActivityUsage, getToken, userUrl, abortSignal) {
+	_getOrganizationRequest: async function(userActivityUsage, getToken, userUrl, abortSignal, timerKey) {
+		const endTimer = timer.startTimer(timerKey, 'organizationRequest', true);
 		const organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
-		return await this._fetchEntityWithToken({
+		const organization = await this._fetchEntityWithToken({
 			link: organizationLink,
 			userLink: userUrl,
 			getToken: getToken,
@@ -43,6 +115,8 @@ var upcomingAssessmentsBehaviorImpl = {
 				signal: abortSignal,
 			},
 		});
+		endTimer();
+		return organization;
 	},
 
 	_findActivityHref: function(userActivityUsage) {
@@ -59,17 +133,19 @@ var upcomingAssessmentsBehaviorImpl = {
 		return '';
 	},
 
-	_getActivityRequest: async function(userActivityUsage, getToken, userUrl) {
+	_getActivityRequest: async function(userActivityUsage, getToken, userUrl, timerKey) {
+		const endTimer = timer.startTimer(timerKey, 'activityRequest', true);
 		const activityLink = this._findActivityHref(userActivityUsage);
 		try {
 			const activity = await this._fetchEntityWithToken(activityLink, getToken, userUrl);
+			endTimer();
 			return activity;
 		} catch (err) {
 			const status = typeof err === 'number' ? err : err && err.status;
 			if (typeof status === 'number' && status >= 400 && status < 500) {
-
 				return null;
 			}
+			endTimer();
 			throw err;
 		}
 	},
@@ -120,6 +196,8 @@ var upcomingAssessmentsBehaviorImpl = {
 		userUrl,
 		abortSignal,
 	) {
+		const timerKey = getTimerKey(userUrl);
+		const endTimer = timer.startTimer(timerKey, 'userActivityUsagesInfos');
 		if (!Array.isArray(userActivityUsages) || userActivityUsages.length === 0) {
 			return;
 		}
@@ -128,8 +206,8 @@ var upcomingAssessmentsBehaviorImpl = {
 		const supportedUserUsages = this._concatActivityUsageTypes(userActivityUsages);
 
 		const requests = supportedUserUsages.map(async(userActivityUsage) => {
-			const organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl, abortSignal);
-			const activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl);
+			const organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl, abortSignal, timerKey);
+			const activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl, timerKey);
 			const userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
 			const [activity, organization] = await Promise.all([activityRequest, organizationRequest]);
@@ -164,10 +242,12 @@ var upcomingAssessmentsBehaviorImpl = {
 		if (responses.length && !successResponses.length) {
 			return Promise.reject(new Error('All activity requests failed'));
 		}
+		endTimer();
 		return successResponses;
 	},
 
 	_getUserActivityUsages: async function(userEntity, getToken, userUrl) {
+		const endTimer = timer.startTimer(getTimerKey(userUrl), 'userActivityUsages');
 		const myActivitiesLink = (
 			userEntity.getLinkByRel(Rels.Activities.myActivitiesEmpty)
 			|| userEntity.getLinkByRel(Rels.Activities.myActivities)
@@ -178,15 +258,19 @@ var upcomingAssessmentsBehaviorImpl = {
 			const activitiesEntity = await this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl);
 			const customRangeActionHref = this._getCustomRangeAction(activitiesEntity);
 
-			return this._fetchEntityWithToken(customRangeActionHref, getToken, userUrl);
+			const myActivities = await this._fetchEntityWithToken(customRangeActionHref, getToken, userUrl);
+			endTimer();
+			return myActivities;
 		}
+		endTimer();
 	},
 
-	_getOverdueActivities: function(activitiesEntity, getToken, userUrl, abortSignal) {
+	_getOverdueActivities: async function(activitiesEntity, getToken, userUrl, abortSignal, timerKey) {
+		const endTimer = timer.startTimer(timerKey || getTimerKey(userUrl), 'overdueUsages', true);
 		const overdueActivitiesLink = (activitiesEntity.getLinkByRel(Rels.Activities.overdue) || {}).href;
 
 		if (overdueActivitiesLink) {
-			return this._fetchEntityWithToken({
+			const toReturn = await this._fetchEntityWithToken({
 				link: overdueActivitiesLink,
 				userLink: userUrl,
 				getToken: getToken,
@@ -194,8 +278,11 @@ var upcomingAssessmentsBehaviorImpl = {
 					signal: abortSignal,
 				}
 			});
+			endTimer();
+			return toReturn;
 		}
 
+		endTimer();
 		// API doesn't include the overdue link if user doesn't have any overdue activities
 		return SirenParse({});
 	},
@@ -232,6 +319,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		this._showError = false;
 		const userUrl = this.userUrl;
 		const getToken = this.getToken;
+		const timerKey = userUrl + ' info';
 
 		if (!this.__getInfoRequest) {
 			this.__getInfoRequest = Promise.resolve();
@@ -242,11 +330,13 @@ var upcomingAssessmentsBehaviorImpl = {
 		}
 
 		this.__getInfoRequest = this.__getInfoRequest.then(async() => {
+			const endInfoRequestTimer = timer.startTimer(timerKey, 'getInfoRequest', true);
 			try {
 				if (window.AbortController) {
 					this.__getInfoAbortController = new AbortController();
 				}
 
+				const endUserEntityTimer = timer.startTimer(timerKey, 'userEntity', true);
 				const userEntity = await this._fetchEntityWithToken({
 					link: userUrl,
 					getToken: getToken,
@@ -254,6 +344,7 @@ var upcomingAssessmentsBehaviorImpl = {
 						signal: (this.__getInfoAbortController || {}).signal,
 					},
 				});
+				endUserEntityTimer();
 				this._firstName = (userEntity.getSubEntityByRel(Rels.firstName) || { properties: {} }).properties.name;
 				const myActivitiesLink = (
 					userEntity.getLinkByRel(Rels.Activities.myActivitiesEmpty)
@@ -261,6 +352,7 @@ var upcomingAssessmentsBehaviorImpl = {
 					|| {}
 				).href;
 
+				const endMyActivitiesTimer = timer.startTimer(timerKey, 'myActivities', true);
 				const activitiesEntity = await this._fetchEntityWithToken({
 					link: myActivitiesLink,
 					userLink: userUrl,
@@ -269,6 +361,7 @@ var upcomingAssessmentsBehaviorImpl = {
 						signal: (this.__getInfoAbortController || {}).signal,
 					}
 				});
+				endMyActivitiesTimer();
 				this.__activitiesEntity = activitiesEntity;
 
 				const activities = await this._loadActivitiesForPeriod({
@@ -277,14 +370,17 @@ var upcomingAssessmentsBehaviorImpl = {
 					abortSignal: (this.__getInfoAbortController || {}).signal,
 					userUrl: userUrl,
 					getToken: getToken,
+					timerKey: timerKey,
 				});
 				this.__getInfoAbortController = null;
 
+				endInfoRequestTimer(true);
 				return activities;
 
 			} catch (e) {
 				this.__getInfoAbortController = null;
 
+				endInfoRequestTimer(true);
 				if (!(e instanceof Error) || e.name !== 'AbortError') {
 					this._showError = true;
 					this._firstName = null;
@@ -300,8 +396,13 @@ var upcomingAssessmentsBehaviorImpl = {
 		abortSignal,
 		getToken,
 		userUrl,
+		timerKey
 	}) {
+		timerKey = timerKey || userUrl + ' loadAcivities';
+		const endLoadActivitiesForPeriod = timer.startTimer(timerKey, 'loadActivitiesForPeriod', true);
 		const periodUrl = this._getCustomRangeAction(activitiesEntity, dateObj);
+
+		const endUserActivitiesRequest = timer.startTimer(timerKey, 'endUserActivitiesRequest', true);
 		const userActivitiesRequest = this._fetchEntityWithToken({
 			link: periodUrl,
 			userLink: userUrl,
@@ -310,7 +411,8 @@ var upcomingAssessmentsBehaviorImpl = {
 				signal: abortSignal,
 			},
 		});
-		const overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortSignal);
+		endUserActivitiesRequest();
+		const overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortSignal, timerKey);
 
 		const [userActivityUsages, overdueUserActivityUsages] = await Promise.all([userActivitiesRequest, overdueActivitiesRequest]);
 		this._previousPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.previousPeriod) || {}).href;
@@ -336,6 +438,8 @@ var upcomingAssessmentsBehaviorImpl = {
 		const activities = this._updateActivitiesInfo(userActivityUsagesInfos, getToken, userUrl);
 
 		this.set('_allActivities', activities);
+
+		endLoadActivitiesForPeriod();
 		return activities;
 	},
 
@@ -387,6 +491,8 @@ var upcomingAssessmentsBehaviorImpl = {
 	* parent content activity are projected onto the child activity when missing.
 	*/
 	_flattenActivities: async function(activities, getToken, userUrl, abortSignal) {
+		const timerKey = getTimerKey(userUrl);
+		const endFlattenActivities = timer.startTimer(timerKey, 'flattenActivities');
 		let activityEntities;
 		if (Array.isArray(activities)) {
 			activityEntities = activities;
@@ -434,6 +540,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			}
 			activitiesMap.set(activitySelfLink, canonicalActivity);
 		});
+		endFlattenActivities();
 		return Array.from(activitiesMap.values())
 			.filter((activity) => {
 				return !redundantActivities.includes(activity.getLinkByRel('self').href);
@@ -484,6 +591,8 @@ var upcomingAssessmentsBehaviorImpl = {
 	* On success, all activities, with linked subentities hydrated
 	*/
 	_hydrateActivityEntities: async function(activityEntities, getToken, userUrl, abortSignal) {
+		const timerKey = getTimerKey(userUrl);
+		const endHydrateActivities = timer.startTimer(timerKey, 'hydrateActivities');
 		// Already-complete entities
 		const hydratedActivities = activityEntities
 			.filter(entity => {
@@ -505,6 +614,7 @@ var upcomingAssessmentsBehaviorImpl = {
 					.then(SirenParse);
 			});
 		const entities = await Promise.all(activityPromises);
+		endHydrateActivities();
 		return hydratedActivities.concat(entities);
 	},
 
