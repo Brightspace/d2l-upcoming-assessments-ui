@@ -439,7 +439,7 @@ var upcomingAssessmentsBehaviorImpl = {
 
 		this.set('_allActivities', activities);
 
-		endLoadActivitiesForPeriod();
+		endLoadActivitiesForPeriod(true);
 		return activities;
 	},
 
