@@ -195,8 +195,8 @@ var upcomingAssessmentsBehaviorImpl = {
 		getToken,
 		userUrl,
 		abortSignal,
+		timerKey
 	) {
-		const timerKey = getTimerKey(userUrl);
 		const endTimer = timer.startTimer(timerKey, 'userActivityUsagesInfos');
 		if (!Array.isArray(userActivityUsages) || userActivityUsages.length === 0) {
 			return;
@@ -433,6 +433,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			getToken,
 			userUrl,
 			abortSignal,
+			timerKey
 		);
 
 		const activities = this._updateActivitiesInfo(userActivityUsagesInfos, getToken, userUrl);
