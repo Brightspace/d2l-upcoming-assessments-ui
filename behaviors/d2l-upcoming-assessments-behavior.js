@@ -46,16 +46,21 @@ class UpcomingAssessmentsTimer {
 			return;
 		}
 
+		if (!requestType) {
+			console.error(`no request type found ${key}`);
+		}
+
+		if (!this.times[key][requestType]) {
+			console.error(`no item found for ${key}, ${requestType}`);
+		}
+
 		const val = this.times[key][requestType];
 		val.endTime = (Date.now() - val.time) / 1000;
 		if (!val) {
 			console.log(`Requests done for ${key} ${requestType}, no initial timer was found`); // eslint-disable-line no-console
 			return;
 		}
-		if (options.resolve) {
-			console.log(`${val.requestType} fetched, elapsed time: ${val.endTime} seconds (${key})`); // eslint-disable-line no-console
-			delete this.times[key][requestType];
-		}
+
 		if (options.resolveAllInBatch) {
 			const innerMessages = {};
 			for (const i in this.times[key]) {
@@ -64,6 +69,9 @@ class UpcomingAssessmentsTimer {
 				delete this.times[key][i];
 			}
 			console.log(`${requestType} fetched, elapsed time: ${(Date.now() - val.time) / 1000} (${key})`, innerMessages);  // eslint-disable-line no-console
+		} else if (options.resolve) {
+			console.log(`${val.requestType} fetched, elapsed time: ${val.endTime} seconds (${key})`); // eslint-disable-line no-console
+			delete this.times[key][requestType];
 		}
 	}
 
@@ -319,7 +327,6 @@ var upcomingAssessmentsBehaviorImpl = {
 		this._showError = false;
 		const userUrl = this.userUrl;
 		const getToken = this.getToken;
-		const timerKey = userUrl + ' info';
 
 		if (!this.__getInfoRequest) {
 			this.__getInfoRequest = Promise.resolve();
@@ -330,6 +337,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		}
 
 		this.__getInfoRequest = this.__getInfoRequest.then(async() => {
+			const timerKey = getTimerKey(userUrl + ' info');
 			const endInfoRequestTimer = timer.startTimer(timerKey, 'getInfoRequest', true);
 			try {
 				if (window.AbortController) {
@@ -378,6 +386,7 @@ var upcomingAssessmentsBehaviorImpl = {
 				return activities;
 
 			} catch (e) {
+				console.error(e);
 				this.__getInfoAbortController = null;
 
 				endInfoRequestTimer(true);
@@ -440,7 +449,7 @@ var upcomingAssessmentsBehaviorImpl = {
 
 		this.set('_allActivities', activities);
 
-		endLoadActivitiesForPeriod(true);
+		endLoadActivitiesForPeriod();
 		return activities;
 	},
 
