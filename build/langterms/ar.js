@@ -8,7 +8,7 @@ window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
  */
 window.D2L.UpcomingAssessments.LangArBehavior = {
 	'ar': {
-		"activityComplete": "تم الإكمال",
+		"activityComplete": "مكتملة",
 		"activityDueToday": "تاريخ الاستحقاق اليوم",
 		"activityEnded": "مغلق",
 		"activityEndsToday": "ينتهي اليوم",
@@ -16,10 +16,10 @@ window.D2L.UpcomingAssessments.LangArBehavior = {
 		"activityOverdue": "تم تجاوز تاريخ الاستحقاق",
 		"assignment": "الفرض",
 		"content": "المحتوى",
-		"currentPeriod": "{startDate} - {endDate}",
+		"currentPeriod": "{startDate}‏ - {endDate}‏",
 		"discussion": "المناقشة",
-		"dueDateLongImminent": "{prefix}: {dueDate}",
-		"dueDateShort": "تاريخ الاستحقاق {dueDate}",
+		"dueDateLongImminent": "{prefix}: {‏dueDate}",
+		"dueDateShort": "تاريخ الاستحقاق في {dueDate}",
 		"endDateShort": "ينتهي في {endDate}",
 		"errorMessage": "يبدو أن هناك مشكلة في تحميل هذه الأداة البرمجية. نحن نعمل على حلّها في أسرع وقت ممكن.",
 		"goNextText": "التالي",

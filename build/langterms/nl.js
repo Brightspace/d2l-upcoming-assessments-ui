@@ -9,7 +9,7 @@ window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
 window.D2L.UpcomingAssessments.LangNlBehavior = {
 	'nl': {
 		"activityComplete": "Voltooien",
-		"activityDueToday": "Moet vandaag af",
+		"activityDueToday": "Uiterste datum vandaag",
 		"activityEnded": "Gesloten",
 		"activityEndsToday": "Eindigt vandaag",
 		"activityExempted": "Uitgesloten",

@@ -8,7 +8,7 @@ window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
  */
 window.D2L.UpcomingAssessments.LangJaBehavior = {
 	'ja': {
-		"activityComplete": "完了",
+		"activityComplete": "の完了",
 		"activityDueToday": "本日期限",
 		"activityEnded": "クローズ",
 		"activityEndsToday": "本日終了",
@@ -16,7 +16,7 @@ window.D2L.UpcomingAssessments.LangJaBehavior = {
 		"activityOverdue": "期限切れ",
 		"assignment": "課題",
 		"content": "コンテンツ",
-		"currentPeriod": "{startDate} - {endDate}",
+		"currentPeriod": "{startDate}～{endDate}",
 		"discussion": "ディスカッション",
 		"dueDateLongImminent": "{prefix}: {dueDate}",
 		"dueDateShort": "期限 {dueDate}",

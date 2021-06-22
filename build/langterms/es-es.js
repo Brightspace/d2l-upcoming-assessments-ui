@@ -4,27 +4,29 @@ window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
 
 /**
  * This file is auto-generated. Do not modify.
- * @polymerBehavior window.D2L.UpcomingAssessments.LangEsBehavior
+ * @polymerBehavior window.D2L.UpcomingAssessments.LangEsesBehavior
  */
-window.D2L.UpcomingAssessments.LangEsBehavior = {
-	'es': {
-		"activityComplete": "Completar",
+window.D2L.UpcomingAssessments.LangEsesBehavior = {
+	'es-es': {
+		"activityComplete": "Completo",
 		"activityDueToday": "Vence hoy",
 		"activityEnded": "Cerrado",
 		"activityEndsToday": "Finaliza hoy",
-		"activityExempted": "Eximido",
-		"activityOverdue": "Vencido",
-		"assignment": "Asignación",
+		"activityExempted": "Exento",
+		"activityOverdue": "Atrasadas",
+		"assignment": "Tarea",
+		"closeSimpleOverlayText": "Volver al panel",
+		"closeSimpleOverlayTextMobile": "Panel de",
 		"content": "Contenido",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Debate",
 		"dueDateLongImminent": "{prefix}: {dueDate}",
-		"dueDateShort": "Fecha de entrega {dueDate}",
-		"endDateShort": "Término {endDate}",
-		"errorMessage": "Al parecer, hay un problema con la carga de este componente. Estamos trabajando para solucionarlo y lo arreglaremos lo antes posible.",
+		"dueDateShort": "Fecha de vencimiento {dueDate}",
+		"endDateShort": "Finaliza el {endDate}",
+		"errorMessage": "Al parecer, hay un problema con la carga de este widget. Estamos trabajando para solucionarlo y lo arreglaremos lo antes posible.",
 		"goNextText": "siguiente",
 		"goPreviousText": "anterior",
-		"noAssessmentsInThisTimeFrame": "{userName} no tiene ningún trabajo que entregar durante este período.",
+		"noAssessmentsInThisTimeFrame": "{userName} no tiene ningún trabajo que entregar durante este periodo.",
 		"noUpcomingAssessments": "{userName} no tiene ningún trabajo que entregar en las próximas dos semanas.",
 		"quiz": "Cuestionario",
 		"today": "Hoy",
