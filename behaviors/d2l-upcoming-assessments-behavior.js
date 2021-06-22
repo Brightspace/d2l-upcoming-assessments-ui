@@ -394,8 +394,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			activityEntities = activities.entities || [];
 		}
 		const supportedActivities = activityEntities
-			.filter(this._isSupportedType.bind(this))
-			.filter(x => !x.hasClass('broken'));
+			.filter(this._isSupportedType.bind(this));
 
 		const activitiesContext = this._createNormalizedEntityMap(supportedActivities);
 		const flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
