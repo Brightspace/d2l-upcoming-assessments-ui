@@ -1,5 +1,5 @@
 {
-   "activityComplete" : "完了",
+   "activityComplete" : "の完了",
    "activityDueToday" : "本日期限",
    "activityEnded" : "クローズ",
    "activityEndsToday" : "本日終了",
@@ -7,7 +7,7 @@
    "activityOverdue" : "期限切れ",
    "assignment" : "課題",
    "content" : "コンテンツ",
-   "currentPeriod" : "{startDate} - {endDate}",
+   "currentPeriod" : "{startDate}～{endDate}",
    "discussion" : "ディスカッション",
    "dueDateLongImminent" : "{prefix}: {dueDate}",
    "dueDateShort" : "期限 {dueDate}",
