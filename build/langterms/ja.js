@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangJaBehavior = {
 		"viewAllAssignments": "すべての学習の表示"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangJaBehavior['ja'];

@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangArBehavior = {
 		"viewAllAssignments": "عرض كل العمل"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangArBehavior['ar'];

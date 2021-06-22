@@ -1,101 +1,48 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<title>d2l-all-assessments demo</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-		<script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-
-		<script type="module" src="../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
-		<script type="module" src="../../@polymer/iron-demo-helpers/demo-snippet.js"></script>
-		<script type="module" src="../../d2l-typography/d2l-typography.js"></script>
-		<script type="module" src="../components/d2l-all-assessments.js"></script>
-		<!-- FIXME(polymer-modulizer):
-		These imperative modules that innerHTML your HTML are
-		a hacky way to be sure that any mixins in included style
-		modules are ready before any elements that reference them are
-		instantiated, otherwise the CSS @apply mixin polyfill won't be
-		able to expand the underlying CSS custom properties.
-		See: https://github.com/Polymer/polymer-modulizer/issues/154
-		-->
+		<link rel="stylesheet" href="/node_modules/@brightspace-ui/core/components/demo/styles.css" type="text/css">
+		<script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+		<script type="module">
+			import '@brightspace-ui/core/components/demo/demo-page.js';
+			import '../components/d2l-all-assessments.js';
+		</script>
 	</head>
-	<body class="d2l-typography">
-		<script type="module">
-const $_documentContainer = document.createElement('template');
+	<script>
+		window.demo = true;
+	</script>
+	<body unresolved>
+		<d2l-demo-page page-title="d2l-all-assessments">
 
-$_documentContainer.innerHTML = `<custom-style include="d2l-typography">
-			<style is="custom-style" include="d2l-typography"></style>
-		</custom-style>`;
+			<h2>With Activities</h2>
 
-document.body.appendChild($_documentContainer.content);
-</script>
-		<script type="module">
-const $_documentContainer = document.createElement('template');
-
-$_documentContainer.innerHTML = `<style>
-			d2l-all-assessments {
-				display: block;
-				height: 100%;
-				box-shadow: 1px 1px 10px gray;
-				padding: 10px;
-			}
-		</style>`;
-
-document.body.appendChild($_documentContainer.content);
-</script>
-	</head>
-	<body unresolved class="d2l-typography">
-		<script type="module">
-const $_documentContainer = document.createElement('template');
-
-$_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments-demo">
-			<template strip-whitespace="">
-				<d2l-all-assessments user-url="[[userUrl]]" get-token="[[getToken]]" flags="[[flags]]"></d2l-all-assessments>
-			</template>
-		</dom-module>`;
-
-document.body.appendChild($_documentContainer.content);
-import '@polymer/polymer/polymer-legacy.js';
-import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
-Polymer({
-	is: 'd2l-all-assessments-demo',
-	properties: {
-		userUrl: {
-			type: String,
-			value: ''
-		},
-		getToken: {
-			type: Function,
-			value: function() {
-				return function() {
-					return Promise.resolve('');
-				};
-			}
-		},
-		flags: {
-			type: Object,
-			value: {
-				assignmentDetailsEnabled: true,
-				discussionDetailsEnabled: true
-			}
-		}
-	}
-});
-</script>
-<script>
-const $_documentContainer = document.createElement('template');
-
-$_documentContainer.innerHTML = `<div>
-			<h2>All Assessments</h2>
-			<demo-snippet>
+			<d2l-demo-snippet>
 				<template>
-					<d2l-all-assessments-demo user-url="data/user.withactivities.json">
-					</d2l-all-assessments-demo>
+					<d2l-all-assessments
+						href="./data/user.withactivities.json"
+						token="does-not-matter-here"
+						current-time="2016-07-01T00:00:00.000Z"
+						start-date="2016-07-01T00:00:00.000Z"
+						end-date="2016-07-15T00:00:00.000Z"
+					></d2l-all-assessments>
 				</template>
-			</demo-snippet>
-		</div>`;
+			</d2l-demo-snippet>
 
-document.body.appendChild($_documentContainer.content);
-</script>
+			<h2>Without Activities</h2>
+
+			<d2l-demo-snippet>
+				<template>
+					<d2l-all-assessments
+						href="./data/user.noactivities.json"
+						token="does-not-matter-here"
+						current-time="2016-07-01T00:00:00.000Z"
+						start-date="2016-07-01T00:00:00.000Z"
+						end-date="2016-07-15T00:00:00.000Z"
+					></d2l-all-assessments>
+				</template>
+			</d2l-demo-snippet>
+
+		</d2l-demo-page>
+
 	</body>
 </html>

@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangPtBehavior = {
 		"viewAllAssignments": "Exibir todos os trabalhos"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangPtBehavior['pt'];

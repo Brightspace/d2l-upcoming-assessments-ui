@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangZhTWBehavior = {
 		"viewAllAssignments": "檢視所有作業"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangZhTWBehavior['zh-TW'];

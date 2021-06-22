@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangTrBehavior = {
 		"viewAllAssignments": "Tüm çalışmaları görüntüle"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangTrBehavior['tr'];

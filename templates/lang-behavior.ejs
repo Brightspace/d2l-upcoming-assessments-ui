@@ -9,3 +9,5 @@ window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
 window.D2L.UpcomingAssessments.Lang<%- data.properLang %>Behavior = {
 	'<%- data.lang %>': <%- data.resources %>
 };
+
+export default window.D2L.UpcomingAssessments.Lang<%- data.properLang %>Behavior['<%- data.lang %>'];

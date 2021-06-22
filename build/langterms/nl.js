@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangNlBehavior = {
 		"viewAllAssignments": "Al het werk weergeven"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangNlBehavior['nl'];

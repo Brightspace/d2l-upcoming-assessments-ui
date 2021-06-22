@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangFrBehavior = {
 		"viewAllAssignments": "Afficher tous les travaux"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangFrBehavior['fr'];

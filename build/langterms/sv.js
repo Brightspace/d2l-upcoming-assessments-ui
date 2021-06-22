@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangSvBehavior = {
 		"viewAllAssignments": "Visa alla jobb"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangSvBehavior['sv'];

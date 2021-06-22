@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangKoBehavior = {
 		"viewAllAssignments": "모든 작업 보기"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangKoBehavior['ko'];

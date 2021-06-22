@@ -32,3 +32,5 @@ window.D2L.UpcomingAssessments.LangDadkBehavior = {
 		"viewAllAssignments": "Se alle opgaver"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangDadkBehavior['da-dk'];

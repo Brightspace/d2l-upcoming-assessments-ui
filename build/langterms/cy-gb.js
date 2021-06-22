@@ -34,3 +34,5 @@ window.D2L.UpcomingAssessments.LangCygbBehavior = {
 		"viewAllAssignments": "Gweld pob darn o waith"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangCygbBehavior['cy-gb'];

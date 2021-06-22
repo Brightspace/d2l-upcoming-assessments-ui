@@ -25,9 +25,15 @@
         }
     ],
     "links":[
-       {
+        {
             "rel": [
                 "https://activities.api.brightspace.com/rels/my-activities"
+            ],
+            "href": "/demo/data/activities/user/170.json"
+        },
+        {
+            "rel": [
+                "https://activities.api.brightspace.com/rels/my-activities#empty"
             ],
             "href": "/demo/data/activities/user/170.json"
         }
