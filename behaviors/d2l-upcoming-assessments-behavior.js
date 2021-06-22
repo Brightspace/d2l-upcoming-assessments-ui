@@ -16,9 +16,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		userUrl: String,
 		getToken: {
 			type: Object,
-			value: function() {
-				return null;
-			}
+			value: () => null
 		},
 		_showError: {
 			type: Boolean,
@@ -27,9 +25,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		_firstName: String,
 		_allActivities: {
 			type: Array,
-			value: function() {
-				return [];
-			}
+			value: () => [],
 		},
 		_previousPeriodUrl: String,
 		_nextPeriodUrl: String,
@@ -37,9 +33,9 @@ var upcomingAssessmentsBehaviorImpl = {
 		_periodEnd: String
 	},
 
-	_getOrganizationRequest: function(userActivityUsage, getToken, userUrl, abortSignal) {
-		var organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
-		return this._fetchEntityWithToken({
+	_getOrganizationRequest: async function(userActivityUsage, getToken, userUrl, abortSignal) {
+		const organizationLink = (userActivityUsage.getLinkByRel(Rels.organization) || {}).href;
+		return await this._fetchEntityWithToken({
 			link: organizationLink,
 			userLink: userUrl,
 			getToken: getToken,
@@ -50,12 +46,12 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_findActivityHref: function(userActivityUsage) {
-		for (var i = 0; i < this._allTypes.length; i++) {
-			var activityRel = (this._types[this._allTypes[i]] || {}).activityRel;
+		for (let i = 0; i < this._allTypes.length; i++) {
+			const activityRel = (this._types[this._allTypes[i]] || {}).activityRel;
 			if (!activityRel) {
 				continue;
 			}
-			var link = userActivityUsage.getLinkByRel(activityRel);
+			const link = userActivityUsage.getLinkByRel(activityRel);
 			if (link) {
 				return link.href;
 			}
@@ -63,20 +59,23 @@ var upcomingAssessmentsBehaviorImpl = {
 		return '';
 	},
 
-	_getActivityRequest: function(userActivityUsage, getToken, userUrl) {
-		var activityLink = this._findActivityHref(userActivityUsage);
-		return Promise.resolve(this._fetchEntityWithToken(activityLink, getToken, userUrl))
-			.catch(function(err) {
-				var status = typeof err === 'number' ? err : err && err.status;
-				if (typeof status === 'number' && status >= 400 && status < 500) {
-					return null;
-				}
-				throw err;
-			});
+	_getActivityRequest: async function(userActivityUsage, getToken, userUrl) {
+		const activityLink = this._findActivityHref(userActivityUsage);
+		try {
+			const activity = await this._fetchEntityWithToken(activityLink, getToken, userUrl);
+			return activity;
+		} catch (err) {
+			const status = typeof err === 'number' ? err : err && err.status;
+			if (typeof status === 'number' && status >= 400 && status < 500) {
+
+				return null;
+			}
+			throw err;
+		}
 	},
 
 	_getInstructions: function(type, activity) {
-		var item = this._types[type];
+		const item = this._types[type];
 		if (!item) {
 			return '';
 		}
@@ -97,7 +96,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_getActivityStatus: function(type, userActivityUsage, overdueUserUsages) {
-		var item = this._types[type];
+		const item = this._types[type];
 		if (!item) {
 			return '';
 		}
@@ -114,7 +113,7 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* Returns an object that contains the information required to populate an assessment list item
 	*/
-	_getUserActivityUsagesInfos: function(
+	_getUserActivityUsagesInfos: async function(
 		userActivityUsages,
 		overdueUserActivityUsages,
 		getToken,
@@ -125,81 +124,66 @@ var upcomingAssessmentsBehaviorImpl = {
 			return;
 		}
 
-		var requests = [];
+		const overdueUserUsages = this._concatActivityUsageTypes(overdueUserActivityUsages);
+		const supportedUserUsages = this._concatActivityUsageTypes(userActivityUsages);
 
-		var overdueUserUsages = this._concatActivityUsageTypes(overdueUserActivityUsages);
-		var supportedUserUsages = this._concatActivityUsageTypes(userActivityUsages);
+		const requests = supportedUserUsages.map(async(userActivityUsage) => {
+			const organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl, abortSignal);
+			const activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl);
+			const userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
 
-		supportedUserUsages.forEach(function(userActivityUsage) {
-			var organizationRequest = this._getOrganizationRequest.call(this, userActivityUsage, getToken, userUrl, abortSignal);
-			var activityRequest = this._getActivityRequest.call(this, userActivityUsage, getToken, userUrl);
-			var userActivityUsageHref = userActivityUsage.getLinkByRel('self').href;
+			const [activity, organization] = await Promise.all([activityRequest, organizationRequest]);
+			if (!activity) {
+				return null;
+			}
 
-			var request = Promise.all([activityRequest, organizationRequest])
-				.then(function(response) {
-					var activity = response[0];
-					var organization = response[1];
+			const type = this._getActivityType(activity);
+			const statusDetails = this._getActivityStatus(type, userActivityUsage, overdueUserUsages);
+			const info = this._getInstructions(type, activity);
 
-					if (!activity) {
-						return null;
-					}
+			const tier2IconKey = this._getIconSetKey(activity, 'tier2');
 
-					var type = this._getActivityType(activity);
-					var statusDetails = this._getActivityStatus(type, userActivityUsage, overdueUserUsages);
-					var info = this._getInstructions(type, activity);
+			return {
+				name: activity.properties.name || activity.properties.title,
+				courseName: organization.properties.name,
+				info: info,
+				dueDate: statusDetails.dueDateState.dueDate,
+				endDate: statusDetails.endDateState.endDate,
+				statusConfig: statusDetails.statusConfig,
+				type: type,
+				userActivityUsageHref: userActivityUsageHref,
+				isCompleted: statusDetails.completionState.isCompleted,
+				tier2IconKey: tier2IconKey,
+			};
+		});
 
-					var tier2IconKey = this._getIconSetKey(activity, 'tier2');
-
-					return {
-						name: activity.properties.name || activity.properties.title,
-						courseName: organization.properties.name,
-						info: info,
-						dueDate: statusDetails.dueDateState.dueDate,
-						endDate: statusDetails.endDateState.endDate,
-						statusConfig: statusDetails.statusConfig,
-						type: type,
-						userActivityUsageHref: userActivityUsageHref,
-						isCompleted: statusDetails.completionState.isCompleted,
-						tier2IconKey: tier2IconKey,
-					};
-				}.bind(this));
-
-			requests.push(request);
-		}.bind(this));
-
-		return Promise.all(requests)
-			.then(function(responses) {
-				var successResponses = responses.filter(function(response) {
-					return !!response;
-				});
-				if (responses.length && !successResponses.length) {
-					return Promise.reject(new Error('All activity requests failed'));
-				}
-				return successResponses;
-			});
+		const responses = await Promise.all(requests);
+		const successResponses = responses.filter((response) => {
+			return !!response;
+		});
+		if (responses.length && !successResponses.length) {
+			return Promise.reject(new Error('All activity requests failed'));
+		}
+		return successResponses;
 	},
 
-	_getUserActivityUsages: function(userEntity, getToken, userUrl) {
-		var myActivitiesLink = (
+	_getUserActivityUsages: async function(userEntity, getToken, userUrl) {
+		const myActivitiesLink = (
 			userEntity.getLinkByRel(Rels.Activities.myActivitiesEmpty)
 			|| userEntity.getLinkByRel(Rels.Activities.myActivities)
 			|| {}
 		).href;
 
-		var self = this;
-
 		if (myActivitiesLink) {
-			return this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl)
-				.then(function(activitiesEntity) {
-					var customRangeActionHref = self._getCustomRangeAction(activitiesEntity);
+			const activitiesEntity = await this._fetchEntityWithToken(myActivitiesLink, getToken, userUrl);
+			const customRangeActionHref = this._getCustomRangeAction(activitiesEntity);
 
-					return self._fetchEntityWithToken(customRangeActionHref, getToken, userUrl);
-				});
+			return this._fetchEntityWithToken(customRangeActionHref, getToken, userUrl);
 		}
 	},
 
 	_getOverdueActivities: function(activitiesEntity, getToken, userUrl, abortSignal) {
-		var overdueActivitiesLink = (activitiesEntity.getLinkByRel(Rels.Activities.overdue) || {}).href;
+		const overdueActivitiesLink = (activitiesEntity.getLinkByRel(Rels.Activities.overdue) || {}).href;
 
 		if (overdueActivitiesLink) {
 			return this._fetchEntityWithToken({
@@ -217,23 +201,22 @@ var upcomingAssessmentsBehaviorImpl = {
 	},
 
 	_getCustomRangeAction: function(activitiesEntity, dateObj) {
-		var self = this;
-		var date = dateObj || new Date();
+		const date = dateObj || new Date();
 
-		var parameters = self._getCustomDateRangeParameters(date);
-		var action = (activitiesEntity.getActionByName(Actions.activities.selectCustomDateRange) || {});
+		const parameters = this._getCustomDateRangeParameters(date);
+		const action = (activitiesEntity.getActionByName(Actions.activities.selectCustomDateRange) || {});
 
-		return self._createActionUrl(action, parameters);
+		return this._createActionUrl(action, parameters);
 	},
 
 	_getCustomDateRangeParameters: function(selectedDate) {
-		var day = selectedDate.getDay();
-		var startDate = new Date(selectedDate.setDate(selectedDate.getDate() - day));
+		const day = selectedDate.getDay();
+		const startDate = new Date(selectedDate.setDate(selectedDate.getDate() - day));
 		startDate.setHours(0, 0, 0, 0);
-		var start = startDate.toISOString();
-		var twoWeeksFromStart = new Date(startDate.setDate(startDate.getDate() + 13));
+		const start = startDate.toISOString();
+		const twoWeeksFromStart = new Date(startDate.setDate(startDate.getDate() + 13));
 		twoWeeksFromStart.setHours(23, 59, 59, 999);
-		var end = twoWeeksFromStart.toISOString();
+		const end = twoWeeksFromStart.toISOString();
 
 		return {
 			start: start,
@@ -247,9 +230,8 @@ var upcomingAssessmentsBehaviorImpl = {
 
 	_getInfo: function() {
 		this._showError = false;
-		var self = this;
-		var userUrl = this.userUrl;
-		var getToken = this.getToken;
+		const userUrl = this.userUrl;
+		const getToken = this.getToken;
 
 		if (!this.__getInfoRequest) {
 			this.__getInfoRequest = Promise.resolve();
@@ -259,74 +241,68 @@ var upcomingAssessmentsBehaviorImpl = {
 			this.__getInfoAbortController.abort();
 		}
 
-		this.__getInfoRequest = this.__getInfoRequest
-			.then(() => {
+		this.__getInfoRequest = this.__getInfoRequest.then(async() => {
+			try {
 				if (window.AbortController) {
 					this.__getInfoAbortController = new AbortController();
 				}
 
-				return this._fetchEntityWithToken({
+				const userEntity = await this._fetchEntityWithToken({
 					link: userUrl,
 					getToken: getToken,
 					requestInit: {
 						signal: (this.__getInfoAbortController || {}).signal,
 					},
 				});
-			})
-			.then(function(userEntity) {
-				self._firstName = (userEntity.getSubEntityByRel(Rels.firstName) || { properties: {} }).properties.name;
-				var myActivitiesLink = (
+				this._firstName = (userEntity.getSubEntityByRel(Rels.firstName) || { properties: {} }).properties.name;
+				const myActivitiesLink = (
 					userEntity.getLinkByRel(Rels.Activities.myActivitiesEmpty)
 					|| userEntity.getLinkByRel(Rels.Activities.myActivities)
 					|| {}
 				).href;
 
-				return self._fetchEntityWithToken({
+				const activitiesEntity = await this._fetchEntityWithToken({
 					link: myActivitiesLink,
 					userLink: userUrl,
 					getToken: getToken,
 					requestInit: {
-						signal: (self.__getInfoAbortController || {}).signal,
+						signal: (this.__getInfoAbortController || {}).signal,
 					}
 				});
-			})
-			.then(function(activitiesEntity) {
-				self.__activitiesEntity = activitiesEntity;
+				this.__activitiesEntity = activitiesEntity;
 
-				return self._loadActivitiesForPeriod({
+				const activities = await this._loadActivitiesForPeriod({
 					activitiesEntity: activitiesEntity,
 					dateObj: new Date(),
-					abortSignal: (self.__getInfoAbortController || {}).signal,
+					abortSignal: (this.__getInfoAbortController || {}).signal,
 					userUrl: userUrl,
 					getToken: getToken,
 				});
-			})
-			.then(function(activities) {
-				self.__getInfoAbortController = null;
+				this.__getInfoAbortController = null;
 
 				return activities;
-			}, function(e) {
-				self.__getInfoAbortController = null;
+
+			} catch (e) {
+				this.__getInfoAbortController = null;
 
 				if (!(e instanceof Error) || e.name !== 'AbortError') {
-					self._showError = true;
-					self._firstName = null;
+					this._showError = true;
+					this._firstName = null;
 				}
-			});
-
+			}
+		});
 		return this.__getInfoRequest;
 	},
 
-	_loadActivitiesForPeriod: function({
+	_loadActivitiesForPeriod: async function({
 		activitiesEntity,
 		dateObj,
 		abortSignal,
 		getToken,
 		userUrl,
 	}) {
-		var periodUrl = this._getCustomRangeAction(activitiesEntity, dateObj);
-		var self = this;
-		var userActivitiesRequest = this._fetchEntityWithToken({
+		const periodUrl = this._getCustomRangeAction(activitiesEntity, dateObj);
+		const userActivitiesRequest = this._fetchEntityWithToken({
 			link: periodUrl,
 			userLink: userUrl,
 			getToken: getToken,
@@ -334,56 +310,50 @@ var upcomingAssessmentsBehaviorImpl = {
 				signal: abortSignal,
 			},
 		});
-		var overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortSignal);
+		const overdueActivitiesRequest = this._getOverdueActivities(activitiesEntity, getToken, userUrl, abortSignal);
 
-		return Promise.all([userActivitiesRequest, overdueActivitiesRequest])
-			.then(function(activitiesResponses) {
-				var userActivityUsages = activitiesResponses[0];
-				var overdueUserActivityUsages = activitiesResponses[1];
+		const [userActivityUsages, overdueUserActivityUsages] = await Promise.all([userActivitiesRequest, overdueActivitiesRequest]);
+		this._previousPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.previousPeriod) || {}).href;
+		this._nextPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.nextPeriod) || {}).href;
+		this._periodStart = userActivityUsages.properties.start;
+		this._periodEnd = userActivityUsages.properties.end;
 
-				self._previousPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.previousPeriod) || {}).href;
-				self._nextPeriodUrl = (userActivityUsages.getLinkByRel(Rels.Activities.nextPeriod) || {}).href;
-				self._periodStart = userActivityUsages.properties.start;
-				self._periodEnd = userActivityUsages.properties.end;
+		const flattenActivityUsages = this._flattenActivities(userActivityUsages, getToken, userUrl, abortSignal);
+		const flattenOverdueActivityUsages = this._flattenActivities(overdueUserActivityUsages, getToken, userUrl, abortSignal);
+		const [	flattenedActivityUsages, flattenedOverdueActivityUsages] = await Promise.all([
+			flattenActivityUsages,
+			flattenOverdueActivityUsages
+		]);
 
-				var flattenActivityUsages = self._flattenActivities(userActivityUsages, getToken, userUrl, abortSignal);
-				var flattenOverdueActivityUsages = self._flattenActivities(overdueUserActivityUsages, getToken, userUrl, abortSignal);
-				return Promise.all([
-					flattenActivityUsages,
-					flattenOverdueActivityUsages
-				]).then(function(responses) {
-					return self._getUserActivityUsagesInfos(
-						responses[0],
-						responses[1],
-						getToken,
-						userUrl,
-						abortSignal,
-					);
-				});
-			})
-			.then(function(userActivityUsagesInfos) {
-				var activities = self._updateActivitiesInfo(userActivityUsagesInfos, getToken, userUrl);
+		const userActivityUsagesInfos = await this._getUserActivityUsagesInfos(
+			flattenedActivityUsages,
+			flattenedOverdueActivityUsages,
+			getToken,
+			userUrl,
+			abortSignal,
+		);
 
-				self.set('_allActivities', activities);
-				return activities;
-			});
+		const activities = this._updateActivitiesInfo(userActivityUsagesInfos, getToken, userUrl);
+
+		this.set('_allActivities', activities);
+		return activities;
 	},
 
 	_updateActivitiesInfo: function(activities) {
 		activities = activities || [];
 		return activities
-			.filter(function(activity) {
+			.filter((activity) => {
 				return activity.dueDate || activity.endDate;
 			})
-			.sort(function(a, b) {
+			.sort((a, b) => {
 				return (new Date(a.dueDate || a.endDate)) > (new Date(b.dueDate || b.endDate)) ? 1 : -1;
 			});
 	},
 
 	_createActionUrl: function(action, parameters) {
-		var query = {};
+		const query = {};
 		if (action.fields) {
-			action.fields.forEach(function(field) {
+			action.fields.forEach((field) => {
 				if (parameters.hasOwnProperty(field.name)) {
 					query[field.name] = parameters[field.name];
 				} else if (field.value !== undefined) {
@@ -392,7 +362,7 @@ var upcomingAssessmentsBehaviorImpl = {
 			});
 		}
 
-		var queryString = Object.keys(query).map(function(key) {
+		const queryString = Object.keys(query).map((key) => {
 			return key + '=' + query[key];
 		}).join('&');
 
@@ -416,91 +386,87 @@ var upcomingAssessmentsBehaviorImpl = {
 	* Linked subentities are hydrated, and the date restrictions of the
 	* parent content activity are projected onto the child activity when missing.
 	*/
-	_flattenActivities: function(activities, getToken, userUrl, abortSignal) {
-		var activityEntities;
-		var self = this;
+	_flattenActivities: async function(activities, getToken, userUrl, abortSignal) {
+		let activityEntities;
 		if (Array.isArray(activities)) {
 			activityEntities = activities;
 		} else {
 			activityEntities = activities.entities || [];
 		}
-		var supportedActivities = activityEntities
+		const supportedActivities = activityEntities
 			.filter(this._isSupportedType.bind(this))
 			.filter(x => !x.hasClass('broken'));
 
-		var activitiesContext = this._createNormalizedEntityMap(supportedActivities);
-		var flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
-		return self._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortSignal)
-			.then(function(hydratedActivities) {
-				var activitiesMap = activitiesContext.activitiesMap;
-				var parentActivitiesMap = activitiesContext.parentActivitiesMap;
-				var redundantActivities = [];
-				// Normalize activity data prior to deduping; eg, some activities don't
-				// have a due date (surveys), while the content topic can
-				hydratedActivities.forEach(function(activity) {
-					var canonicalActivity = activity;
-					var activitySelfLink = activity.getLinkByRel('self').href;
-					if (parentActivitiesMap.has(activitySelfLink)) {
-						var parentActivity = parentActivitiesMap.get(activitySelfLink);
-						// There are cases where a content topic child activity (eg. a survey activity) doesn't
-						// have the same set of restrictions as the content topic itself. Because we only want to
-						// display one version of the same logical activity, we'll use the child activity,
-						// but ensure it has the superset of data from the content topic (due date).
-						// Since our data model is currently based on the LMS Siren entities,
-						// create and parse a new synthetic entity.
-						if (!activity.hasEntityByClass('due-date') && parentActivity.hasEntityByClass('due-date')) {
-							var parentDueDate = parentActivity.getSubEntityByClass('due-date');
-							// Create new object with updated helper functions
-							canonicalActivity = SirenParse({
-								class: activity.class,
-								rel: activity.rel,
-								properties: activity.properties,
-								entities: [parentDueDate].concat(activity.entities || []),
-								actions: activity.actions,
-								links: activity.links
-							});
-						}
-						// Ensure we only have a single representation of the same logical activity,
-						// preferring the child activity
-						redundantActivities.push(parentActivity.getLinkByRel('self').href);
-					}
-					activitiesMap.set(activitySelfLink, canonicalActivity);
-				});
-				return Array.from(activitiesMap.values())
-					.filter(function(activity) {
-						return !redundantActivities.includes(activity.getLinkByRel('self').href);
+		const activitiesContext = this._createNormalizedEntityMap(supportedActivities);
+		const flattenedActivities = Array.from(activitiesContext.activitiesMap.values());
+		const hydratedActivities = await this._hydrateActivityEntities(flattenedActivities, getToken, userUrl, abortSignal);
+		const activitiesMap = activitiesContext.activitiesMap;
+		const parentActivitiesMap = activitiesContext.parentActivitiesMap;
+		const redundantActivities = [];
+		// Normalize activity data prior to deduping; eg, some activities don't
+		// have a due date (surveys), while the content topic can
+		hydratedActivities.forEach((activity) => {
+			let canonicalActivity = activity;
+			const activitySelfLink = activity.getLinkByRel('self').href;
+			if (parentActivitiesMap.has(activitySelfLink)) {
+				const parentActivity = parentActivitiesMap.get(activitySelfLink);
+				// There are cases where a content topic child activity (eg. a survey activity) doesn't
+				// have the same set of restrictions as the content topic itself. Because we only want to
+				// display one version of the same logical activity, we'll use the child activity,
+				// but ensure it has the superset of data from the content topic (due date).
+				// Since our data model is currently based on the LMS Siren entities,
+				// create and parse a new synthetic entity.
+				if (!activity.hasEntityByClass('due-date') && parentActivity.hasEntityByClass('due-date')) {
+					const parentDueDate = parentActivity.getSubEntityByClass('due-date');
+					// Create new object with updated helper functions
+					canonicalActivity = SirenParse({
+						class: activity.class,
+						rel: activity.rel,
+						properties: activity.properties,
+						entities: [parentDueDate].concat(activity.entities || []),
+						actions: activity.actions,
+						links: activity.links
 					});
+				}
+				// Ensure we only have a single representation of the same logical activity,
+				// preferring the child activity
+				redundantActivities.push(parentActivity.getLinkByRel('self').href);
+			}
+			activitiesMap.set(activitySelfLink, canonicalActivity);
+		});
+		return Array.from(activitiesMap.values())
+			.filter((activity) => {
+				return !redundantActivities.includes(activity.getLinkByRel('self').href);
 			});
 	},
 
 	_createNormalizedEntityMap: function(activityEntities) {
-		var activitiesMap = new Map();
-		var parentActivitiesMap = new Map();
-		var allActivities = [];
-		var self = this;
+		const activitiesMap = new Map();
+		const parentActivitiesMap = new Map();
+		const allActivities = [];
 		activityEntities
 			.map(SirenParse)
-			.forEach(function(activity) {
-				var childActivity = activity.getSubEntityByRel(Rels.Activities.childUserActivityUsage);
+			.forEach((activity) => {
+				let childActivity = activity.getSubEntityByRel(Rels.Activities.childUserActivityUsage);
 				if (childActivity) {
 					// @NOTE: Possible bug in node-siren-parser means linked subentities don't have
 					// helper functions, so, re-parse if so.
 					if (childActivity.href) {
-						var childActivityHref = childActivity.href; // Save because parsing it in isolation dumps this..
+						const childActivityHref = childActivity.href; // Save because parsing it in isolation dumps this..
 						childActivity = SirenParse(childActivity);
 						childActivity.href = childActivityHref;
 					}
-					var childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
+					const childSelfLink = childActivity.href || (childActivity.getLinkByRel('self') || {}).href;
 					parentActivitiesMap.set(childSelfLink, activity);
-					if (self._isSupportedType(childActivity)) {
+					if (this._isSupportedType(childActivity)) {
 						allActivities.push(childActivity);
 					}
 				}
 				allActivities.push(activity);
 			});
 		// Dedupe activities, preferring already-hydrated version of any entities
-		allActivities.forEach(function(activityEntity) {
-			var selfLink = (activityEntity.getLinkByRel('self') || {}).href
+		allActivities.forEach((activityEntity) => {
+			const selfLink = (activityEntity.getLinkByRel('self') || {}).href
 				|| activityEntity.href;
 			// Save the entity if it doesn't exist, or the current representation is a linked subentity
 			// (has an href directly on the entity)
@@ -517,19 +483,18 @@ var upcomingAssessmentsBehaviorImpl = {
 	/*
 	* On success, all activities, with linked subentities hydrated
 	*/
-	_hydrateActivityEntities: function(activityEntities, getToken, userUrl, abortSignal) {
-		var self = this;
+	_hydrateActivityEntities: async function(activityEntities, getToken, userUrl, abortSignal) {
 		// Already-complete entities
-		var hydratedActivities = activityEntities
-			.filter(function(entity) {
+		const hydratedActivities = activityEntities
+			.filter(entity => {
 				return !entity.href;
 			});
-		var activityPromises = activityEntities
-			.filter(function(entity) {
+		const activityPromises = activityEntities
+			.filter(entity => {
 				return entity.href;
 			})
-			.map(function(entity) {
-				return self._fetchEntityWithToken({
+			.map(entity => {
+				return this._fetchEntityWithToken({
 					link: entity.href,
 					userLink: userUrl,
 					getToken: getToken,
@@ -539,16 +504,13 @@ var upcomingAssessmentsBehaviorImpl = {
 				})
 					.then(SirenParse);
 			});
-		return Promise.all(activityPromises)
-			.then(function(entities) {
-				return hydratedActivities.concat(entities);
-			});
+		const entities = await Promise.all(activityPromises);
+		return hydratedActivities.concat(entities);
 	},
 
 	_isSupportedType: function(usage) {
-		var self = this;
-		return this._allTypes.some(function(typeString) {
-			var type = self._types[typeString];
+		return this._allTypes.some(typeString => {
+			const type = this._types[typeString];
 			if (usage.hasClass(type.userActivityUsageClass)) {
 				return type.usagePredicate
 					? type.usagePredicate(usage)
