@@ -15,8 +15,8 @@ window.D2L.UpcomingAssessments.LangEsesBehavior = {
 		"activityExempted": "Exento",
 		"activityOverdue": "Atrasadas",
 		"assignment": "Tarea",
-		"closeSimpleOverlayText": "Volver al panel",
-		"closeSimpleOverlayTextMobile": "Panel de",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Contenido",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Debate",
@@ -29,6 +29,7 @@ window.D2L.UpcomingAssessments.LangEsesBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} no tiene ningún trabajo que entregar durante este periodo.",
 		"noUpcomingAssessments": "{userName} no tiene ningún trabajo que entregar en las próximas dos semanas.",
 		"quiz": "Cuestionario",
+		"survey": "Survey",
 		"today": "Hoy",
 		"tomorrow": "Mañana",
 		"viewAllAssignments": "Ver todos los trabajos"

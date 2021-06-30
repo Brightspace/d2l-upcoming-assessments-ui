@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangJaBehavior = {
 		"activityExempted": "免除",
 		"activityOverdue": "期限切れ",
 		"assignment": "課題",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "コンテンツ",
 		"currentPeriod": "{startDate}～{endDate}",
 		"discussion": "ディスカッション",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangJaBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} さんには、この期間に期限を迎える学習がありません。",
 		"noUpcomingAssessments": "{userName} さんには、2 週間以内に期限を迎える学習がありません。",
 		"quiz": "クイズ",
+		"survey": "Survey",
 		"today": "今日",
 		"tomorrow": "明日",
 		"viewAllAssignments": "すべての学習の表示"

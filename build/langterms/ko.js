@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangKoBehavior = {
 		"activityExempted": "면제됨",
 		"activityOverdue": "기한 경과",
 		"assignment": "과제",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "콘텐츠",
 		"currentPeriod": "{startDate}일 ~ {endDate}일",
 		"discussion": "토론",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangKoBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} 님에게는 이 기간이 기한인 작업이 없습니다.",
 		"noUpcomingAssessments": "{userName} 님에게는 기한이 2주 이내인 작업이 없습니다.",
 		"quiz": "퀴즈",
+		"survey": "Survey",
 		"today": "오늘",
 		"tomorrow": "내일",
 		"viewAllAssignments": "모든 작업 보기"

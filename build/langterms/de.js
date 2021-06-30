@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangDeBehavior = {
 		"activityExempted": "Ausgenommen",
 		"activityOverdue": "Überfällig",
 		"assignment": "Übung",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Inhalt",
 		"currentPeriod": "{startDate} – {endDate}",
 		"discussion": "Diskussion",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangDeBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} hat in diesem Zeitraum keine fälligen Übungen.",
 		"noUpcomingAssessments": "{userName} hat in den nächsten zwei Wochen keine fälligen Übungen.",
 		"quiz": "Test",
+		"survey": "Survey",
 		"today": "Heute",
 		"tomorrow": "Morgen",
 		"viewAllAssignments": "Alle Arbeiten anzeigen"

@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangFrfrBehavior = {
 		"activityExempted": "Dispensé",
 		"activityOverdue": "En retard",
 		"assignment": "Devoir",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Contenu",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Discussion",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangFrfrBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} n’a pas de travail prévu pour cette période.",
 		"noUpcomingAssessments": "{userName} n’a pas de travail prévu dans les 2 prochaines semaines.",
 		"quiz": "Questionnaire",
+		"survey": "Survey",
 		"today": "Aujourd’hui",
 		"tomorrow": "Demain",
 		"viewAllAssignments": "Afficher tout le travail"

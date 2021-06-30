@@ -50,6 +50,7 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 	render() {
 		return html`
 			<d2l-input-date
+				label="${this.localize('chooseDate')}"
 				value="${this.startDate}"
 				@change="${this._onDateChanged}"
 			></d2l-input-date>

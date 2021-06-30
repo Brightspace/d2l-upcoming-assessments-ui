@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangDadkBehavior = {
 		"activityExempted": "Undtaget",
 		"activityOverdue": "Forsinket",
 		"assignment": "Opgave",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Indhold",
 		"currentPeriod": "{startDate} – {endDate}",
 		"discussion": "Diskussion",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangDadkBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} har ingen opgaver med forfaldsdato i dette tidsrum.",
 		"noUpcomingAssessments": "{userName} har ingen opgaver med forfaldsdato de næste to uger.",
 		"quiz": "Eksamination",
+		"survey": "Survey",
 		"today": "I dag",
 		"tomorrow": "I morgen",
 		"viewAllAssignments": "Se alle opgaver"

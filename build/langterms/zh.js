@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangZhBehavior = {
 		"activityExempted": "已免除",
 		"activityOverdue": "过期",
 		"assignment": "作业",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "内容",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "讨论",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangZhBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} 无任何在此时间段到期的作业。",
 		"noUpcomingAssessments": "{userName} 在未来 2 周内无任何到期的作业。",
 		"quiz": "测验",
+		"survey": "Survey",
 		"today": "今天",
 		"tomorrow": "明天",
 		"viewAllAssignments": "查看所有作业"

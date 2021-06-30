@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangEsBehavior = {
 		"activityExempted": "Eximido",
 		"activityOverdue": "Vencido",
 		"assignment": "Asignación",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Contenido",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Debate",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangEsBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} no tiene ningún trabajo que entregar durante este período.",
 		"noUpcomingAssessments": "{userName} no tiene ningún trabajo que entregar en las próximas dos semanas.",
 		"quiz": "Cuestionario",
+		"survey": "Survey",
 		"today": "Hoy",
 		"tomorrow": "Mañana",
 		"viewAllAssignments": "Ver todos los trabajos"

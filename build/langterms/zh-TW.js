@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangZhTWBehavior = {
 		"activityExempted": "免修",
 		"activityOverdue": "逾期",
 		"assignment": "作業",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "內容",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "討論",
@@ -27,6 +29,7 @@ window.D2L.UpcomingAssessments.LangZhTWBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} 在現階段沒有任何將要截止的作業。",
 		"noUpcomingAssessments": "{userName} 在接下來 2 週沒有任何將要截止的作業。",
 		"quiz": "測驗",
+		"survey": "Survey",
 		"today": "今天",
 		"tomorrow": "明天",
 		"viewAllAssignments": "檢視所有作業"
