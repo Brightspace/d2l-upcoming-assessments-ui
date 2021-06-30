@@ -1,5 +1,3 @@
-/* global describe, it, fixture, expect, beforeEach, sinon */
-
 describe('<d2l-all-assessments-list-item>', function() {
 	var element;
 

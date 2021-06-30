@@ -11,12 +11,12 @@ window.D2L.UpcomingAssessments = window.D2L.UpcomingAssessments || {};
 */
 var statusBadgeBehaviorImpl = {
 	properties: {},
-	_completeState: {text: 'activityComplete', state: 'success'},
-	_endedState: {text: 'activityEnded', state: 'null'},
-	_exemptedState: {text: 'activityExempted', state: 'success'},
-	_overdueState: {text: 'activityOverdue', state: 'alert'},
-	_dueTodayState: {text: 'activityDueToday', state: 'default'},
-	_endsTodayState: {text: 'activityEndsToday', state: 'default'},
+	_completeState: { text: 'activityComplete', state: 'success' },
+	_endedState: { text: 'activityEnded', state: 'null' },
+	_exemptedState: { text: 'activityExempted', state: 'success' },
+	_overdueState: { text: 'activityOverdue', state: 'alert' },
+	_dueTodayState: { text: 'activityDueToday', state: 'default' },
+	_endsTodayState: { text: 'activityEndsToday', state: 'default' },
 
 	_createStatusConfig: function(isCompleted, isEnded, isExempt, isOverdue, isDueToday, endsToday) {
 		var statusConfig = null;

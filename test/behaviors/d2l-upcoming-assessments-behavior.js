@@ -1,5 +1,3 @@
-/* global describe, it, expect, fixture, beforeEach, afterEach, sinon */
-
 import SirenParse from 'siren-parser';
 import './d2l-upcoming-assessments-behavior-consumer.js';
 
@@ -736,7 +734,7 @@ describe('d2l upcoming assessments behavior', function() {
 		permutations = addPermutations(permutations, 'endsToday');
 
 		permutations.forEach(function(permutation) {
-			var {isCompleted, isDueToday, isOverdue, isEnded, isExempt, endsToday} = permutation;
+			var { isCompleted, isDueToday, isOverdue, isEnded, isExempt, endsToday } = permutation;
 			var testName = `when activity is ${isCompleted ? '' : 'not'} completed`
 					+ ` and is ${isDueToday ? '' : 'not'} due today`
 					+ ` and is ${isOverdue ? '' : 'not'} overdue`
