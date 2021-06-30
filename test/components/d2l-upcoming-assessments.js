@@ -1,5 +1,3 @@
-/* global describe, it, fixture, expect, beforeEach, afterEach, sinon */
-
 'use strict';
 
 describe('<d2l-upcoming-assessments>', function() {

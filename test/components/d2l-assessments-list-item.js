@@ -1,5 +1,3 @@
-/* global describe, it, fixture, expect */
-
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 describe('<d2l-assessments-list-item>', function() {

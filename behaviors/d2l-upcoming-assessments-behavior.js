@@ -354,7 +354,7 @@ var upcomingAssessmentsBehaviorImpl = {
 		const query = {};
 		if (action.fields) {
 			action.fields.forEach((field) => {
-				if (parameters.hasOwnProperty(field.name)) {
+				if (parameters.hasOwnProperty(field.name)) { // eslint-disable-line no-prototype-builtins
 					query[field.name] = parameters[field.name];
 				} else if (field.value !== undefined) {
 					query[field.name] = field.value;

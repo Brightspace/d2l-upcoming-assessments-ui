@@ -1,5 +1,3 @@
-/* global describe, it, fixture, expect, beforeEach */
-
 'use strict';
 
 describe('<d2l-date-dropdown>', function() {

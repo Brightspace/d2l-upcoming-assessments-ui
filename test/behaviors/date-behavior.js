@@ -1,5 +1,3 @@
-/* global describe, it, expect, fixture, beforeEach, expect */
-
 'use strict';
 
 describe('date behavior', function() {

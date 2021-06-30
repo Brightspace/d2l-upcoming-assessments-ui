@@ -1,5 +1,3 @@
-/* global describe, it, fixture, expect, beforeEach */
-
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
 

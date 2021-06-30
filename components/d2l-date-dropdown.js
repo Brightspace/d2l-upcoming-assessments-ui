@@ -200,7 +200,7 @@ Polymer({
 		if (!useShadow) {
 			this.dispatchEvent(new CustomEvent(
 				'focus',
-				{bubbles: true, composed: false}
+				{ bubbles: true, composed: false }
 			));
 		}
 	}
