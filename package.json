@@ -17,12 +17,11 @@
   "scripts": {
     "build": "gulp build",
     "start": "web-dev-server --node-resolve --watch --open demo/",
-    "test": "npm run test:lint:js && npm run test:lint:wc && npm run test:wct",
-    "test:local": "npm run test:lint:js && npm run test:lint:wc && npm run test:wct:local",
-    "test:lint:js": "eslint . --ext .js,.html",
-    "test:lint:wc": "polymer lint",
+    "test": "npm run test:lint && npm run test:wct",
+    "test:local": "npm run test:lint && npm run test:wct:local",
+    "test:lint": "eslint . --ext .js,.html",
     "test:wct": "polymer test -p",
-    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test -p --skip-plugin sauce"
+    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test --skip-plugin sauce"
   },
   "author": "D2L Corporation",
   "license": "Apache-2.0",
