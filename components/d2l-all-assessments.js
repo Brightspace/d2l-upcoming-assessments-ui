@@ -1,4 +1,5 @@
 import { css, html, LitElement } from 'lit-element';
+import { ifDefined } from 'lit-html/directives/if-defined';
 import '@brightspace-ui/core/components/inputs/input-date';
 import '@brightspace-ui/core/components/colors/colors';
 import '@brightspace-ui/core/components/typography/typography';
@@ -51,7 +52,7 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 		return html`
 			<d2l-input-date
 				label="${this.localize('chooseDate')}"
-				value="${this.startDate}"
+				value="${ifDefined(this.startDate)}"
 				@change="${this._onDateChanged}"
 			></d2l-input-date>
 
@@ -65,9 +66,9 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 				overdue-group-by-days=14
 				overdue-day-limit=84
 				upcoming-week-limit=2
-				current-time="${this.currentTime}"
-				start-date="${this.startDate}"
-				end-date="${this.endDate}"
+				current-time="${ifDefined(this.currentTime)}"
+				start-date="${ifDefined(this.startDate)}"
+				end-date="${ifDefined(this.endDate)}"
 				user-url="${this.href}"
 			></d2l-w2d-collections>
 		`;

@@ -17,11 +17,12 @@
   "scripts": {
     "build": "gulp build",
     "start": "web-dev-server --node-resolve --watch --open demo/",
-    "test": "npm run test:lint && npm run test:wct",
-    "test:local": "npm run test:lint && npm run test:wct:local",
-    "test:lint": "eslint . --ext .js,.html",
-    "test:wct": "polymer test -p",
-    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test --skip-plugin sauce"
+    "test": "npm run test:lint && npm run test:wct && npm run test:wtr",
+    "test:local": "npm run test:lint && npm run test:wct:local && npm run test:wtr",
+    "test:lint": "eslint . --ext .js,.html && lit-analyzer \"{components,demo,test}/**/*.js\" --strict --rules.no-unknown-tag-name off",
+    "test:wct": "polymer test",
+    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test --skip-plugin sauce",
+    "test:wtr": "web-test-runner test/**/*.test.js --node-resolve"
   },
   "author": "D2L Corporation",
   "license": "Apache-2.0",
@@ -32,6 +33,7 @@
     "@babel/eslint-parser": "^7.14.7",
     "@polymer/iron-demo-helpers": "^3.1.0",
     "@web/dev-server": "^0.1.17",
+    "@web/test-runner": "^0.13.13",
     "@webcomponents/webcomponentsjs": "^2.5.0",
     "cross-env": "^7.0.3",
     "del": "^6.0.0",
@@ -44,6 +46,7 @@
     "gulp-cli": "^2.3.0",
     "gulp-ejs": "^5.1.0",
     "gulp-rename": "^2.0.0",
+    "lit-analyzer": "^1.2.1",
     "merge-stream": "^2.0.0",
     "polymer-cli": "^1.9.11",
     "require-dir": "^1.2.0",

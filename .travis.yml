@@ -4,8 +4,7 @@ node_js:
 addons:
   chrome: stable
 before_script:
-- npm run test:lint:js
-- npm run test:lint:wc
+- npm run test:lint
 script:
 - set -e
 - polymer test --skip-plugin sauce
