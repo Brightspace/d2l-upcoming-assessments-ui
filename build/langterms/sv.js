@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangSvBehavior = {
 		"activityExempted": "Undantagen",
 		"activityOverdue": "Försenad",
 		"assignment": "Uppgift",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Innehåll",
 		"currentPeriod": "{startDate} – {endDate}",
 		"discussion": "Diskussion",
@@ -27,8 +29,11 @@ window.D2L.UpcomingAssessments.LangSvBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} har ingen uppgift med förfallodatum inom denna tidsram.",
 		"noUpcomingAssessments": "{userName} har inga uppgifter med förfallodatum inom de närmaste två veckorna.",
 		"quiz": "Förhör",
+		"survey": "Survey",
 		"today": "Idag",
 		"tomorrow": "Imorgon",
 		"viewAllAssignments": "Visa alla jobb"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangSvBehavior['sv'];

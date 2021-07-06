@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangFrONBehavior = {
 		"activityExempted": "Exempté",
 		"activityOverdue": "En retard",
 		"assignment": "Tâche",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Contenu",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Discussion",
@@ -27,8 +29,11 @@ window.D2L.UpcomingAssessments.LangFrONBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} n'a aucun tâche à remettre durant cette période.",
 		"noUpcomingAssessments": "{userName} n'a aucun tâche à remettre au cours des deux prochaines semaines.",
 		"quiz": "Questionnaire",
+		"survey": "Survey",
 		"today": "Aujourd’hui",
 		"tomorrow": "Demain",
 		"viewAllAssignments": "Afficher tous les travaux"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangFrONBehavior['fr-ON'];

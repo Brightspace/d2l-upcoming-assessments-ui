@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangPtBehavior = {
 		"activityExempted": "Isento",
 		"activityOverdue": "Atraso",
 		"assignment": "Atividade",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Conteúdo",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Discussão",
@@ -27,8 +29,11 @@ window.D2L.UpcomingAssessments.LangPtBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} não tem nenhum trabalho para entregar nesse intervalo de tempo.",
 		"noUpcomingAssessments": "{userName} não tem nenhum trabalho para entregar nas próximas 2 semanas.",
 		"quiz": "Questionário",
+		"survey": "Survey",
 		"today": "Hoje",
 		"tomorrow": "Amanhã",
 		"viewAllAssignments": "Exibir todos os trabalhos"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangPtBehavior['pt'];

@@ -1,167 +1,96 @@
-/**
-	`d2l-all-assessments`
-	A Widget for viewing all assessments
+import { css, html, LitElement } from 'lit-element';
+import { ifDefined } from 'lit-html/directives/if-defined';
+import '@brightspace-ui/core/components/inputs/input-date';
+import '@brightspace-ui/core/components/colors/colors';
+import '@brightspace-ui/core/components/typography/typography';
+import { LocalizeDynamicMixin } from '@brightspace-ui/core/mixins/localize-dynamic-mixin';
+import { HypermediaStateMixin, observableTypes } from '@brightspace-hmc/foundation-engine/framework/lit/HypermediaStateMixin';
+import '@brightspace-hmc/foundation-components/features/workToDo/d2l-w2d-collections';
 
-	@demo demo/d2l-all-assessments.html
-*/
-/*
-  FIXME(polymer-modulizer): the above comments were extracted
-  from HTML and may be out of place here. Review them and
-  then delete this comment!
-*/
-import '@polymer/polymer/polymer-legacy.js';
+const rel = Object.freeze({
+	myActivities: 'https://activities.api.brightspace.com/rels/my-activities#empty',
+});
 
-import 'd2l-colors/d2l-colors.js';
-import 'd2l-typography/d2l-typography-shared-styles.js';
-import '../behaviors/d2l-upcoming-assessments-behavior.js';
-import '../behaviors/date-behavior.js';
-import '../behaviors/localize-behavior.js';
-import './d2l-all-assessments-list.js';
-import './d2l-assessments-list.js';
-import './d2l-date-dropdown.js';
-import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
-const $_documentContainer = document.createElement('template');
+class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitElement)) {
+	static get properties() {
+		return {
+			currentTime: { type: String, attribute: 'current-time' },
+			startDate: { type: String, attribute: 'start-date' },
+			endDate: { type: String, attribute: 'end-date' },
+			_myActivitiesHref: { type: String, observable: observableTypes.link, rel: rel.myActivities, prime: true }
+		};
+	}
 
-$_documentContainer.innerHTML = `<dom-module id="d2l-all-assessments">
-	<template strip-whitespace="">
-		<style>
-			.no-assessments-in-time-frame {
-				margin: 0;
-				text-align: center;
-			}
-
-			d2l-all-assessments-list, .no-assessments-in-time-frame, .period-selection-container {
-				padding-top: 40px;
-			}
-
-			.period-selection-container {
+	static get styles() {
+		return [css`
+			:host {
 				display: flex;
 				justify-content: center;
+				margin-top: 10px;
 				margin-bottom: 10px;
-			}
-		</style>
-
-		<div class="period-selection-container">
-			<d2l-date-dropdown current-period-text="[[_currentPeriodText]]" locale="[[locale]]">
-			</d2l-date-dropdown>
-		</div>
-		<template is="dom-if" if="[[_hasActivities(_allActivities)]]">
-			<d2l-all-assessments-list assessment-items="[[_allActivities]]" period-start="[[_periodStart]]" period-end="[[_periodEnd]]" flags="[[flags]]">
-			</d2l-all-assessments-list>
-		</template>
-		<div hidden$="[[_hasActivities(_allActivities)]]" class="no-assessments-in-time-frame">[[_noAssessmentsInThisTimeFrame]]</div>
-	</template>
-</dom-module>`;
-
-document.head.appendChild($_documentContainer.content);
-
-Polymer({
-	is: 'd2l-all-assessments',
-
-	properties: {
-		_noAssessmentsInThisTimeFrame: {
-			type: String,
-			computed: 'localize("noAssessmentsInThisTimeFrame", "userName", _firstName)'
-		},
-		_currentPeriodText: String,
-		flags: {
-			type: Object,
-			value: function() {
-				return {};
-			}
-		},
-		locale: String
-	},
-
-	behaviors: [
-		window.D2L.UpcomingAssessments.UpcomingAssessmentsBehavior,
-		window.D2L.UpcomingAssessments.DateBehavior,
-		window.D2L.UpcomingAssessments.LocalizeBehavior
-	],
-
-	listeners: {
-		'd2l-date-dropdown-value-changed': '_onDateValueChanged'
-	},
-
-	observers: [
-		'_onApiConfigChanged(userUrl, getToken)'
-	],
-
-	_debounceTime: 20,
-
-	_onApiConfigChanged: function() {
-		this.debounce('getAllAssessmentsInfo', this._getAllAssessmentsInfo, this._debounceTime);
-	},
-
-	_getAllAssessmentsInfo: function() {
-		if (this.__dateChangeAbortController) {
-			this.__dateChangeAbortController.abort();
-		}
-
-		this._resetData();
-		this._getInfo()
-			.then(this._formatPeriodText.bind(this));
-	},
-
-	_hasActivities: function(activities) {
-		return activities && activities.length > 0;
-	},
-
-	_onDateValueChanged: function(e) {
-		if (e.detail.date) {
-			if (this.__dateChangeAbortController) {
-				this.__dateChangeAbortController.abort();
+				flex-direction: column;
 			}
 
-			if (!this.__dateChangeActivityLoadRequest) {
-				this.__dateChangeActivityLoadRequest = Promise.resolve();
+			d2l-input-date {
+				align-self: center;
 			}
-
-			this.__dateChangeActivityLoadRequest = this.__dateChangeActivityLoadRequest
-				.then(() => {
-					this.__dateChangeAbortController = new AbortController();
-
-					return this._loadActivitiesForPeriod({
-						activitiesEntity: this.__activitiesEntity,
-						dateObj: e.detail.date,
-						abortSignal: (this.__dateChangeAbortController || {}).signal,
-						getToken: this.getToken,
-						userUrl: this.userUrl,
-					});
-				})
-				.then(this._formatPeriodText.bind(this))
-				.then(() => {
-					this.__dateChangeAbortController = null;
-				}, (e) => {
-					this.__dateChangeAbortController = null;
-
-					if (!(e instanceof Error) || e.name !== 'AbortError') {
-						this._showError = true;
-						this._firstName = null;
-					}
-				});
-
-			return this.__dateChangeActivityLoadRequest;
-		}
-	},
-
-	_formatPeriodText: function() {
-		var startDateDate = new Date(this._periodStart);
-		var endDateDate = new Date(this._periodEnd);
-
-		var startDateString = this.formatDate(startDateDate, { format: 'monthDay' });
-		var endDateString;
-		if (startDateDate && endDateDate && (startDateDate.getMonth() === endDateDate.getMonth())) {
-			endDateString = endDateDate.getDate();
-		} else {
-			endDateString = this.formatDate(endDateDate, { format: 'monthDay' });
-		}
-
-		this._currentPeriodText = this.localize('currentPeriod', 'startDate', startDateString, 'endDate', endDateString);
-	},
-
-	_resetData: function() {
-		this._currentPeriodText = null;
-		this._upcomingAssessmentsBehaviour_resetData();
+		`];
 	}
-});
+
+	constructor() {
+		super();
+		this._setDates(new Date());
+	}
+
+	static get localizeConfig() {
+		return {
+			importFunc: async lang => (await import(`../build/langterms/${lang}.js`)).default
+		};
+	}
+
+	render() {
+		return html`
+			<d2l-input-date
+				label="${this.localize('chooseDate')}"
+				value="${ifDefined(this.startDate)}"
+				@change="${this._onDateChanged}"
+			></d2l-input-date>
+
+			<d2l-w2d-collections
+				href="${this._myActivitiesHref}"
+				.token="${this.token}"
+				?skeleton="${!this._loaded}"
+				allow-unclickable-activities
+				use-first-name
+				group-by-days=14
+				overdue-group-by-days=14
+				overdue-day-limit=84
+				upcoming-week-limit=2
+				current-time="${ifDefined(this.currentTime)}"
+				start-date="${ifDefined(this.startDate)}"
+				end-date="${ifDefined(this.endDate)}"
+				user-url="${this.href}"
+			></d2l-w2d-collections>
+		`;
+	}
+
+	_onDateChanged(e) {
+		if (e.target.value) {
+			this._setDates(new Date(e.target.value));
+		}
+	}
+
+	_setDates(selectedDate) {
+		const dayOfWeek = selectedDate.getDay();
+		const beginningOfWeek = new Date(selectedDate.setDate(selectedDate.getDate() - dayOfWeek));
+		beginningOfWeek.setHours(0, 0, 0, 0);
+		this.startDate = beginningOfWeek.toISOString();
+		this.currentTime = beginningOfWeek.toISOString();
+
+		const endOfWeekAfter = new Date(beginningOfWeek.setDate(beginningOfWeek.getDate() + 12));
+		endOfWeekAfter.setHours(23, 59, 59, 999);
+		this.endDate = endOfWeekAfter.toISOString();
+	}
+}
+
+customElements.define('d2l-all-assessments', D2LAllAssessments);

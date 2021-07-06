@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangTrBehavior = {
 		"activityExempted": "Muaf",
 		"activityOverdue": "Süresi Dolmuş",
 		"assignment": "Ödev",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "İçerik",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Tartışma",
@@ -27,8 +29,11 @@ window.D2L.UpcomingAssessments.LangTrBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} adlı kullanıcıya ait bu zaman çerçevesinde süresi dolan herhangi bir çalışma bulunmuyor.",
 		"noUpcomingAssessments": "{userName} adlı kullanıcıya ait önümüzdeki 2 hafta içinde süresi dolan herhangi bir çalışma bulunmuyor.",
 		"quiz": "Sınav",
+		"survey": "Survey",
 		"today": "Bugün",
 		"tomorrow": "Yarın",
 		"viewAllAssignments": "Tüm çalışmaları görüntüle"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangTrBehavior['tr'];

@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangArBehavior = {
 		"activityExempted": "معفى",
 		"activityOverdue": "تم تجاوز تاريخ الاستحقاق",
 		"assignment": "الفرض",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "المحتوى",
 		"currentPeriod": "{startDate}‏ - {endDate}‏",
 		"discussion": "المناقشة",
@@ -27,8 +29,11 @@ window.D2L.UpcomingAssessments.LangArBehavior = {
 		"noAssessmentsInThisTimeFrame": "ليس لـ {userName} أي عمل مستحق لهذا الإطار الزمني.",
 		"noUpcomingAssessments": "ليس لـ {userName} أي عمل مستحق في الأسبوعَين المقبلَين.",
 		"quiz": "الاختبار",
+		"survey": "Survey",
 		"today": "اليوم",
 		"tomorrow": "غدًا",
 		"viewAllAssignments": "عرض كل العمل"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangArBehavior['ar'];

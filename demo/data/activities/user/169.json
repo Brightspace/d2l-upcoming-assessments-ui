@@ -16,7 +16,8 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-07-06T23:00:00.000Z"
+                        "date": "2017-07-06T23:00:00.000Z",
+                        "localizedDate": "2017-07-06T23:00:00.000"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -50,7 +51,7 @@
                     "rel": [
                         "self"
                     ],
-                    "href": "not-used-dont-bother"
+                    "href": "data/activities/assignment4/usages/123.json"
                 },
                 {
                     "rel": [
@@ -87,7 +88,8 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-07-07T23:00:00.000Z"
+                        "date": "2017-07-07T23:00:00.000Z",
+                        "localizedDate": "2017-07-07T23:00:00.000"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -121,7 +123,7 @@
                     "rel": [
                         "self"
                     ],
-                    "href": "not-used-dont-bother"
+                    "href": "data/activities/assignment2/usages/123.json"
                 },
                 {
                     "rel": [
@@ -158,7 +160,8 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-07-12T23:00:00.000Z"
+                        "date": "2017-07-12T23:00:00.000",
+                        "localizedDate": "2017-07-12T23:00:00.000"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -170,7 +173,7 @@
                     "rel": [
                         "self"
                     ],
-                    "href": "not-used-dont-bother"
+                    "href": "data/activities/assignment3/usages/123.json"
                 },
                 {
                     "rel": [
@@ -207,7 +210,8 @@
                         "due-date"
                     ],
                     "properties": {
-                        "date": "2017-07-13T23:00:00.000Z"
+                        "date": "2017-07-13T23:00:00.000Z",
+                        "localizedDate": "2017-07-13T23:00:00.000"
                     },
                     "rel": [
                         "https://api.brightspace.com/rels/date"
@@ -219,7 +223,7 @@
                     "rel": [
                         "self"
                     ],
-                    "href": "not-used-dont-bother"
+                    "href": "data/activities/assignment1/usages/123.json"
                 },
                 {
                     "rel": [
@@ -260,6 +264,36 @@
                   "name": "end",
                   "type": "text",
                   "value": "Sept 16 2017 23:59:59"
+                }
+            ]
+        },
+        {
+            "name": "filter-work-to-do",
+            "method": "GET",
+            "href": "/demo/data/activities/user/169.json",
+            "fields": [
+                {
+                    "type": "text",
+                    "name": "start",
+                    "value": "2016-12-19T23:00:00.000Z"
+                },
+                {
+                    "type": "text",
+                    "name": "end",
+                    "value": "2017-12-25T23:00:00.000Z"
+                },
+                {
+                    "type": "number",
+                    "name": "page"
+                },
+                {
+                    "type": "number",
+                    "name": "pageSize"
+                },
+                {
+                    "type": "checkbox",
+                    "name": "embed",
+                    "value": false
                 }
             ]
         }

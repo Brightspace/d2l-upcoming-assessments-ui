@@ -15,6 +15,8 @@ window.D2L.UpcomingAssessments.LangNlBehavior = {
 		"activityExempted": "Uitgesloten",
 		"activityOverdue": "Achterstallig",
 		"assignment": "Opdracht",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Inhoud",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Discussie",
@@ -27,8 +29,11 @@ window.D2L.UpcomingAssessments.LangNlBehavior = {
 		"noAssessmentsInThisTimeFrame": "{userName} heeft geen werk dat binnen dit tijdskader af moet zijn.",
 		"noUpcomingAssessments": "{userName} heeft geen werk dat in de komende 2 weken af moet zijn.",
 		"quiz": "Test",
+		"survey": "Survey",
 		"today": "Vandaag",
 		"tomorrow": "Morgen",
 		"viewAllAssignments": "Al het werk weergeven"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangNlBehavior['nl'];

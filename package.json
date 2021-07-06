@@ -16,12 +16,13 @@
   },
   "scripts": {
     "build": "gulp build",
-    "test": "npm run test:lint:js && npm run test:lint:wc && npm run test:wct",
-    "test:local": "npm run test:lint:js && npm run test:lint:wc && npm run test:wct:local",
-    "test:lint:js": "eslint . --ext .js,.html",
-    "test:lint:wc": "polymer lint",
-    "test:wct": "polymer test -p",
-    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test -p --skip-plugin sauce"
+    "start": "web-dev-server --node-resolve --watch --open demo/",
+    "test": "npm run test:lint && npm run test:wct && npm run test:wtr",
+    "test:local": "npm run test:lint && npm run test:wct:local && npm run test:wtr",
+    "test:lint": "eslint . --ext .js,.html && lit-analyzer \"{components,demo,test}/**/*.js\" --strict --rules.no-unknown-tag-name off",
+    "test:wct": "polymer test",
+    "test:wct:local": "cross-env LAUNCHPAD_BROWSERS=chrome polymer test --skip-plugin sauce",
+    "test:wtr": "web-test-runner test/**/*.test.js --node-resolve"
   },
   "author": "D2L Corporation",
   "license": "Apache-2.0",
@@ -31,6 +32,8 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
     "@polymer/iron-demo-helpers": "^3.1.0",
+    "@web/dev-server": "^0.1.17",
+    "@web/test-runner": "^0.13.13",
     "@webcomponents/webcomponentsjs": "^2.5.0",
     "cross-env": "^7.0.3",
     "del": "^6.0.0",
@@ -43,6 +46,7 @@
     "gulp-cli": "^2.3.0",
     "gulp-ejs": "^5.1.0",
     "gulp-rename": "^2.0.0",
+    "lit-analyzer": "^1.2.1",
     "merge-stream": "^2.0.0",
     "polymer-cli": "^1.9.11",
     "require-dir": "^1.2.0",
@@ -56,17 +60,21 @@
     "type-detect": "1.0.0"
   },
   "dependencies": {
-    "d2l-localize-behavior": "BrightspaceUI/localize-behavior#semver:^2",
+    "@brightspace-hmc/foundation-components": "BrightspaceHypermediaComponents/foundation-components.git#semver:^0",
+    "@brightspace-hmc/foundation-engine": "BrightspaceHypermediaComponents/foundation-engine.git#semver:^0",
+    "@brightspace-ui/core": "^1.139.4",
+    "@polymer/iron-a11y-keys": "^3.0.1",
+    "@polymer/polymer": "^3.4.1",
     "d2l-colors": "BrightspaceUI/colors#semver:^4",
     "d2l-date-picker": "BrightspaceUI/date-picker#semver:^2",
     "d2l-fetch-siren-entity-behavior": "Brightspace/d2l-fetch-siren-entity-behavior.git#semver:^6",
     "d2l-hypermedia-constants": "Brightspace/d2l-hypermedia-constants#semver:^6",
     "d2l-icons": "BrightspaceUI/icons#semver:^6",
     "d2l-link": "BrightspaceUI/link#semver:^5",
+    "d2l-localize-behavior": "BrightspaceUI/localize-behavior#semver:^2",
     "d2l-status-indicator": "BrightspaceUI/status-indicator#semver:^3",
     "d2l-typography": "BrightspaceUI/typography#semver:^7",
-    "@polymer/iron-a11y-keys": "^3.0.1",
-    "@polymer/polymer": "^3.4.1",
+    "lit-element": "^2.5.1",
     "siren-parser": "^8.4.0"
   }
 }

@@ -15,8 +15,8 @@ window.D2L.UpcomingAssessments.LangCygbBehavior = {
 		"activityExempted": "Wedi’i eithrio",
 		"activityOverdue": "Yn hwyr",
 		"assignment": "Aseiniad",
-		"closeSimpleOverlayText": "Yn ôl i’r Dangosfwrdd",
-		"closeSimpleOverlayTextMobile": "Dangosfwrdd",
+		"checklistItem": "Checklist Item",
+		"chooseDate": "Choose Date:",
 		"content": "Cynnwys",
 		"currentPeriod": "{startDate} - {endDate}",
 		"discussion": "Trafodaeth",
@@ -29,8 +29,11 @@ window.D2L.UpcomingAssessments.LangCygbBehavior = {
 		"noAssessmentsInThisTimeFrame": "Does gan {userName} ddim unrhyw waith yn ddyledus ar gyfer y cyfnod amser hwn.",
 		"noUpcomingAssessments": "Does gan {userName} ddim unrhyw waith yn ddyledus yn y pythefnos nesaf.",
 		"quiz": "Cwis",
+		"survey": "Survey",
 		"today": "Heddiw",
 		"tomorrow": "Yfory",
 		"viewAllAssignments": "Gweld pob darn o waith"
 }
 };
+
+export default window.D2L.UpcomingAssessments.LangCygbBehavior['cy-gb'];
