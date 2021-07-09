@@ -17,7 +17,9 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 			currentTime: { type: String, attribute: 'current-time' },
 			startDate: { type: String, attribute: 'start-date' },
 			endDate: { type: String, attribute: 'end-date' },
-			_myActivitiesHref: { type: String, observable: observableTypes.link, rel: rel.myActivities, prime: true }
+			_initialDateToDisplay: { type: String },
+			_myActivitiesHref: { type: String, observable: observableTypes.link, rel: rel.myActivities, prime: true },
+			_timezoneOffsetMinutes: { type: Number }
 		};
 	}
 
@@ -39,6 +41,9 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 
 	constructor() {
 		super();
+		const now = new Date();
+		this._timezoneOffsetMinutes = now.getTimezoneOffset();
+		this._initialDateToDisplay = now.toISOString();
 		this._setDates(new Date());
 	}
 
@@ -52,7 +57,7 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 		return html`
 			<d2l-input-date
 				label="${this.localize('chooseDate')}"
-				value="${ifDefined(this.startDate)}"
+				value="${ifDefined(this._initialDateToDisplay)}"
 				@change="${this._onDateChanged}"
 			></d2l-input-date>
 
@@ -81,14 +86,34 @@ class D2LAllAssessments extends LocalizeDynamicMixin(HypermediaStateMixin(LitEle
 	}
 
 	_setDates(selectedDate) {
-		const dayOfWeek = selectedDate.getDay();
-		const beginningOfWeek = new Date(selectedDate.setDate(selectedDate.getDate() - dayOfWeek));
-		beginningOfWeek.setHours(0, 0, 0, 0);
+		// The date selector provides us with a datetime of midnight UTC of the selected day - but
+		// really, the user thinks they're selecting a datetime of midnight of the selected day in
+		// their local timezone. Because of this, we need to add their offset to this datetime so
+		// that we're still dealing in UTC datetimes, but that have been shifted by their local
+		// offset.
+		const localSelectedDate = new Date(selectedDate);
+		localSelectedDate.setMinutes(localSelectedDate.getMinutes() + this._timezoneOffsetMinutes);
+
+		// Note that getDay/getDate return the day of the week/month in the local timezone, not in
+		// UTC. However, because we've already shifted this Date object by the offset above, the
+		// day of the week is what you'd expect here (e.g. if the user selected a Sunday, dayOfWeek
+		// will be zero).
+		const dayOfWeek = localSelectedDate.getDay();
+		const dayOfMonth = localSelectedDate.getDate();
+		const beginningOfWeek = new Date(
+			localSelectedDate.getFullYear(),
+			localSelectedDate.getMonth(),
+			dayOfMonth - dayOfWeek
+		);
 		this.startDate = beginningOfWeek.toISOString();
 		this.currentTime = beginningOfWeek.toISOString();
 
-		const endOfWeekAfter = new Date(beginningOfWeek.setDate(beginningOfWeek.getDate() + 12));
-		endOfWeekAfter.setHours(23, 59, 59, 999);
+		const endOfWeekAfter = new Date(
+			beginningOfWeek.getFullYear(),
+			beginningOfWeek.getMonth(),
+			beginningOfWeek.getDate() + 13,
+			23, 59, 59, 999
+		);
 		this.endDate = endOfWeekAfter.toISOString();
 	}
 }
