@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/Brightspace/upcoming-assessments-ui#readme",
   "name": "d2l-upcoming-assessments",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "main": "index.js",
   "directories": {
     "test": "test"
