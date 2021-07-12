@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
+    "@open-wc/testing": "^2.5.33",
     "@polymer/iron-demo-helpers": "^3.1.0",
     "@web/dev-server": "^0.1.17",
     "@web/test-runner": "^0.13.13",
